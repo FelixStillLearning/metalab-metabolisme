@@ -1,0 +1,35 @@
+# Dependensi
+node_modules/
+
+# Hasil build
+dist/
+
+# Pengujian
+coverage/
+test-results/
+playwright-report/
+blob-report/
+
+# Variabel lingkungan
+.env
+.env.*
+!.env.example
+
+# Log
+*.log
+npm-debug.log*
+
+# Sistem operasi
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.swp
+
+# Vite
+*.local
