@@ -1,6 +1,6 @@
 # Spesifikasi Isi Soal
 
-Dokumen ini menjadi acuan isi untuk setiap episode: butir soal buku, bentuk interaksi di media, jawaban, dan halaman buku. Jawaban mengikuti kunci jawaban guru Biologi SMA Negeri 16 Bandung. Bila buku dan kunci berbeda, media mengikuti kunci, dan perbedaannya ditulis di bagian Selisih buku dan kunci.
+Dokumen ini menjadi acuan isi untuk setiap episode: butir soal buku, bentuk interaksi di media, jawaban, dan halaman buku. Jawaban mengikuti kunci jawaban guru Biologi SMA Negeri 16 Bandung. Bila buku dan kunci berbeda, media mengikuti kunci.
 
 Sumber:
 
@@ -157,37 +157,6 @@ Tabel 1.11 (usulan tim, perlu divalidasi guru karena tidak ada di kunci):
 | Hasil sampingan    | 2 NADH, 2 ATP  | 2 NADH, 2 CO₂            | 6 NADH, 2 FADH₂, 2 ATP | 12 H₂O             |
 | ATP yang terbentuk | 2 (bersih)     | 0                        | 2                      | 34                 |
 
-Isi tiap sel diambil dari rumusan pengertian setiap tahap di buku (hal. 20, 22, 25, 28). Jumlah ATP: 2 + 0 + 2 + 34 = 38. Tabel buku hal. 28 menulis 8, 6, dan 24 ATP karena NADH dan FADH₂ ikut dihitung di tahap asalnya; media memakai ATP yang benar-benar terbentuk di setiap tahap, dan perbedaannya dijelaskan di panduan guru.
+Isi tiap sel diambil dari rumusan pengertian setiap tahap di buku (hal. 20-21, 22, 25, 28). Jumlah ATP: 2 + 0 + 2 + 34 = 38.
 
 Urutan butir di episode ini mengikuti alur: g (mengumpulkan NADH dan FADH₂) lebih dulu, lalu a-d, i, e, f dan h, j, dan 1.11. Semua butir tetap ada.
-
-## Selisih buku dan kunci
-
-| Hal                                         | Buku                          | Kunci guru (dipakai media) |
-| ------------------------------------------- | ----------------------------- | -------------------------- |
-| Tahap dekarboksilasi oksidatif              | 2 tahap (hal. 22)             | 3 tahap                    |
-| Tahap siklus Krebs                          | 5 tahap utama (hal. 24)       | 8 tahap                    |
-| Letak H₂O, ATP, NADH, FADH₂ di siklus Krebs | Mengikuti 5 tahap             | Mengikuti 8 tahap          |
-| Suasana siklus Krebs                        | Anaerob (hal. 25)             | Aerobik                    |
-| Hasil glikolisis                            | 2 asam piruvat, 2 ATP, 2 NADH | Ditambah 2 H₂O             |
-
-Bagan siklus Krebs di media digambar ulang dari Gambar 1.18 dan dilengkapi isositrat, suksinil KoA, dan fumarat.
-
-## Kekeliruan buku yang tidak diikuti
-
-- Hal. 14: panah reaksi respirasi (b) diberi label "Klorofil".
-- Hal. 19, Gambar 1.14: "Fase Investigasi Energi"; yang benar investasi.
-- Hal. 24-25: tahap (d) melompati fumarat, dan tahap (e) menyebut reaksi isomerase, padahal malat dioksidasi oleh dehidrogenase.
-- Hal. 25: FADH₂ disebut mengikat "elektron (H²⁺) dan proton (e⁻)"; istilahnya tertukar.
-- Hal. 28: "24H⁺ mendonorkan elektronnya ke oksigen"; elektron berasal dari NADH dan FADH₂, sedangkan H⁺ adalah proton.
-
-## Catatan untuk panduan guru
-
-- Nilai 3 ATP per NADH dan 2 ATP per FADH₂ (total 38 ATP) adalah nilai klasik yang dipakai buku. Literatur terbaru memakai sekitar 2,5 dan 1,5, sehingga totalnya sekitar 30-32 ATP.
-- Perbedaan jumlah tahap antara buku dan media (lihat Selisih buku dan kunci).
-- Urutan butir pada Episode 4.
-
-## Hal yang perlu dikonfirmasi ke guru
-
-- Isi tabel 1.11.
-- Kartu oksigen di tabel 1.6: "anabolisme tidak memerlukan oksigen bebas" tidak berlaku untuk semua anabolisme, karena kemosintesis bakteri nitrifikasi memakai O₂.
