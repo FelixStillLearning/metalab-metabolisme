@@ -148,15 +148,15 @@ POE:
 
 Tabel 1.11 (usulan tim, perlu divalidasi guru karena tidak ada di kunci):
 
-| Variabel           | Glikolisis     | Dekarboksilasi oksidatif | Siklus Krebs           | Transpor elektron  |
-| ------------------ | -------------- | ------------------------ | ---------------------- | ------------------ |
-| Bahan              | Glukosa        | 2 asam piruvat           | 2 asetil KoA           | 10 NADH, 2 FADH₂   |
-| Tempat             | Sitosol        | Matriks mitokondria      | Matriks mitokondria    | Membran krista     |
-| Oksigen            | Tanpa oksigen  | Memerlukan oksigen       | Memerlukan oksigen     | Memerlukan oksigen |
-| Hasil utama        | 2 asam piruvat | 2 asetil KoA             | 4 CO₂                  | 34 ATP             |
-| Hasil sampingan    | 2 NADH, 2 ATP  | 2 NADH, 2 CO₂            | 6 NADH, 2 FADH₂, 2 ATP | 12 H₂O             |
-| ATP yang terbentuk | 2 (bersih)     | 0                        | 2                      | 34                 |
+| Variabel           | Glikolisis              | Dekarboksilasi oksidatif   | Siklus Krebs               | Transpor elektron          |
+| ------------------ | ----------------------- | -------------------------- | -------------------------- | -------------------------- |
+| Bahan              | Glukosa                 | 2 asam piruvat             | 2 asetil KoA               | 10 NADH, 2 FADH₂           |
+| Tempat             | Sitosol                 | Matriks mitokondria        | Matriks mitokondria        | Membran krista             |
+| Oksigen            | Anaerob (tanpa oksigen) | Aerob (memerlukan oksigen) | Aerob (memerlukan oksigen) | Aerob (memerlukan oksigen) |
+| Hasil              | 2 asam piruvat, 2 ATP   | 2 asetil KoA, 2 CO₂        | 4 CO₂, 2 ATP               | 34 ATP, 12 H₂O             |
+| Pembawa elektron   | 2 NADH                  | 2 NADH                     | 6 NADH, 2 FADH₂            | Dipakai: 10 NADH, 2 FADH₂  |
+| ATP yang terbentuk | 2 (bersih)              | 0                          | 2                          | 34                         |
 
-Isi tiap sel diambil dari rumusan pengertian setiap tahap di buku (hal. 20-21, 22, 25, 28). Jumlah ATP: 2 + 0 + 2 + 34 = 38.
+Isi tiap sel diambil dari rumusan pengertian setiap tahap di buku (hal. 20-21, 22, 25, 28). Jumlah ATP: 2 + 0 + 2 + 34 = 38. Hasil tidak dibagi menjadi hasil utama dan hasil sampingan, karena buku tidak menyebut hasil utama siklus Krebs dan CO₂ adalah zat buangan. Baris pembawa elektron menunjukkan asal 10 NADH dan 2 FADH₂ yang dipakai di transpor elektron.
 
 Urutan butir di episode ini mengikuti alur: g (mengumpulkan NADH dan FADH₂) lebih dulu, lalu a-d, i, e, f dan h, j, dan 1.11. Semua butir tetap ada.
