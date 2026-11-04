@@ -106,7 +106,7 @@ Setiap commit otomatis diperiksa: lint dan format pada berkas yang diubah (lint-
 ## Alur kerja tim
 
 - Branch `main` hanya berisi pekerjaan yang sudah diperiksa.
-- Pekerjaan baru dibuat di branch terpisah dari `main`, misalnya `fitur/beranda` atau `perbaikan/teks-soal-glikolisis`.
+- Pekerjaan baru dibuat di branch terpisah dari `main`. Nama branch memakai awalan yang sama dengan jenis commit, yaitu `feat/`, `fix/`, `docs/`, `chore/`, `refactor/`, atau `test/`, lalu nama singkat dengan huruf kecil dan tanda hubung, misalnya `feat/beranda` atau `fix/teks-soal-glikolisis`.
 - Perubahan masuk ke `main` lewat Pull Request yang diperiksa anggota lain.
 - Pesan commit memakai format Conventional Commits dengan bahasa Indonesia, misalnya `feat(beranda): tambah tombol mulai belajar` atau `fix(poe): perbaiki urutan pilihan alasan`.
 - Satu commit berisi satu perubahan yang utuh.
