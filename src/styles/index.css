@@ -1,1 +1,14 @@
 @import 'tailwindcss';
+@import './tokens.css';
+
+@layer base {
+  body {
+    @apply bg-screen font-body text-paper;
+  }
+
+  h1,
+  h2,
+  h3 {
+    @apply font-head;
+  }
+}
