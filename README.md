@@ -54,7 +54,6 @@ Media dibuka secara daring lewat browser. Di HP, beranda, peta materi, dan Lemba
 
 ```text
 docs/                          dokumentasi tim: arsitektur, konvensi, pengujian
-public/fonts/                  berkas font lokal
 public/audio/                  efek suara dan narasi
 src/app/                       titik masuk aplikasi, router, provider
 src/assets/images/             gambar raster, misalnya maskot

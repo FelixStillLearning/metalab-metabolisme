@@ -1,4 +1,8 @@
 @import 'tailwindcss';
+@import '@fontsource/grandstander/latin-700.css';
+@import '@fontsource/grandstander/latin-800.css';
+@import '@fontsource/atkinson-hyperlegible/latin-400.css';
+@import '@fontsource/atkinson-hyperlegible/latin-700.css';
 @import './tokens.css';
 
 @layer base {
