@@ -1,0 +1,47 @@
+/* Token gaya Kertas komik. Nilai diambil dari prototype desain final.
+   static: semua token tetap ada di hasil build, karena SVG dan animasi memakainya lewat var() dari JS. */
+@theme static {
+  /* Latar layar dan kertas */
+  --color-screen: #2f6f73;
+  --color-screen-2: #3e8580;
+  --color-screen-3: #24595c;
+  --color-ink: #0d2526;
+  --color-paper: #f5f1e8;
+  --color-paper-2: #e9e2d2;
+  --color-paper-3: #ddd4c0;
+  --color-muted: #5b574f;
+  --color-accent: #e3b23c;
+  --color-hot: #e8857a;
+  --color-ok: #cfe6dc;
+
+  /* Molekul */
+  --color-atp: #3f5ba9;
+  --color-adp: #33498a;
+  --color-fosfat: #e3b23c;
+  --color-nad: #e8857a;
+  --color-h2o: #bddbe4;
+
+  --font-head: 'Grandstander', 'Atkinson Hyperlegible', sans-serif;
+  --font-body: 'Atkinson Hyperlegible', system-ui, sans-serif;
+
+  /* Bayangan kertas: tanpa blur untuk kotak, drop-shadow untuk bentuk potong (clip-path) */
+  --shadow-kertas: 4px 7px 0 #0d25265c;
+  --shadow-kertas-sm: 3px 5px 0 #0d25264d;
+  --drop-shadow-kertas: 3px 6px 2px #0d25266b;
+
+  /* Kurva gerak */
+  --ease-keluar: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-pose: cubic-bezier(0.2, 1.18, 0.38, 1);
+  --ease-letup: cubic-bezier(0.2, 1.6, 0.4, 1);
+  --ease-ancang: cubic-bezier(0.55, 0, 0.8, 0.2);
+  --ease-busur: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-kamera: cubic-bezier(0.6, 0, 0.2, 1);
+}
+
+/* Durasi gerak. Tailwind tidak punya kelompok tema durasi; pakai duration-(--durasi-ui). */
+:root {
+  --durasi-ui: 280ms;
+  --durasi-pose: 700ms;
+  --durasi-kamera: 1400ms;
+  --durasi-tenang: 240ms;
+}
