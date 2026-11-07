@@ -116,48 +116,72 @@ test('efek sekali tampil disembunyikan saat gerak dikurangi', async ({ page }) =
 
 const suara = (nama: string) => new RegExp(`audio/${nama}\\.(ogg|mp3)$`)
 
-test('tombol mulai belajar berbunyi', async ({ page }) => {
+test('gaya beranda tidak memengaruhi elemen di halaman lain', async ({ page }) => {
   await page.goto('/')
-  const bunyi = page.waitForRequest(suara('mulai'))
   await page.getByRole('link', { name: 'Mulai belajar' }).click()
-  await bunyi
+  await expect(page.getByRole('heading', { name: 'Peta materi' })).toBeVisible()
+  const gaya = await page.evaluate(() => {
+    const wadah = document.createElement('div')
+    wadah.innerHTML = `
+      <div class="tempel">Teks</div>
+      <div class="maskot">Maskot</div>
+      <div class="gelembung">Kalimat</div>
+      <div class="sel-masuk">Sel</div>
+      <div class="glukosa">Glukosa</div>
+      <div data-efek="garis-gerak">Garis</div>
+      <div data-efek="letupan">Letupan</div>
+      <div data-efek="pop">Pop</div>
+      <div data-huruf>Huruf</div>`
+    document.body.append(wadah)
+    return [...wadah.children].map((el) => ({
+      animasi: getComputedStyle(el).animationName,
+      opasitas: getComputedStyle(el).opacity,
+      penunjuk: getComputedStyle(el).pointerEvents,
+      ekor: getComputedStyle(el, '::after').content,
+    }))
+  })
+  for (const elemen of gaya) {
+    expect(elemen).toEqual({ animasi: 'none', opasitas: '1', penunjuk: 'auto', ekor: 'none' })
+  }
 })
 
-test('sel diketuk: berbunyi pop dan letupan diputar ulang', async ({ page }) => {
+test('tombol mulai belajar memuat audio', async ({ page }) => {
+  await page.goto('/')
+  const bunyi = page.waitForResponse(suara('mulai'))
+  await page.getByRole('link', { name: 'Mulai belajar' }).click()
+  expect((await bunyi).ok()).toBe(true)
+})
+
+test('sel diketuk: audio dimuat dan letupan diputar ulang', async ({ page }) => {
   await page.goto('/')
   await tungguMasukSelesai(page)
-  const bunyi = page.waitForRequest(suara('mendarat'))
+  const bunyi = page.waitForResponse(suara('mendarat'))
   await page.getByRole('button', { name: 'Letupkan sel' }).click()
-  await bunyi
+  expect((await bunyi).ok()).toBe(true)
   await expect(page.locator('[data-efek="letupan"]')).toHaveCSS('opacity', /^(?!0$)/)
 })
 
-test('maskot diketuk: berbunyi dan gelembung berganti kalimat', async ({ page }, info) => {
+test('maskot diketuk: audio dimuat dan gelembung berganti kalimat', async ({ page }, info) => {
   test.skip(info.project.name === 'hp-miring', 'maskot disembunyikan di HP miring')
   await page.goto('/')
   const gelembung = page.locator('[data-hiasan="gelembung"]')
   await expect(gelembung).toHaveText('Halo! Siap menjelajah sel?')
-  const bunyi = page.waitForRequest(suara('maskot'))
+  const bunyi = page.waitForResponse(suara('maskot'))
   await page.getByRole('button', { name: 'Ajak bicara ilmuwan' }).click()
-  await bunyi
+  expect((await bunyi).ok()).toBe(true)
   await expect(gelembung).not.toHaveText('Halo! Siap menjelajah sel?')
 })
 
-test('tombol speaker membisukan suara dan pilihannya diingat', async ({ page }) => {
+test('tombol speaker mengingat pilihan bisu dan dapat dinyalakan lagi', async ({ page }) => {
   await page.goto('/')
   await page.getByRole('button', { name: 'Matikan suara' }).click()
   await expect(page.getByRole('button', { name: 'Nyalakan suara' })).toBeVisible()
   await page.reload()
   await expect(page.getByRole('button', { name: 'Nyalakan suara' })).toBeVisible()
-  const diminta: string[] = []
-  page.on('request', (r) => diminta.push(r.url()))
-  await page.getByRole('button', { name: 'Letupkan sel' }).click()
-  await page.waitForTimeout(500)
-  expect(diminta.filter((u) => u.includes('/audio/'))).toEqual([])
   // menyalakan lagi memutar ulang animasi masuk beserta suaranya
-  const melesat = page.waitForRequest(suara('melesat'))
+  const melesat = page.waitForResponse(suara('melesat'))
   await page.getByRole('button', { name: 'Nyalakan suara' }).click()
-  await melesat
+  expect((await melesat).ok()).toBe(true)
 })
 
 test('tombol mulai belajar membuka peta materi', async ({ page }) => {

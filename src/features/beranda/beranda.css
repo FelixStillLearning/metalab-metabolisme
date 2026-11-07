@@ -7,12 +7,12 @@
    Efek sekali tampil (garis gerak, letupan, POP) bawaannya tidak terlihat,
    jadi saat gerak dikurangi semuanya diam dan efek tidak muncul. */
 
-[data-efek] {
+.beranda [data-efek] {
   opacity: 0;
   pointer-events: none;
 }
 
-.gelembung::after {
+.beranda .gelembung::after {
   content: '';
   position: absolute;
   top: 38%;
@@ -25,55 +25,55 @@
 
 /* Di layar mendatar gelembung berada di kiri maskot, ekornya menunjuk ke kanan */
 @media (orientation: landscape) {
-  .gelembung::after {
+  .beranda .gelembung::after {
     left: auto;
     right: -14px;
     clip-path: polygon(0 0, 100% 55%, 0 100%);
   }
 }
 
-.maskot {
+.beranda .maskot {
   transform-origin: 50% 100%;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .tempel {
-    animation: tempel 520ms var(--ease-letup) var(--tunda, 0ms) backwards;
+  .beranda .tempel {
+    animation: beranda-tempel 520ms var(--ease-letup) var(--tunda, 0ms) backwards;
   }
 
-  .sel-masuk {
-    animation: melesat 800ms var(--ease-keluar) 450ms backwards;
+  .beranda .sel-masuk {
+    animation: beranda-melesat 800ms var(--ease-keluar) 450ms backwards;
   }
 
-  [data-efek='garis-gerak'] {
-    animation: kilas 800ms linear 450ms both;
+  .beranda [data-efek='garis-gerak'] {
+    animation: beranda-kilas 800ms linear 450ms both;
   }
 
-  [data-efek='letupan'] {
-    animation: letup 1200ms var(--ease-letup) var(--tunda, 1150ms) both;
+  .beranda [data-efek='letupan'] {
+    animation: beranda-letup 1200ms var(--ease-letup) var(--tunda, 1150ms) both;
   }
 
-  [data-efek='pop'] {
+  .beranda [data-efek='pop'] {
     opacity: 1;
   }
 
-  [data-huruf] {
+  .beranda [data-huruf] {
     opacity: 0;
-    animation: huruf 1500ms var(--ease-letup) var(--tunda) both;
+    animation: beranda-huruf 1500ms var(--ease-letup) var(--tunda) both;
   }
 
-  .glukosa {
+  .beranda .glukosa {
     animation:
-      tempel 520ms var(--ease-letup) var(--tunda) backwards,
+      beranda-tempel 520ms var(--ease-letup) var(--tunda) backwards,
       melayang var(--durasi) ease-in-out calc(var(--tunda) + 520ms) infinite alternate;
   }
 
-  .maskot {
-    animation: muncul 700ms var(--ease-pose) 1600ms backwards;
+  .beranda .maskot {
+    animation: beranda-muncul 700ms var(--ease-pose) 1600ms backwards;
   }
 }
 
-@keyframes tempel {
+@keyframes beranda-tempel {
   from {
     opacity: 0;
     scale: 0.6;
@@ -82,7 +82,7 @@
 }
 
 /* Ancang-ancang di luar layar, melesat, sedikit kebablasan, lalu diam di pose akhir */
-@keyframes melesat {
+@keyframes beranda-melesat {
   0% {
     opacity: 0;
     translate: 45vw -4vh;
@@ -97,7 +97,7 @@
   }
 }
 
-@keyframes kilas {
+@keyframes beranda-kilas {
   15%,
   70% {
     opacity: 0.9;
@@ -109,7 +109,7 @@
   }
 }
 
-@keyframes letup {
+@keyframes beranda-letup {
   0% {
     opacity: 0;
     scale: 0.3;
@@ -130,7 +130,7 @@
   }
 }
 
-@keyframes huruf {
+@keyframes beranda-huruf {
   0% {
     opacity: 0;
     scale: 0.5;
@@ -148,7 +148,7 @@
   }
 }
 
-@keyframes muncul {
+@keyframes beranda-muncul {
   from {
     opacity: 0;
     translate: 0 60%;
