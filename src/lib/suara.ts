@@ -1,10 +1,15 @@
-import { Howl } from 'howler'
+import { Howl, Howler } from 'howler'
 import { usePengaturan } from '../stores/pengaturan'
 
 export type NamaSuara = 'melesat' | 'mendarat' | 'maskot' | 'mulai'
 
 // Berkas dimuat saat pertama kali dibutuhkan; MP3 untuk browser yang tidak mendukung OGG (Safari lama)
 const termuat = new Map<NamaSuara, Howl>()
+
+// Bisu juga berlaku untuk audio yang sedang berjalan atau masih menunggu dimuat.
+Howler.mute(!usePengaturan.getState().suaraAktif)
+const berhentiMemantau = usePengaturan.subscribe(({ suaraAktif }) => Howler.mute(!suaraAktif))
+import.meta.hot?.dispose(berhentiMemantau)
 
 export function putar(nama: NamaSuara) {
   if (!usePengaturan.getState().suaraAktif) return
