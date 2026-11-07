@@ -15,4 +15,8 @@
   h3 {
     @apply font-head;
   }
+
+  :focus-visible {
+    @apply outline-3 outline-offset-2 outline-accent;
+  }
 }

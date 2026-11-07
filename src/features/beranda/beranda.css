@@ -1,0 +1,157 @@
+/* Koreografi gerak komik beranda, berurutan (ms sejak halaman dibuka):
+   0     teks dan tombol ditempel satu per satu
+   450   sel melesat masuk dengan garis gerak, mengerem, memantul
+   1150  sel mendarat: letupan di belakang dan POP! muncul per huruf
+   1300  dua glukosa ditempel lalu melayang
+   1600  maskot muncul dari bawah lalu diam; gelembung menyusul
+   Efek sekali tampil (garis gerak, letupan, POP) bawaannya tidak terlihat,
+   jadi saat gerak dikurangi semuanya diam dan efek tidak muncul. */
+
+[data-efek] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.gelembung::after {
+  content: '';
+  position: absolute;
+  top: 38%;
+  left: -14px;
+  width: 16px;
+  height: 18px;
+  background: var(--color-paper);
+  clip-path: polygon(100% 0, 0 55%, 100% 100%);
+}
+
+/* Di layar mendatar gelembung berada di kiri maskot, ekornya menunjuk ke kanan */
+@media (orientation: landscape) {
+  .gelembung::after {
+    left: auto;
+    right: -14px;
+    clip-path: polygon(0 0, 100% 55%, 0 100%);
+  }
+}
+
+.maskot {
+  transform-origin: 50% 100%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .tempel {
+    animation: tempel 520ms var(--ease-letup) var(--tunda, 0ms) backwards;
+  }
+
+  .sel-masuk {
+    animation: melesat 800ms var(--ease-keluar) 450ms backwards;
+  }
+
+  [data-efek='garis-gerak'] {
+    animation: kilas 800ms linear 450ms both;
+  }
+
+  [data-efek='letupan'] {
+    animation: letup 1200ms var(--ease-letup) var(--tunda, 1150ms) both;
+  }
+
+  [data-efek='pop'] {
+    opacity: 1;
+  }
+
+  [data-huruf] {
+    opacity: 0;
+    animation: huruf 1500ms var(--ease-letup) var(--tunda) both;
+  }
+
+  .glukosa {
+    animation:
+      tempel 520ms var(--ease-letup) var(--tunda) backwards,
+      melayang var(--durasi) ease-in-out calc(var(--tunda) + 520ms) infinite alternate;
+  }
+
+  .maskot {
+    animation: muncul 700ms var(--ease-pose) 1600ms backwards;
+  }
+}
+
+@keyframes tempel {
+  from {
+    opacity: 0;
+    scale: 0.6;
+    rotate: -8deg;
+  }
+}
+
+/* Ancang-ancang di luar layar, melesat, sedikit kebablasan, lalu diam di pose akhir */
+@keyframes melesat {
+  0% {
+    opacity: 0;
+    translate: 45vw -4vh;
+    rotate: 14deg;
+  }
+  12% {
+    opacity: 1;
+  }
+  72% {
+    translate: -2.5vw 0;
+    rotate: -8deg;
+  }
+}
+
+@keyframes kilas {
+  15%,
+  70% {
+    opacity: 0.9;
+    translate: 0 0;
+  }
+  100% {
+    opacity: 0;
+    translate: 8vw 0;
+  }
+}
+
+@keyframes letup {
+  0% {
+    opacity: 0;
+    scale: 0.3;
+    rotate: -20deg;
+  }
+  25% {
+    opacity: 1;
+    scale: 1.05;
+    rotate: 0deg;
+  }
+  75% {
+    opacity: 1;
+    scale: 1;
+  }
+  100% {
+    opacity: 0;
+    scale: 1.08;
+  }
+}
+
+@keyframes huruf {
+  0% {
+    opacity: 0;
+    scale: 0.5;
+    translate: 0 22px;
+  }
+  15%,
+  80% {
+    opacity: 1;
+    scale: 1;
+    translate: 0 0;
+  }
+  100% {
+    opacity: 0;
+    scale: 0.94;
+  }
+}
+
+@keyframes muncul {
+  from {
+    opacity: 0;
+    translate: 0 60%;
+    rotate: 8deg;
+  }
+}
