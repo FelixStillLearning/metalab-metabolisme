@@ -36,6 +36,23 @@
   --ease-ancang: cubic-bezier(0.55, 0, 0.8, 0.2);
   --ease-busur: cubic-bezier(0.65, 0, 0.35, 1);
   --ease-kamera: cubic-bezier(0.6, 0, 0.2, 1);
+
+  /* Animasi kertas. Dipakai dengan motion-safe: agar berhenti saat gerak dikurangi. */
+  --animate-melayang: melayang 6s ease-in-out infinite alternate;
+  --animate-bernapas: bernapas 7s ease-in-out infinite alternate;
+
+  /* Arah gerak diatur per objek lewat --dx dan --dy */
+  @keyframes melayang {
+    to {
+      translate: var(--dx, 0) var(--dy, -10px);
+    }
+  }
+  @keyframes bernapas {
+    to {
+      scale: 1.02;
+      rotate: 1.5deg;
+    }
+  }
 }
 
 /* Durasi gerak. Tailwind tidak punya kelompok tema durasi; pakai duration-(--durasi-ui). */
