@@ -1,4 +1,4 @@
-import { Play, Volume2, VolumeX } from 'lucide-react'
+import { Play } from 'lucide-react'
 import { Fragment, useEffect, useRef, useState, type CSSProperties } from 'react'
 import { Link } from 'react-router'
 import garisGerak from '../../assets/images/efek-garis-gerak.webp'
@@ -10,7 +10,7 @@ import logo from '../../assets/images/logo-metalab.webp'
 import maskot from '../../assets/images/maskot-ilmuwan-melambai.webp'
 import sel from '../../assets/images/sel-hewan.webp'
 import { bolehBersuaraSendiri, putar, type NamaSuara } from '../../lib/suara'
-import { usePengaturan } from '../../stores/pengaturan'
+import TombolSuara from '../../components/TombolSuara'
 import './beranda.css'
 
 const gambarLatar = { '--latar': `url("${latar}")`, '--latar-hp': `url("${latarHp}")` }
@@ -54,25 +54,6 @@ function useSuaraMasuk(putaran: number) {
   }, [putaran])
 }
 
-function TombolSuara({ saatDinyalakan }: { saatDinyalakan: () => void }) {
-  const aktif = usePengaturan((s) => s.suaraAktif)
-  const aturSuara = usePengaturan((s) => s.aturSuara)
-  const Ikon = aktif ? Volume2 : VolumeX
-  return (
-    <button
-      type="button"
-      aria-label={aktif ? 'Matikan suara' : 'Nyalakan suara'}
-      onClick={() => {
-        aturSuara(!aktif)
-        if (!aktif) saatDinyalakan()
-      }}
-      className="absolute top-4 right-4 z-30 grid size-12 place-items-center rounded-full bg-paper text-ink shadow-kertas-sm transition-transform duration-(--durasi-ui) ease-pose hover:-translate-y-0.5 active:translate-y-0.5"
-    >
-      <Ikon aria-hidden="true" className="size-6" />
-    </button>
-  )
-}
-
 // Ukuran di layar mendatar dibatasi tinggi layar juga, supaya HP miring 800x360 tetap muat tanpa menggulir.
 function Beranda() {
   // putaran: animasi masuk diputar ulang; ulangPop: letupan sel; ketukan: kalimat maskot
@@ -107,7 +88,7 @@ function Beranda() {
       style={gaya(gambarLatar)}
       className="beranda relative isolate grid min-h-dvh grid-cols-1 content-start gap-6 overflow-hidden bg-screen bg-(image:--latar-hp) bg-cover bg-center bg-no-repeat px-4 py-6 landscape:grid-cols-[6fr_5fr] landscape:content-center landscape:items-center landscape:gap-x-[4vw] landscape:gap-y-[2dvh] landscape:bg-(image:--latar) landscape:px-[7vw] landscape:py-[5dvh]"
     >
-      <TombolSuara saatDinyalakan={putarUlangSemua} />
+      <TombolSuara saatDinyalakan={putarUlangSemua} className="absolute top-4 right-4 z-30" />
       <div key={putaran} className="contents">
         <div className="absolute inset-0 -z-10">
           {PARTIKEL.map(([kiri, atas, ukuran, dx, dy, durasi]) => (
