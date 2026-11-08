@@ -1,0 +1,96 @@
+.peta-materi {
+  background-image: var(--latar-peta-hp);
+  background-size: cover;
+  background-position: center;
+}
+
+.peta-materi .peta-bagian,
+.peta-materi .peta-aerob {
+  display: grid;
+  gap: 20px;
+}
+
+.peta-materi .peta-kertas {
+  border-radius: 3px;
+  background: var(--color-paper);
+  padding: 16px;
+  box-shadow: var(--shadow-kertas-sm);
+}
+
+.peta-materi .peta-pengantar {
+  display: grid;
+  align-content: start;
+  justify-items: start;
+  gap: 8px;
+}
+
+.peta-materi .peta-episode {
+  display: grid;
+  gap: 16px;
+  border-left: 3px dashed var(--color-screen);
+  padding-left: 16px;
+}
+
+.peta-materi .peta-lanjutan {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+@media (min-width: 640px) {
+  .peta-materi {
+    background-image: var(--latar-peta);
+  }
+
+  .peta-materi .peta-episode {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1280px) {
+  .peta-materi .peta-kertas {
+    padding: 20px 16px;
+  }
+
+  .peta-materi .peta-pengantar {
+    gap: 12px;
+  }
+
+  .peta-materi .peta-bagian {
+    grid-template-columns: 160px minmax(0, 1fr) 64px 64px;
+    align-items: stretch;
+  }
+
+  .peta-materi .peta-aerob {
+    grid-template-columns: 180px minmax(0, 1fr);
+  }
+
+  .peta-materi .peta-aerob[data-closed] {
+    grid-template-columns: 1fr;
+  }
+
+  .peta-materi .peta-episode {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    border-left: 0;
+    border-top: 3px dashed var(--color-screen);
+    padding: 16px 0 0;
+  }
+
+  .peta-materi .peta-episode > li {
+    min-height: 300px;
+    overflow-wrap: anywhere;
+  }
+
+  .peta-materi .peta-lanjutan {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: center;
+    padding: 24px 12px;
+  }
+
+  .peta-materi .peta-lanjutan h2,
+  .peta-materi .peta-lanjutan p {
+    writing-mode: vertical-rl;
+  }
+}
