@@ -1,6 +1,6 @@
 import { gsap } from 'gsap'
 import { ArrowLeft, Pause, Play, Settings } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Link } from 'react-router'
 import ikonPutarHp from '../../assets/svg/ui-putar-hp.svg?raw'
 import TombolSuara from '../../components/TombolSuara'
@@ -21,13 +21,18 @@ export type StatusBab = 'selesai' | 'sekarang' | ''
 
 type Props = {
   judul: string
-  label: string
-  ringkasan: string
+  // Sampul hanya tampil bila tidak dimulai langsung
+  label?: string
+  ringkasan?: string
+  gambarSampul?: string
   bab: Bab[]
-  gambarSampul: string
   jalankan: (p: Panggung) => Promise<void>
   // Putar ulang tanpa jeda dari Lembar Hasil: mulai sendiri, soal dijawab otomatis
   otomatis?: boolean
+  // Mulai sendiri tanpa sampul, soal tetap dijawab siswa (mis. peta penutup)
+  langsung?: boolean
+  // Isi di atas adegan, mis. tombol di akhir
+  children?: ReactNode
 }
 
 // Sama dengan media query ajakan putar HP di pemutar-episode.css
@@ -58,8 +63,10 @@ function PemutarEpisode({
   gambarSampul,
   jalankan,
   otomatis = false,
+  langsung = false,
+  children,
 }: Props) {
-  const [mulai, setMulai] = useState(false)
+  const [mulai, setMulai] = useState(otomatis || langsung)
   const [panelBuka, setPanelBuka] = useState(false)
   const babSekarang = usePemutar((s) => s.bab)
   const dijeda = usePemutar((s) => s.dijeda)
@@ -196,8 +203,8 @@ function PemutarEpisode({
 
   // Dipasang setelah pengendali di atas, jadi tiap pemasangan memakai AbortController-nya sendiri
   useEffect(() => {
-    if (!otomatis) return
-    kendali.otomatis = true
+    if (!otomatis && !langsung) return
+    kendali.otomatis = otomatis
     mulaiEpisode()
     // Dimulai saat HP tegak: dijeda sampai siswa memutar HP lalu menekan lanjut
     if (matchMedia(TEGAK).matches) jedaSemua(true)
@@ -206,7 +213,7 @@ function PemutarEpisode({
     }
     // Hanya saat dipasang: mulaiEpisode membaca ref, jadi versi lamanya tetap benar
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [otomatis])
+  }, [otomatis, langsung])
 
   const status = bab.map((_, j): StatusBab =>
     j < babSekarang ? 'selesai' : j === babSekarang ? 'sekarang' : '',
@@ -230,6 +237,7 @@ function PemutarEpisode({
         <PilihanAdegan />
         <LengkapiAdegan />
         <PoeAdegan />
+        {children}
         {!mulai && (
           <div className="pemutar-sampul">
             <div className="pemutar-sampul-gambar">

@@ -117,20 +117,39 @@
   line-height: 1.5;
 }
 
-.pemutar-sampul .tombol-utama {
-  margin-top: 1cqw;
+.pemutar-sampul .tombol-utama,
+.pemutar-akhir .tombol-utama {
   padding: 0.5em 1.6em 0.7em;
   font: 800 clamp(16px, 1.6cqw, 28px) / 1.2 var(--font-head);
   cursor: pointer;
   transition: translate var(--durasi-ui) var(--ease-pose);
 }
 
-.pemutar-sampul .tombol-utama:hover {
+.pemutar-sampul .tombol-utama {
+  margin-top: 1cqw;
+}
+
+.pemutar-sampul .tombol-utama:hover,
+.pemutar-akhir .tombol-utama:hover {
   translate: 0 -4px;
 }
 
-.pemutar-sampul .tombol-utama:active {
+.pemutar-sampul .tombol-utama:active,
+.pemutar-akhir .tombol-utama:active {
   translate: 0 2px;
+}
+
+/* Tombol di akhir adegan, di atas gelembung narator */
+.pemutar-akhir {
+  position: absolute;
+  top: 69%;
+  left: 50%;
+  translate: -50% 0;
+}
+
+.pemutar-akhir .tombol-utama {
+  display: inline-block;
+  text-decoration: none;
 }
 
 .pemutar-kembali {
