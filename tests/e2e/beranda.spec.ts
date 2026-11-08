@@ -224,3 +224,13 @@ test('tombol mulai belajar memakai gambar tombol utama', async ({ page }) => {
   })
   expect(ok).toBe(true)
 })
+
+test('gelembung maskot beranda sejajar kepala', async ({ page }, info) => {
+  test.skip(info.project.name === 'hp-miring', 'maskot disembunyikan di HP miring')
+  await page.goto('/')
+  await tungguMasukSelesai(page)
+  const maskot = (await page.locator('[data-hiasan="maskot"]').boundingBox())!
+  const gelembung = (await page.locator('[data-hiasan="gelembung"]').boundingBox())!
+  expect(gelembung.y + gelembung.height / 2).toBeLessThan(maskot.y + maskot.height / 3)
+  expect(gelembung.y + gelembung.height / 2).toBeGreaterThan(maskot.y)
+})

@@ -222,7 +222,7 @@ function Beranda() {
             </div>
           </div>
 
-          <div className="flex items-center gap-4 [@media(orientation:landscape)_and_(max-height:500px)]:hidden landscape:absolute landscape:right-[3vw] landscape:bottom-[3dvh] landscape:z-20 landscape:flex-row-reverse">
+          <div className="flex items-start gap-4 [@media(orientation:landscape)_and_(max-height:500px)]:hidden landscape:absolute landscape:right-[3vw] landscape:bottom-[3dvh] landscape:z-20 landscape:flex-row-reverse">
             <div className="relative">
               <img
                 src={maskot}
@@ -244,7 +244,7 @@ function Beranda() {
                 key={ketukan}
                 data-hiasan="gelembung"
                 style={tunda(ketukan ? 0 : 2100)}
-                className="gelembung tempel relative max-w-[10em] rounded-sm bg-paper px-5 py-3 font-head text-[18px] leading-tight font-extrabold text-ink shadow-kertas landscape:text-[clamp(18px,min(1.9vw,3.4dvh),32px)]"
+                className="gelembung tempel relative max-w-[10em] rounded-sm landscape:mt-[min(3dvh,28px)] bg-paper px-5 py-3 font-head text-[18px] leading-tight font-extrabold text-ink shadow-kertas landscape:text-[clamp(18px,min(1.9vw,3.4dvh),32px)]"
               >
                 {KALIMAT[ketukan % KALIMAT.length]}
               </p>
