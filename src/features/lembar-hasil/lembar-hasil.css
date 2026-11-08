@@ -1,0 +1,396 @@
+/* Lembar Hasil. Susunan dari hasil.css prototype desain final; warna disesuaikan dengan latar
+   kertas krem B08 (prototype memakai layar teal). Versi tabel hanya untuk dicetak guru. */
+
+.hasil-halaman {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  background: var(--color-screen);
+  color: var(--color-ink);
+}
+
+.hasil {
+  width: min(100vw, calc(100dvh * 16 / 9));
+  aspect-ratio: 16 / 9;
+  container-type: inline-size;
+  display: grid;
+  grid-template-columns: 58% 1fr;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 1.3cqw 2cqw;
+  padding: 4.2cqw 5.5cqw 4.2cqw 4cqw;
+  background: url('../../assets/images/latar-hasil.webp') center / 100% 100% no-repeat;
+}
+
+.hasil-kepala {
+  grid-column: 2;
+}
+
+.hasil-bagan {
+  grid-row: 1 / 3;
+  grid-column: 1;
+  display: grid;
+  min-height: 0;
+}
+
+.hasil-bagan > svg {
+  width: 100%;
+  height: 100%;
+}
+
+.hasil-pin-hp {
+  display: none;
+}
+
+.hasil-sisi {
+  display: flex;
+  flex-direction: column;
+  gap: 1.3cqw;
+  min-height: 0;
+  overflow: auto;
+  padding-right: 0.5cqw;
+}
+
+.hasil h1 {
+  margin: 0;
+  font: 800 3cqw/1 var(--font-head);
+  letter-spacing: -0.01em;
+}
+
+.hasil-lead {
+  margin: 0.7cqw 0 0;
+  font-size: max(14px, 1.1cqw);
+  color: var(--color-muted);
+}
+
+.hasil h2 {
+  margin: 0 0 0.4cqw;
+  font: 800 max(14px, 1.15cqw) / 1.3 var(--font-body);
+}
+
+.pair {
+  display: grid;
+  grid-template-columns: auto auto auto 1fr;
+  align-items: end;
+  column-gap: 0.8cqw;
+  padding: 0.9cqw 0;
+  border-top: 1px solid #0d252633;
+}
+
+.pair .q {
+  grid-column: 1 / -1;
+  margin-bottom: 0.4cqw;
+  font-size: max(13px, 1cqw);
+  color: var(--color-muted);
+}
+
+.pair .n {
+  font: 800 2.7cqw/1 var(--font-head);
+}
+
+.pair .n small {
+  display: block;
+  font: 700 max(11px, 0.85cqw) / 1.4 var(--font-body);
+  color: var(--color-muted);
+}
+
+.pair .n.guess {
+  color: var(--color-muted);
+}
+
+.pair .n.guess s {
+  text-decoration-thickness: 0.2cqw;
+}
+
+.pair .n.guess.same {
+  color: var(--color-screen-3);
+}
+
+.pair .n.real {
+  color: var(--color-atp);
+}
+
+.pair .arr {
+  padding-bottom: 1.2cqw;
+  font-size: 1.8cqw;
+  color: var(--color-muted);
+}
+
+.pair .why {
+  align-self: center;
+  font-size: max(13px, 0.95cqw);
+}
+
+/* Kolom penjelasan G13 */
+.hasil textarea {
+  width: 100%;
+  padding: 0.9cqw 1.1cqw;
+  border-image: url('../../assets/images/interaksi-kolom-isian.webp') 30 fill / 10px stretch;
+  color: var(--color-ink);
+  font: 400 max(15px, 1.1cqw) / 1.45 var(--font-body);
+  resize: none;
+  user-select: text;
+}
+
+.hasil-pesan {
+  min-height: 1.4em;
+  margin: 0.3cqw 0 0;
+  font-size: max(13px, 0.95cqw);
+  font-weight: 700;
+  color: var(--color-screen-3);
+}
+
+.hasil-aksi {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7cqw;
+  margin-top: auto;
+}
+
+.hasil-aksi > * {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+  min-height: 44px;
+  padding: 0.5em 1.1em;
+  font: 700 max(13px, 0.95cqw) / 1.2 var(--font-body);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.hasil-aksi svg {
+  width: 1.15em;
+  height: 1.15em;
+  flex: none;
+}
+
+/* Tombol kedua: tombol pilihan G04 */
+.hasil-tombol {
+  border-image: url('../../assets/images/interaksi-tombol-pilihan.webp') 0 90 0 90 fill / 0 14px
+    stretch;
+  color: var(--color-ink);
+}
+
+.hasil-tombol:hover {
+  color: var(--color-atp);
+}
+
+/* Bagan */
+.dg text {
+  fill: var(--color-ink);
+  font-family: var(--font-body);
+}
+
+.dg .lbl {
+  font-size: 17px;
+  font-weight: 700;
+  fill: var(--color-muted);
+}
+
+.dg .pin .k {
+  font: 800 21px/1 var(--font-head);
+}
+
+.dg .pin .a {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.dg .pin .besar {
+  font: 800 44px/1 var(--font-head);
+  fill: var(--color-atp);
+}
+
+.dg .lead-line {
+  fill: none;
+  stroke: #b8862a;
+  stroke-width: 2;
+  stroke-dasharray: 3 5;
+}
+
+.dg .flow {
+  fill: none;
+  stroke: var(--color-screen-3);
+  stroke-width: 5;
+  stroke-linecap: round;
+}
+
+.dg .side {
+  fill: none;
+  stroke: var(--color-screen-3);
+  stroke-width: 3;
+}
+
+.dg .kurung {
+  fill: none;
+  stroke: var(--color-muted);
+  stroke-width: 3;
+}
+
+/* Bagan tergambar dari atas ke bawah, jawaban menempel setelah bagiannya */
+.dg [data-step] {
+  animation: hasil-muncul 450ms ease-out backwards;
+  animation-delay: calc(250ms + var(--i) * 260ms);
+}
+
+@keyframes hasil-muncul {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+.hasil[data-tenang] .dg [data-step] {
+  animation: none;
+}
+
+/* HP (tegak, juga miring): satu kolom yang digulir, latar B08 versi tegak */
+@media (max-width: 760px), (max-height: 500px) {
+  .hasil {
+    width: 100%;
+    aspect-ratio: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 48px 30px 52px;
+    background: none;
+    border-image: url('../../assets/images/latar-hasil-hp.webp') 110 fill / 44px stretch;
+  }
+
+  .hasil-bagan > svg {
+    height: auto;
+  }
+
+  .hasil-lead {
+    margin-top: 8px;
+  }
+
+  .dg .pin .a {
+    display: none;
+  }
+
+  .hasil-pin-hp {
+    display: grid;
+    gap: 6px;
+    margin: 8px 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: 15px;
+    line-height: 1.35;
+  }
+
+  .hasil-pin-hp li {
+    display: grid;
+    grid-template-columns: 26px 1fr;
+    gap: 8px;
+  }
+
+  .hasil-pin-hp b {
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    background: url('../../assets/images/interaksi-pin.webp') center / contain no-repeat;
+    font: 800 15px/1 var(--font-head);
+  }
+
+  .hasil-sisi {
+    gap: 20px;
+    overflow: visible;
+    padding: 0;
+  }
+
+  .hasil h1 {
+    font-size: 30px;
+  }
+
+  .hasil h2,
+  .hasil-lead,
+  .pair .q,
+  .pair .why,
+  .hasil textarea {
+    font-size: 16px;
+  }
+
+  .hasil textarea {
+    padding: 12px;
+  }
+
+  .pair {
+    gap: 10px;
+    padding: 14px 0;
+  }
+
+  .pair .n {
+    font-size: 32px;
+  }
+
+  .pair .arr {
+    font-size: 24px;
+  }
+
+  .pair .n small,
+  .hasil-pesan {
+    font-size: 13px;
+  }
+
+  .pair .why {
+    grid-column: 1 / -1;
+  }
+
+  .hasil-aksi {
+    gap: 12px;
+  }
+
+  .hasil-aksi > * {
+    font-size: 15px;
+  }
+}
+
+/* HP miring: bagan setinggi layar, tidak selebar layar */
+@media (max-height: 500px) and (orientation: landscape) {
+  .hasil-bagan > svg {
+    justify-self: center;
+    width: auto;
+    max-width: 100%;
+    height: 85dvh;
+  }
+}
+
+/* Versi cetak untuk guru */
+.hasil-cetak {
+  display: none;
+}
+
+@media print {
+  body,
+  .hasil-halaman {
+    display: block;
+    min-height: 0;
+    background: #fff;
+    color: #000;
+  }
+
+  .hasil {
+    display: none;
+  }
+
+  .hasil-cetak {
+    display: block;
+    font:
+      12pt/1.4 'Times New Roman',
+      serif;
+  }
+
+  .hasil-cetak table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .hasil-cetak td,
+  .hasil-cetak th {
+    padding: 4px 6px;
+    border: 1px solid #000;
+    text-align: left;
+    vertical-align: top;
+  }
+}

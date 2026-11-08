@@ -1,19 +1,48 @@
-import { ArrowLeft } from 'lucide-react'
-import { Link } from 'react-router'
+import { useLocation, useNavigate } from 'react-router'
+import sel from '../../assets/images/sel-hewan.webp'
+import PemutarEpisode from '../../features/pemutar-episode/PemutarEpisode'
+import { BAB } from './bab'
+import { pembuka } from './pembuka'
+import { soalAB } from './soalAB'
+import { soalC } from './soalC'
+import { soalD } from './soalD'
+import { soalE } from './soalE'
+import { soalG } from './soalG'
+import { soalH } from './soalH'
+import { useJawaban } from '../../stores/jawaban'
+import { usePemutar } from '../../stores/pemutar'
+import type { Panggung } from '../../features/pemutar-episode/mesin'
+
+async function episode(p: Panggung) {
+  useJawaban.getState().mulai()
+  await pembuka(p)
+  const { glu, penanda } = await soalAB(p)
+  const pgal = await soalC(p, glu, penanda)
+  const piruvat = await soalD(p, pgal)
+  await soalE(p, piruvat)
+  await soalG(p, piruvat)
+  await soalH(p, piruvat)
+  // Semua bab selesai; draf putaran ini menjadi hasil tersimpan (putar ulang otomatis tidak menulis)
+  usePemutar.setState({ bab: BAB.length, kalimat: '' })
+  useJawaban.getState().selesaikan()
+}
 
 function Episode1Glikolisis() {
+  const navigate = useNavigate()
+  const otomatis = (useLocation().state as { otomatis?: boolean } | null)?.otomatis === true
   return (
-    <main className="min-h-dvh p-6 sm:p-10">
-      <Link
-        to="/peta-materi"
-        className="mb-8 inline-flex min-h-12 items-center gap-2 rounded-lg bg-paper px-4 py-3 font-head font-extrabold text-ink shadow-kertas-sm hover:bg-paper-2"
-      >
-        <ArrowLeft aria-hidden="true" className="size-5" />
-        Peta materi
-      </Link>
-      <h1 className="text-balance text-4xl font-extrabold">Glikolisis</h1>
-      <p className="mt-4 text-pretty">Materi glikolisis sedang disiapkan.</p>
-    </main>
+    <PemutarEpisode
+      judul="Glikolisis"
+      label="Aktivitas 1.7 · Episode 01"
+      ringkasan="Tonton bagaimana sel memecah glukosa. Videonya berhenti di setiap soal Aktivitas 1.7: kamu menjawab langsung di adegan, lalu videonya berlanjut sesuai pilihanmu."
+      bab={[...BAB]}
+      gambarSampul={sel}
+      otomatis={otomatis}
+      jalankan={async (p) => {
+        await episode(p)
+        if (!p.signal.aborted) navigate('/episode/1/hasil')
+      }}
+    />
   )
 }
 
