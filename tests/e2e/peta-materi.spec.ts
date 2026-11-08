@@ -447,3 +447,36 @@ test('HP miring: kartu utama memakai ikon kecil dan tetap muat setinggi layar', 
   }
   expect(await page.evaluate(() => document.documentElement.scrollHeight <= innerHeight)).toBe(true)
 })
+
+test('membuka kartu 2 tetap menampilkan kartu 1 di kiri pada kedua mode gerak', async ({
+  page,
+}, info) => {
+  test.skip(info.project.name === 'hp-tegak', 'HP tegak memakai susunan menurun')
+  const pengantar = page.getByRole('heading', { name: 'Pengantar', exact: true }).locator('..')
+  const aerob = page.getByRole('button', { name: 'Respirasi Aerob', exact: true })
+  const jalur = page.getByRole('region', { name: 'Jalur materi' })
+  for (const reducedMotion of ['no-preference', 'reduce'] as const) {
+    await page.emulateMedia({ reducedMotion })
+    await page.reload()
+    await tungguGerak(page)
+    await aerob.click()
+    // Termasuk gulir otomatis yang dijadwalkan sesudah akordeon selesai.
+    await page.waitForTimeout(1100)
+    const pertama = (await pengantar.boundingBox())!
+    const kedua = (await aerob.boundingBox())!
+    expect(pertama.x).toBeGreaterThanOrEqual(0)
+    expect(pertama.x + pertama.width).toBeLessThanOrEqual(kedua.x)
+    await expect(jalur).toHaveJSProperty('scrollLeft', 0)
+    await expect(page.getByRole('link', { name: 'Buka Glikolisis' })).toBeInViewport()
+    // Sesudah pengguna menggeser ke episode akhir, menutup lalu membuka tetap kembali ke awal.
+    await jalur.evaluate((el) => {
+      el.scrollLeft = el.scrollWidth
+    })
+    await expect.poll(() => jalur.evaluate((el) => el.scrollLeft)).toBeGreaterThan(0)
+    await page.getByRole('button', { name: 'Tutup episode', exact: true }).click()
+    await expect(page.locator('.peta-laci')).toBeHidden()
+    await aerob.click()
+    await page.waitForTimeout(1100)
+    expect((await pengantar.boundingBox())!.x).toBeGreaterThanOrEqual(0)
+  }
+})
