@@ -19,6 +19,14 @@ test.beforeEach(async ({ page }, info) => {
 })
 
 test('soal a dan b memberi umpan balik dan menyimpan jawaban tanpa skor', async ({ page }) => {
+  await expect(page.locator('[data-petunjuk]')).toHaveText(
+    'Ketuk molekul yang menjadi bahan awal glikolisis.',
+  )
+  await expect(glukosa(page).locator('.pemutar-ajakan')).toBeVisible()
+  await expect(glukosa(page).locator('.pemutar-ajakan')).toHaveCSS(
+    'animation-name',
+    'pemutar-ajakan',
+  )
   await expect(page.locator('[data-molecule="glukosa"] [data-carbon]')).toHaveCount(6)
   await expect(page.locator('[data-molecule="piruvat"] [data-carbon]')).toHaveCount(3)
   await expect(page.locator('[data-molecule="o2"]')).toHaveAttribute('data-oksigen', '2')
@@ -31,6 +39,8 @@ test('soal a dan b memberi umpan balik dan menyimpan jawaban tanpa skor', async 
     page.getByRole('heading', { name: 'Ada berapa tahap utama dalam glikolisis?' }),
   ).toBeVisible()
   expect((await draf(page)).a).toBe('Glukosa (6 atom C)')
+  await expect(page.locator('[data-petunjuk]')).toHaveText('Pilih salah satu jawaban di kartu.')
+  await expect(page.locator('.pemutar-sasaran .pemutar-ajakan')).toHaveCount(0)
   const satu = page.getByRole('button', { name: '1 tahap', exact: true })
   await expect(satu).toHaveCSS('font-family', /Atkinson Hyperlegible/)
   if (await page.evaluate(() => matchMedia('(hover: hover)').matches)) {
@@ -64,6 +74,7 @@ test('soal a dan b memberi umpan balik dan menyimpan jawaban tanpa skor', async 
 test('pilihan bisa memakai keyboard dan tidak terjawab selama jeda', async ({ page }) => {
   await page.getByRole('button', { name: 'Jeda (spasi)' }).click()
   await expect(glukosa(page)).toBeDisabled()
+  await expect(glukosa(page).locator('.pemutar-ajakan')).toHaveCSS('animation-play-state', 'paused')
   expect(await draf(page)).toEqual({})
   await page.getByRole('button', { name: 'Lanjut (spasi)' }).click()
   const piruvat = page.getByRole('button', { name: 'Asam piruvat (3 atom C)', exact: true })
@@ -90,4 +101,19 @@ test('meninggalkan pilihan membatalkan penantian dan membuka ulang dari awal', a
   await expect(page.getByRole('button', { name: 'Mulai episode' })).toBeVisible()
   await expect(glukosa(page)).toHaveCount(0)
   expect(galat).toEqual([])
+})
+
+test('petunjuk interaksi tetap tampil tanpa subtitle, penanda diam pada mode tenang', async ({
+  page,
+}) => {
+  await page.getByRole('button', { name: 'Pengaturan', exact: true }).click()
+  const panel = page.getByRole('dialog', { name: 'Pengaturan' })
+  await panel.getByRole('switch', { name: 'Subtitle', exact: true }).click()
+  await panel.getByRole('switch', { name: 'Mode tenang (animasi dikurangi)', exact: true }).click()
+  await panel.getByRole('button', { name: 'Tutup pengaturan' }).click()
+  await expect(page.locator('[data-petunjuk]')).toBeVisible()
+  await expect(page.locator('[data-gelembung]')).toBeHidden()
+  await expect(glukosa(page).locator('.pemutar-ajakan')).toHaveCSS('animation-name', 'none')
+  await glukosa(page).click()
+  await expect(page.locator('[data-petunjuk]')).toHaveText('Pilih salah satu jawaban di kartu.')
 })

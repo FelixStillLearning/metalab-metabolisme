@@ -7,6 +7,7 @@ import tahapAmati from '../../assets/images/interaksi-tahap-poe-amati.webp'
 import tahapJelaskan from '../../assets/images/interaksi-tahap-poe-jelaskan.webp'
 import tahapTebak from '../../assets/images/interaksi-tahap-poe-tebak.webp'
 import gambarAtp from '../../assets/images/pembawa-atp.webp'
+import tangan from '../../assets/images/interaksi-tangan.webp'
 import { usePemutar } from '../../stores/pemutar'
 
 const GAMBAR_TAHAP = { tebak: tahapTebak, amati: tahapAmati, jelaskan: tahapJelaskan }
@@ -95,9 +96,11 @@ export function PoeAdegan() {
                   style={{ left: `${x / 16}%`, top: `${y / 9}%` }}
                   disabled={dijeda}
                   aria-label={`ATP ${i + 1}${isPlaced ? ` di ${poe.zone.name}` : ''}`}
+                  title={isPlaced ? 'Ketuk untuk mengambil ATP kembali' : 'Ketuk untuk menaruh ATP'}
                   onClick={() => poe.taruhToken(i)}
                 >
                   <img src={gambarAtp} alt="" width={128} height={52} />
+                  {!isPlaced && <img src={tangan} alt="" className="pemutar-ajakan" />}
                 </button>
               )
             })}
@@ -117,8 +120,7 @@ export function PoeAdegan() {
           >
             <h3 id="poe-tebak-judul">{poe.judul}</h3>
             <p>
-              Seret ATP ke {poe.zone.name}, atau ketuk ATP-nya. Sekarang:{' '}
-              <b id="cnt">{poe.placed.length} ATP</b>
+              Sekarang: <b id="cnt">{poe.placed.length} ATP</b>
             </p>
             <p>
               <b>Kenapa?</b>

@@ -7,6 +7,7 @@ import TombolSuara from '../../components/TombolSuara'
 import PengaturVolume from '../../components/PengaturVolume'
 import { musik } from '../../lib/suara'
 import { usePemutar } from '../../stores/pemutar'
+import { usePengaturan } from '../../stores/pengaturan'
 import Gelembung from './Gelembung'
 import { disc, el } from './kertas'
 import { jedaSemua, kendali, obj, type Objek, type Panggung } from './mesin'
@@ -68,6 +69,9 @@ function PemutarEpisode({
 }: Props) {
   const [mulai, setMulai] = useState(otomatis || langsung)
   const [panelBuka, setPanelBuka] = useState(false)
+  const tenang = usePengaturan(
+    (s) => s.tenang ?? matchMedia('(prefers-reduced-motion: reduce)').matches,
+  )
   const babSekarang = usePemutar((s) => s.bab)
   const dijeda = usePemutar((s) => s.dijeda)
   const svg = useRef<SVGSVGElement>(null)
@@ -217,7 +221,7 @@ function PemutarEpisode({
   )
 
   return (
-    <div className="pemutar" data-dijeda={dijeda || undefined}>
+    <div className="pemutar" data-dijeda={dijeda || undefined} data-tenang={tenang || undefined}>
       <div className="pemutar-panggung" data-panggung>
         <svg ref={svg} viewBox="0 0 1600 900" role="img" aria-label={`Animasi episode ${judul}`}>
           <g ref={latar} data-lapisan="latar" />

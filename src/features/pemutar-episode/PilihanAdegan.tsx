@@ -19,14 +19,7 @@ function PilihanAdegan() {
       className={molekul ? 'pemutar-pilih-molekul' : 'pemutar-soal'}
       aria-label={pilihan.judul}
     >
-      {molekul ? (
-        <p className="pemutar-petunjuk">
-          <img src={tangan} alt="" />
-          {pilihan.judul}
-        </p>
-      ) : (
-        <h2>{pilihan.judul}</h2>
-      )}
+      {!molekul && <h2>{pilihan.judul}</h2>}
       <div className="pemutar-opsi">
         {pilihan.opsi.map(({ teks, posisi, ukuran, selesai }, i) =>
           selesai ? null : (
@@ -54,7 +47,14 @@ function PilihanAdegan() {
                 pilihan.pilih(i)
               }}
             >
-              {posisi ? <span className="sr-only">{teks}</span> : teks}
+              {posisi ? (
+                <>
+                  <img src={tangan} alt="" className="pemutar-ajakan" />
+                  <span className="sr-only">{teks}</span>
+                </>
+              ) : (
+                teks
+              )}
             </button>
           ),
         )}

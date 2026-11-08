@@ -51,6 +51,9 @@ test('soal g dan h, lalu Lembar Hasil dari jawaban putaran ini', async ({ page }
     '2',
   )
   await expect(page.locator('[data-chip="pir"] [data-carbon]:not([data-bayangan])')).toHaveCount(3)
+  await expect(page.locator('[data-petunjuk]')).toHaveText('Ketuk hasil glikolisis', {
+    timeout: 15000,
+  })
   await tombol(page, 'CO₂').click({ timeout: 15000 })
   await expect(gelembung(page)).toHaveText(
     'CO₂ belum dilepas di glikolisis: karbon masih utuh di asam piruvat (3 + 3 = 6).',
@@ -82,8 +85,10 @@ test('soal g dan h, lalu Lembar Hasil dari jawaban putaran ini', async ({ page }
     'Karbon glukosa masih utuh di asam piruvat: 3 + 3 = 6, belum ada CO₂.',
   )
   await expect(terisi).toHaveCount(0)
+  await expect(page.locator('[data-petunjuk]')).toHaveText('Pilih jawaban untuk rumpang 1.')
   await tombol(page, '2 asam piruvat (3 C)').click()
   await expect(terisi).toHaveCount(1)
+  await expect(page.locator('[data-petunjuk]')).toHaveText('Pilih jawaban untuk rumpang 2.')
   await expect(page.locator('.pemutar-lengkapi [aria-pressed="true"]')).toHaveCount(0)
   await tombol(page, 'membran krista').click()
   await expect(gelembung(page)).toHaveText('Membran krista adalah tempat transpor elektron.')

@@ -25,7 +25,7 @@ export async function soalAB(p: Panggung) {
   await mintaPilihan(
     p.signal,
     {
-      judul: 'Ketuk molekulnya',
+      judul: 'Ketuk molekul yang menjadi bahan awal glikolisis.',
       opsi: [
         { teks: 'Glukosa (6 atom C)', posisi: [800, 420] },
         { teks: 'Asam piruvat (3 atom C)', posisi: [420, 580] },

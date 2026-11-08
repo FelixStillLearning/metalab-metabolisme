@@ -40,10 +40,15 @@ test('POE c: tebak, amati investasi energi, pembelahan 6C jadi 2 PGAL, dan jelas
   const tombolKunci = page.getByRole('button', { name: 'Kunci tebakan, lanjutkan video' })
   await expect(tombolKunci).toBeDisabled()
 
+  await expect(page.locator('[data-petunjuk]')).toHaveText('Ketuk ATP untuk menaruhnya di glukosa.')
+  await expect(page.locator('.tok .pemutar-ajakan')).toHaveCount(3)
   // Taruh 2 ATP
   await page.getByRole('button', { name: 'ATP 1', exact: true }).click()
   await page.getByRole('button', { name: 'ATP 2', exact: true }).click()
   await expect(page.locator('#cnt')).toHaveText('2 ATP')
+  await expect(page.locator('.tok.placed .pemutar-ajakan')).toHaveCount(0)
+  await expect(page.locator('.tok .pemutar-ajakan')).toHaveCount(1)
+  await expect(page.locator('[data-petunjuk]')).toHaveText('Pilih alasan untuk tebakanmu.')
 
   // Pilih alasan
   const alasan2 = page.getByRole('button', {
@@ -62,12 +67,14 @@ test('POE c: tebak, amati investasi energi, pembelahan 6C jadi 2 PGAL, dan jelas
   await expect(alasan2).toHaveCSS('font-family', /Atkinson Hyperlegible/)
   await expect(alasan2).toHaveCSS('font-weight', '700')
   await expect(tombolKunci).toBeEnabled()
+  await expect(page.locator('[data-petunjuk]')).toContainText('Ketuk Kunci tebakan')
 
   // Kunci tebakan
   await tombolKunci.click()
 
   // Masuk tahap Amati
   await expect(page.locator('.poe-steps span.on')).toHaveText('Amati', { timeout: 15000 })
+  await expect(page.locator('[data-petunjuk]')).toHaveCount(0)
   await expect(page.locator('.gtag')).toContainText('Tebakanmu: 2 ATP')
 
   // Glukosa menerima fosfat dan terbelah menjadi 2 PGAL

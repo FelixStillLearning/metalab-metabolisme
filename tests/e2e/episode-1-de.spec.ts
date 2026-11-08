@@ -37,7 +37,12 @@ test.beforeEach(async ({ page }, info) => {
 
 async function soalD(page: Page) {
   // Tiap NAD⁺ menangkap tepat 2 elektron dari satu PGAL
+  await expect(page.locator('[data-petunjuk]')).toHaveText('Ketuk NAD⁺ untuk menangkap elektron', {
+    timeout: 15000,
+  })
+  await expect(page.locator('.pemutar-sasaran .pemutar-ajakan')).toHaveCount(2)
   await tombol(page, 'NAD⁺ 1').click({ timeout: 15000 })
+  await expect(page.locator('.pemutar-sasaran .pemutar-ajakan')).toHaveCount(1)
   await tombol(page, 'NAD⁺ 2').click()
   await expect(page.locator('[data-carrier="NADH"]')).toHaveCount(2, { timeout: 15000 })
   for (const n of await page.locator('[data-carrier="NADH"]').all()) {
@@ -55,6 +60,7 @@ async function soalD(page: Page) {
   }
 
   // Panen fosfat: 4 fosfat, 4 ADP menjadi 4 ATP
+  await expect(page.locator('[data-petunjuk]')).toHaveText('Ketuk tiap fosfat', { timeout: 15000 })
   for (let i = 1; i <= 4; i++) await tombol(page, `Fosfat ${i}`).click({ timeout: 15000 })
   await expect(page.locator('svg text', { hasText: 'ATP terbentuk: 4' })).toHaveCount(1, {
     timeout: 15000,
