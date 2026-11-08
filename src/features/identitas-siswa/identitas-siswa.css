@@ -1,0 +1,79 @@
+.siswa-latar {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: #0d2526b3;
+}
+
+.siswa-dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%;
+  z-index: 51;
+  width: min(460px, calc(100% - 32px));
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
+  padding: clamp(20px, 4vw, 32px);
+  border: 2px solid var(--color-ink);
+  border-radius: 12px;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  box-shadow: var(--shadow-kertas);
+  font: 400 17px/1.4 var(--font-body);
+}
+
+.siswa-dialog h2 {
+  font: 800 26px/1.2 var(--font-head);
+}
+
+.siswa-dialog p {
+  margin: 12px 0 20px;
+}
+
+.siswa-dialog form {
+  display: grid;
+  gap: 8px;
+}
+
+.siswa-dialog label {
+  font-weight: 700;
+}
+
+.siswa-dialog input {
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 12px;
+  margin-bottom: 8px;
+  border: 2px solid var(--color-muted);
+  border-radius: 6px;
+  background: #fff;
+  user-select: text;
+}
+
+.siswa-aksi {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.siswa-aksi button {
+  min-height: 44px;
+  padding: 10px 18px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.siswa-batal {
+  border: 1px solid var(--color-muted);
+  border-radius: 6px;
+}
+
+@media print {
+  .siswa-latar,
+  .siswa-dialog {
+    display: none;
+  }
+}

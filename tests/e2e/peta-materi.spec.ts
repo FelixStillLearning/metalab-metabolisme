@@ -52,7 +52,10 @@ test('empat episode baru muncul setelah kartu aerob dibuka, bisa ditutup dengan 
 test('navigasi beranda, peta, dan episode 1 tersambung dua arah', async ({ page }) => {
   await page.getByRole('link', { name: 'Beranda', exact: true }).click()
   await expect(page).toHaveURL(/#\/$/)
-  await page.getByRole('link', { name: 'Mulai belajar' }).click()
+  await page.getByRole('button', { name: 'Mulai belajar' }).click()
+  await page.getByLabel('Nama', { exact: true }).fill('Siswa Uji')
+  await page.getByLabel('Kelas', { exact: true }).fill('XII 1')
+  await page.getByRole('button', { name: 'Lanjut ke peta materi' }).click()
   await page.getByRole('button', { name: 'Respirasi Aerob', exact: true }).click()
   await page.getByRole('link', { name: 'Buka Glikolisis' }).click()
   await expect(page).toHaveURL(/#\/episode\/1$/)

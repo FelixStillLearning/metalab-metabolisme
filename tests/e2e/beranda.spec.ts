@@ -76,13 +76,13 @@ test('maskot ilmuwan menyapa tanpa menutupi judul dan tombol', async ({ page }, 
   const kotakMaskot = (await maskot.boundingBox())!
   for (const bagian of [
     page.getByRole('heading', { level: 1 }),
-    page.getByRole('link', { name: 'Mulai belajar' }),
+    page.getByRole('button', { name: 'Mulai belajar' }),
   ]) {
     expect(kotakBertumpuk(kotakMaskot, (await bagian.boundingBox())!)).toBe(false)
   }
   if (info.project.name === 'desktop') {
     // maskot besar di kanan bawah, boleh menimpa sel, di kanan kolom teks
-    const tombol = (await page.getByRole('link', { name: 'Mulai belajar' }).boundingBox())!
+    const tombol = (await page.getByRole('button', { name: 'Mulai belajar' }).boundingBox())!
     const sel = (await page.getByRole('img', { name: /^Sel hewan/ }).boundingBox())!
     expect(kotakMaskot.x).toBeGreaterThan(tombol.x + tombol.width)
     expect(kotakMaskot.x + kotakMaskot.width / 2).toBeGreaterThan(sel.x + sel.width / 2)
@@ -118,7 +118,10 @@ const suara = (nama: string) => new RegExp(`audio/${nama}\\.(ogg|mp3)$`)
 
 test('gaya beranda tidak memengaruhi elemen di halaman lain', async ({ page }) => {
   await page.goto('/')
-  await page.getByRole('link', { name: 'Mulai belajar' }).click()
+  await page.getByRole('button', { name: 'Mulai belajar' }).click()
+  await page.getByLabel('Nama', { exact: true }).fill('Siswa Uji')
+  await page.getByLabel('Kelas', { exact: true }).fill('XII 1')
+  await page.getByRole('button', { name: 'Lanjut ke peta materi' }).click()
   await expect(page.getByRole('heading', { name: 'Peta materi' })).toBeVisible()
   const gaya = await page.evaluate(() => {
     const wadah = document.createElement('div')
@@ -148,7 +151,7 @@ test('gaya beranda tidak memengaruhi elemen di halaman lain', async ({ page }) =
 test('tombol mulai belajar memuat audio', async ({ page }) => {
   await page.goto('/')
   const bunyi = page.waitForResponse(suara('mulai'))
-  await page.getByRole('link', { name: 'Mulai belajar' }).click()
+  await page.getByRole('button', { name: 'Mulai belajar' }).click()
   expect((await bunyi).ok()).toBe(true)
 })
 
@@ -186,7 +189,10 @@ test('tombol speaker mengingat pilihan bisu dan dapat dinyalakan lagi', async ({
 
 test('tombol mulai belajar membuka peta materi', async ({ page }) => {
   await page.goto('/')
-  await page.getByRole('link', { name: 'Mulai belajar' }).click()
+  await page.getByRole('button', { name: 'Mulai belajar' }).click()
+  await page.getByLabel('Nama', { exact: true }).fill('Siswa Uji')
+  await page.getByLabel('Kelas', { exact: true }).fill('XII 1')
+  await page.getByRole('button', { name: 'Lanjut ke peta materi' }).click()
   await expect(page).toHaveURL(/#\/peta-materi$/)
   await expect(page.getByRole('heading', { level: 1, name: 'Peta materi' })).toBeVisible()
 })
@@ -194,7 +200,7 @@ test('tombol mulai belajar membuka peta materi', async ({ page }) => {
 test('tata letak mengikuti orientasi layar', async ({ page }, info) => {
   await page.goto('/')
   await tungguMasukSelesai(page)
-  const tombol = (await page.getByRole('link', { name: 'Mulai belajar' }).boundingBox())!
+  const tombol = (await page.getByRole('button', { name: 'Mulai belajar' }).boundingBox())!
   const sel = (await page.getByRole('img', { name: /^Sel hewan/ }).boundingBox())!
   if (info.project.name === 'hp-tegak') {
     expect(sel.y).toBeGreaterThanOrEqual(tombol.y + tombol.height)
@@ -216,7 +222,7 @@ test('tata letak mengikuti orientasi layar', async ({ page }, info) => {
 
 test('tombol mulai belajar memakai gambar tombol utama', async ({ page }) => {
   await page.goto('/')
-  const tombol = page.getByRole('link', { name: 'Mulai belajar' })
+  const tombol = page.getByRole('button', { name: 'Mulai belajar' })
   await expect(tombol).toHaveCSS('border-image-source', /tombol-utama.*\.webp/)
   const ok = await page.evaluate(async () => {
     const src = getComputedStyle(document.querySelector('.tombol-utama')!).borderImageSource
