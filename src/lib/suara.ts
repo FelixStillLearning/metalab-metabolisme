@@ -26,8 +26,10 @@ const termuat = new Map<NamaSuara, Howl>()
 
 // Bisu juga berlaku untuk audio yang sedang berjalan atau masih menunggu dimuat.
 Howler.mute(!usePengaturan.getState().suaraAktif)
-const berhentiMemantau = usePengaturan.subscribe(({ suaraAktif }) => {
+Howler.volume(usePengaturan.getState().volume)
+const berhentiMemantau = usePengaturan.subscribe(({ suaraAktif, volume }) => {
   Howler.mute(!suaraAktif)
+  Howler.volume(volume)
   aturMusik()
 })
 import.meta.hot?.dispose(berhentiMemantau)

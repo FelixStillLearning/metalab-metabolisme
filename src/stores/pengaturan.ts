@@ -4,6 +4,8 @@ import { persist } from 'zustand/middleware'
 export type KunciSaklar = 'subtitle' | 'narasi' | 'efek' | 'musik' | 'pelan' | 'tenang'
 
 type Pengaturan = {
+  volume: number
+  aturVolume: (volume: number) => void
   suaraAktif: boolean
   aturSuara: (aktif: boolean) => void
   subtitle: boolean
@@ -20,6 +22,10 @@ type Pengaturan = {
 export const usePengaturan = create<Pengaturan>()(
   persist(
     (set) => ({
+      volume: 0.5,
+      aturVolume: (volume) => {
+        if (Number.isFinite(volume)) set({ volume: Math.max(0, Math.min(1, volume)) })
+      },
       suaraAktif: true,
       aturSuara: (aktif) => set({ suaraAktif: aktif }),
       subtitle: true,
@@ -32,7 +38,8 @@ export const usePengaturan = create<Pengaturan>()(
     }),
     {
       name: 'metalab-pengaturan',
-      partialize: ({ suaraAktif, subtitle, narasi, efek, musik, pelan, tenang }) => ({
+      partialize: ({ volume, suaraAktif, subtitle, narasi, efek, musik, pelan, tenang }) => ({
+        volume,
         suaraAktif,
         subtitle,
         narasi,

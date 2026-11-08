@@ -12,11 +12,12 @@ vi.mock('howler', () => ({
       stop = stop
     },
   ),
-  Howler: { mute: vi.fn() },
+  Howler: { mute: vi.fn(), volume: vi.fn() },
 }))
 
 beforeEach(() => {
   musik(false)
+  usePengaturan.getState().aturVolume(0.5)
   usePengaturan.getState().aturSuara(true)
   usePengaturan.getState().atur('efek', true)
   usePengaturan.getState().atur('musik', true)
@@ -97,4 +98,20 @@ test('musik tidak dimulai saat musik mati atau semua suara bisu', () => {
   vi.clearAllMocks()
   musik(true)
   expect(play).not.toHaveBeenCalled()
+})
+
+test('volume utama mengubah audio aktif tanpa memulai ulang musik atau melepas bisu', () => {
+  musik(true)
+  vi.clearAllMocks()
+  usePengaturan.getState().aturVolume(0.75)
+  expect(Howler.volume).toHaveBeenLastCalledWith(0.75)
+  expect(play).not.toHaveBeenCalled()
+  expect(stop).not.toHaveBeenCalled()
+  usePengaturan.getState().aturSuara(false)
+  usePengaturan.getState().aturVolume(0.25)
+  expect(Howler.mute).toHaveBeenLastCalledWith(true)
+  expect(Howler.volume).toHaveBeenLastCalledWith(0.25)
+  usePengaturan.getState().aturSuara(true)
+  expect(Howler.mute).toHaveBeenLastCalledWith(false)
+  expect(usePengaturan.getState().volume).toBe(0.25)
 })
