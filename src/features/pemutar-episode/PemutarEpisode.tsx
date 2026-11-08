@@ -97,7 +97,10 @@ function PemutarEpisode({ judul, label, ringkasan, bab, gambarSampul, jalankan }
   useEffect(() => {
     const tegak = matchMedia(TEGAK)
     const cek = () => {
-      if (tegak.matches && sudahMulai.current && !usePemutar.getState().dijeda) jedaSemua(true)
+      if (tegak.matches) {
+        dijedaPanel.current = false
+        if (sudahMulai.current && !usePemutar.getState().dijeda) jedaSemua(true)
+      }
     }
     tegak.addEventListener('change', cek)
     return () => tegak.removeEventListener('change', cek)

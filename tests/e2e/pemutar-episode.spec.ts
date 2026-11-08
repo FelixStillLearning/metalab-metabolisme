@@ -142,3 +142,20 @@ test('kembali ke peta di tengah episode tanpa error', async ({ page }, info) => 
   await page.waitForTimeout(1000)
   expect(galat).toEqual([])
 })
+
+test('menutup pengaturan setelah HP diputar tetap menjeda episode', async ({ page }, info) => {
+  test.skip(info.project.name !== 'hp-miring', 'khusus HP miring')
+  await page.evaluate(() => {
+    Element.prototype.requestFullscreen = () => Promise.reject(new Error('ditolak'))
+  })
+  await mulai(page)
+  await expect(gelembung(page)).toHaveText(KALIMAT_1)
+  await page.getByRole('button', { name: 'Pengaturan', exact: true }).click()
+  await page.setViewportSize({ width: 360, height: 800 })
+  await expect(page.getByRole('heading', { name: 'Putar HP-mu' })).toBeVisible()
+  await page.setViewportSize({ width: 800, height: 360 })
+  await page.getByRole('button', { name: 'Tutup pengaturan' }).click()
+  await expect(page.getByRole('button', { name: 'Lanjut (spasi)' })).toBeVisible()
+  await page.getByRole('button', { name: 'Lanjut (spasi)' }).click()
+  await expect(gelembung(page)).toHaveText(KALIMAT_2)
+})
