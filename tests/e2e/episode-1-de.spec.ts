@@ -112,6 +112,12 @@ test('POE e tebakan 2: tepat, 4 terbentuk dikurangi 2 dipakai, jawaban tersimpan
     timeout: 20000,
   })
   await expect(page.locator('.gtag.ok')).toBeVisible()
+  await expect(page.locator('.gtag.ok')).toHaveCSS('flex-direction', 'column')
+  const hasilTebakan = (await page.locator('.gtag.ok').boundingBox())!
+  const kontrol = (await page.locator('.pemutar-bilah').boundingBox())!
+  expect(Math.abs(hasilTebakan.x - kontrol.x)).toBeLessThan(2)
+  expect(hasilTebakan.y).toBeGreaterThanOrEqual(kontrol.y + kontrol.height)
+  expect(hasilTebakan.width).toBeLessThanOrEqual(280)
   const vonis = page.locator('.poe-card-explain .poe-verdict').first()
   await expect(vonis).toContainText('Tebakanmu tepat', { timeout: 20000 })
   await page.getByRole('button', { name: ALASAN_E }).click()

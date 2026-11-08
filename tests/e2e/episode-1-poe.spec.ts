@@ -94,6 +94,9 @@ test('POE c: tebak, amati investasi energi, pembelahan 6C jadi 2 PGAL, dan jelas
   })
   await alasanSalah.click()
   await expect(page.locator('.poe-feedback')).toContainText('Belum tepat')
+  expect(berisi(await kotak(page, '.poe-card-explain'), await kotak(page, '.poe-feedback'))).toBe(
+    true,
+  )
 
   // Pilih alasan yang benar
   const alasanBenar = page.getByRole('button', {
@@ -105,6 +108,11 @@ test('POE c: tebak, amati investasi energi, pembelahan 6C jadi 2 PGAL, dan jelas
   // Lanjutkan video
   const tombolLanjut = page.getByRole('button', { name: 'Lanjutkan video' })
   await expect(tombolLanjut).toBeVisible()
+  expect(berisi(await kotak(page, '.poe-card-explain'), (await tombolLanjut.boundingBox())!)).toBe(
+    true,
+  )
+  await expect(page.locator('[data-panggung]')).toHaveJSProperty('scrollTop', 0)
+  await expect(page.locator('.pemutar')).toHaveJSProperty('scrollTop', 0)
   await tombolLanjut.click()
 
   // Periksa data tersimpan di store jawaban
@@ -173,7 +181,7 @@ async function tiapUkuran(
   }
 }
 
-// Kartu POE utuh di layar, di bawah bilah kontrol, dan semua tombolnya di dalam kartu
+// Kartu utuh di layar; tombol tetap terjangkau setelah digulir di dalam kartu.
 async function kartuMuat(
   page: Page,
   pemilih: string,
@@ -185,8 +193,12 @@ async function kartuMuat(
   expect(berisi({ x: 0, y: 0, width, height }, kartu), pesan).toBe(true)
   expect(bertumpuk(kartu, await kotak(page, '.pemutar-bilah')), pesan).toBe(false)
   for (const b of await page.locator(`${pemilih} button`).all()) {
+    await b.scrollIntoViewIfNeeded()
     expect(berisi(kartu, (await b.boundingBox())!), pesan).toBe(true)
   }
+  await page.locator(pemilih).evaluate((el) => {
+    el.scrollTop = 0
+  })
 }
 
 // Token ATP tidak saling menempel dan tidak menutupi atom C
@@ -264,10 +276,18 @@ for (const n of [1, 2, 3]) {
     await expect(page.getByRole('button', { name: 'Lanjutkan video' })).toBeVisible()
     await tiapUkuran(page, info.project.name, async (pesan, width, height) => {
       await kartuMuat(page, '.poe-card-explain', pesan, width, height)
-      if (width > 1000) {
-        const gelembung = await kotak(page, '.pemutar-panduan')
-        expect(bertumpuk(await kotak(page, '.poe-card-explain'), gelembung), pesan).toBe(false)
-      }
+      const kartu = await kotak(page, '.poe-card-explain')
+      expect(Math.abs(kartu.x + kartu.width / 2 - width / 2), pesan).toBeLessThan(2)
+      await expect(page.locator('.pemutar-panduan')).toHaveCSS('transform', 'none')
+      const petunjuk = await kotak(page, '.pemutar-panduan')
+      expect(bertumpuk(kartu, petunjuk), pesan).toBe(false)
+      const kontrol = await kotak(page, '.pemutar-bilah')
+      expect(Math.abs(petunjuk.x - kontrol.x), pesan).toBeLessThan(2)
+      expect(petunjuk.y, pesan).toBeGreaterThanOrEqual(kontrol.y + kontrol.height)
+      await expect(page.locator('.poe-card-explain .poe-reasons')).toHaveCSS(
+        'flex-direction',
+        'column',
+      )
     })
   })
 }
@@ -285,7 +305,7 @@ test('POE c: chip tahap, label, zona glukosa, token, dan kartu tebakan tidak ber
       expect(bertumpuk(await kotak(page, '.pemutar-bilah'), kotakLabel), pesan).toBe(false)
     }
 
-    // Zona membingkai cincin glukosa dan tidak tertutup gelembung kalimat
+    // Zona membingkai cincin glukosa dan tidak tertutup popup perintah
     const zona = await kotak(page, '.poe-zone')
     const cincin = await gabungan(page, `[data-molecule="glukosa"] ${KARBON}`)
     expect(berisi(zona, cincin), pesan).toBe(true)

@@ -10,14 +10,6 @@ function PetunjukInteraksi() {
   const tenang = usePengaturan((s) => s.tenang)
   const gerakDikurangi = useReducedMotion()
   const diam = tenang ?? gerakDikurangi
-  const posisi =
-    state.poe?.tahap === 'tebak' ||
-    state.lengkapi ||
-    (state.pilihan && !state.pilihan.opsi[0]?.posisi)
-      ? 'atas'
-      : state.poe?.tahap === 'jelaskan'
-        ? 'bawah'
-        : 'tengah'
 
   return (
     <div className="pemutar-panduan-wadah" role="status" aria-label="Petunjuk interaksi">
@@ -26,7 +18,6 @@ function PetunjukInteraksi() {
           <motion.div
             key={petunjuk}
             className="pemutar-panduan"
-            data-posisi={posisi}
             initial={{ opacity: diam ? 1 : 0, x: diam ? 0 : -16 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: diam ? 0 : -12 }}

@@ -14,7 +14,7 @@ import { jedaSemua, kendali, obj, type Objek, type Panggung } from './mesin'
 import PanelPengaturan from './PanelPengaturan'
 import LengkapiAdegan from './LengkapiAdegan'
 import PilihanAdegan from './PilihanAdegan'
-import PoeAdegan from './PoeAdegan'
+import PoeAdegan, { HasilTebakan } from './PoeAdegan'
 import './pemutar-episode.css'
 
 export type Bab = { k: string; t: string; poe?: boolean }
@@ -228,7 +228,6 @@ function PemutarEpisode({
         <PilihanAdegan />
         <LengkapiAdegan />
         <PoeAdegan />
-        <PetunjukInteraksi />
         {children}
         {!mulai && (
           <div className="pemutar-sampul">
@@ -253,6 +252,8 @@ function PemutarEpisode({
         )}
       </div>
 
+      <PetunjukInteraksi />
+      <HasilTebakan />
       <div className="pemutar-bilah">
         <button
           type="button"

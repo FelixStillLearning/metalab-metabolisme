@@ -16,9 +16,42 @@ const Tanda = ({ tepat }: { tepat: boolean }) => (
   <img className="poe-tanda" src={tepat ? centang : silang} alt="" width={24} height={24} />
 )
 
+export function HasilTebakan() {
+  const poe = usePemutar((s) => s.poe)
+  if (poe?.tahap !== 'amati') return null
+  return poe.statusTebakan ? (
+    <div className={`gtag ${poe.statusTebakan === 'benar' ? 'ok' : 'no'}`}>
+      <img
+        src={poe.statusTebakan === 'benar' ? penandaBenar : penandaBelum}
+        alt={poe.statusTebakan === 'benar' ? 'Tebakanmu tepat:' : 'Tebakanmu belum tepat:'}
+        width={200}
+        height={50}
+      />
+      <span>{poe.tebakan}</span>
+      {poe.catatan && <p className="gtag-catatan">{poe.catatan}</p>}
+    </div>
+  ) : (
+    <div className="gtag">
+      <span>{poe.gtagText}</span>
+    </div>
+  )
+}
+
 export function PoeAdegan() {
   const { poe, dijeda } = usePemutar()
   const pertama = useRef<HTMLButtonElement>(null)
+  const tanggapan = useRef<HTMLDivElement>(null)
+  const alasanTerpilih = poe?.tahap === 'jelaskan' ? poe.selectedExplain : null
+
+  useEffect(() => {
+    const isi = tanggapan.current
+    const kartu = isi?.closest<HTMLElement>('.poe-card-explain')
+    if (isi && kartu) {
+      const batasBawah = kartu.getBoundingClientRect().top + kartu.clientTop + kartu.clientHeight
+      const terpotong = isi.getBoundingClientRect().bottom - batasBawah
+      kartu.scrollTop += Math.max(0, terpotong + 12)
+    }
+  }, [alasanTerpilih])
 
   useEffect(() => {
     pertama.current?.focus()
@@ -41,26 +74,6 @@ export function PoeAdegan() {
           </span>
         ))}
       </div>
-
-      {poe.tahap === 'amati' &&
-        (poe.statusTebakan ? (
-          <div className={`gtag ${poe.statusTebakan === 'benar' ? 'ok' : 'no'}`}>
-            <img
-              src={poe.statusTebakan === 'benar' ? penandaBenar : penandaBelum}
-              alt={poe.statusTebakan === 'benar' ? 'Tebakanmu tepat:' : 'Tebakanmu belum tepat:'}
-              width={200}
-              height={50}
-            />
-            <span>
-              {poe.tebakan}
-              {poe.catatan && ` · ${poe.catatan}`}
-            </span>
-          </div>
-        ) : (
-          <div className="gtag">
-            <span>{poe.gtagText}</span>
-          </div>
-        ))}
 
       {poe.tahap === 'tebak' && (
         <>
@@ -178,7 +191,7 @@ export function PoeAdegan() {
             ))}
           </div>
           {poe.selectedExplain !== null && (
-            <div className="poe-feedback" aria-live="polite">
+            <div ref={tanggapan} className="poe-feedback" aria-live="polite">
               {poe.explainDone ? (
                 <>
                   <p className="poe-verdict ok">
