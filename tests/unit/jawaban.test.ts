@@ -3,7 +3,7 @@ import { useJawaban } from '../../src/stores/jawaban'
 
 beforeEach(() => {
   localStorage.clear()
-  useJawaban.setState({ draf: {}, hasil: null })
+  useJawaban.setState({ draf: {}, drafPoe: {}, hasil: null, hasilPoe: null })
 })
 
 test('jawaban masuk ke draf tersimpan tanpa mengganti hasil lama', async () => {
@@ -24,4 +24,13 @@ test('putaran baru mengosongkan draf saja', () => {
   useJawaban.getState().mulai()
   expect(useJawaban.getState().draf).toEqual({})
   expect(useJawaban.getState().hasil).toEqual({ a: 'hasil sebelumnya' })
+})
+
+test('tebakan dan penjelasan POE tersimpan di drafPoe', () => {
+  useJawaban.getState().catatPoe('c', { tebakan: 2, alasan: 1 })
+  expect(useJawaban.getState().drafPoe.c).toEqual({ tebakan: 2, alasan: 1 })
+  useJawaban.getState().catatPoe('c', { penjelasan: 1 })
+  expect(useJawaban.getState().drafPoe.c).toEqual({ tebakan: 2, alasan: 1, penjelasan: 1 })
+  useJawaban.getState().mulai()
+  expect(useJawaban.getState().drafPoe).toEqual({})
 })

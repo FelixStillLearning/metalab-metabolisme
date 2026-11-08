@@ -6,6 +6,8 @@ import { MotionPathPlugin } from 'gsap/MotionPathPlugin'
 import { jedaNarasi } from '../../lib/narasi'
 import { usePemutar } from '../../stores/pemutar'
 import { tenangAktif, usePengaturan } from '../../stores/pengaturan'
+import gambarGarisGerak from '../../assets/images/efek-garis-gerak.webp'
+import gambarLetupan from '../../assets/images/efek-letupan.webp'
 import { cut, el, type Titik } from './kertas'
 
 gsap.registerPlugin(CustomEase, MotionPathPlugin)
@@ -57,14 +59,15 @@ export function durasi(ms: number, batasTenang = 240) {
 
 const dihentikan = () => new DOMException('Adegan dihentikan', 'AbortError')
 
-export function wait(p: Panggung, ms: number) {
+// batasTenang = Infinity untuk waktu baca: mode tenang hanya memangkas jeda gerak
+export function wait(p: Panggung, ms: number, batasTenang = kendali.otomatis ? Infinity : 400) {
   return new Promise<void>((selesai, gagal) => {
     if (p.signal.aborted) return gagal(dihentikan())
     const batal = () => {
       tunda.kill()
       gagal(dihentikan())
     }
-    const tunda = gsap.delayedCall(durasi(ms, kendali.otomatis ? Infinity : 400) / 1000, () => {
+    const tunda = gsap.delayedCall(durasi(ms, batasTenang) / 1000, () => {
       p.signal.removeEventListener('abort', batal)
       selesai()
     })
@@ -179,23 +182,25 @@ export async function shake(p: Panggung, g: Objek, amp = 3.2, ms = 720) {
   lines.remove()
 }
 
+// Garis gerak H01 di belakang objek; gambarnya tebal di kiri, jadi dibalik saat objek ke kanan
 export function speedLines(p: Panggung, g: Objek, dir: number) {
   if (tenangAktif()) return
   const trails = obj(0, 0, g)
   trails.dataset.effect = 'speed-lines'
   g.insertBefore(trails, g.firstChild)
-  for (let i = 0; i < 5; i++) {
-    const y = -42 + i * 21
-    const x = -dir * 80
-    const length = 100 + (i % 3) * 35
-    const titik: Titik[] = [
-      [x, y - 3],
-      [x - dir * length, y - 1],
-      [x - dir * length, y + 1],
-      [x, y + 3],
-    ]
-    cut(trails, titik, 'var(--color-paper)', { opacity: 0.7 })
-  }
+  el(
+    'image',
+    {
+      href: gambarGarisGerak,
+      x: 80,
+      y: -30,
+      width: 240,
+      height: 60,
+      opacity: 0.85,
+      transform: dir > 0 ? 'scale(-1 1)' : '',
+    },
+    trails,
+  )
   wait(p, 440)
     .then(() => to(trails, { o: 0, x: -dir * 35 }, 180, 'keluar'))
     .then(
@@ -270,22 +275,13 @@ export async function comic(
   g.remove()
 }
 
+// Letupan H02 di belakang objek yang terbelah
 export function burstBehind(p: Panggung, g: Objek) {
   if (tenangAktif()) return
   const burst = obj(g._x, g._y, p.world)
   burst.dataset.effect = 'split-burst'
   p.world.insertBefore(burst, g)
-  for (const [small, large, fill] of [
-    [120, 210, 'var(--color-hot)'],
-    [85, 150, 'var(--color-paper)'],
-  ] as const) {
-    const titik = Array.from({ length: 24 }, (_, i): Titik => {
-      const a = (i / 24) * Math.PI * 2 + 0.1
-      const r = i % 2 ? small : large
-      return [Math.cos(a) * r, Math.sin(a) * r]
-    })
-    cut(burst, titik, fill, {}, 4, { bayangan: true })
-  }
+  el('image', { href: gambarLetupan, x: -240, y: -240, width: 480, height: 480 }, burst)
   hide(burst)
   burst._s = 0.5
   burst._r = -8
@@ -296,6 +292,20 @@ export function burstBehind(p: Panggung, g: Objek) {
       () => burst.remove(),
       () => {},
     )
+}
+
+// Posisi dunia ke posisi adegan 1600x900 setelah kamera, untuk sasaran ketuk HTML
+export const keLayar = (p: Panggung, x: number, y: number): [number, number] => [
+  p.cam._x + x * p.cam._s,
+  p.cam._y + y * p.cam._s,
+]
+
+// Tulisan besar di lapisan efek, seperti kinetic() di prototype
+export function kinetik(p: Panggung, x: number, y: number, t: string, size: number, fill: string) {
+  const g = obj(x, y, p.fx)
+  const e = teks(g, 0, 0, t, size, fill, 400)
+  e.setAttribute('font-family', 'Grandstander, sans-serif')
+  return Object.assign(g, { teks: e })
 }
 
 export const camTo = (p: Panggung, x: number, y: number, s: number, ms = 1400) =>

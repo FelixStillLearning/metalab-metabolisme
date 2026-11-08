@@ -1,5 +1,5 @@
 import { beforeEach, expect, test, vi } from 'vitest'
-import { ucapkan } from '../../src/lib/narasi'
+import { jedaNarasi, ucapkan } from '../../src/lib/narasi'
 import { usePengaturan } from '../../src/stores/pengaturan'
 
 class UtteranceTiruan {
@@ -14,11 +14,17 @@ class UtteranceTiruan {
   }
 }
 
+// paused meniru Chrome: tetap true setelah cancel() sampai resume() dipanggil
 const sintesis = {
+  paused: false,
   speak: vi.fn(),
   cancel: vi.fn(),
-  pause: vi.fn(),
-  resume: vi.fn(),
+  pause: vi.fn(() => {
+    sintesis.paused = true
+  }),
+  resume: vi.fn(() => {
+    sintesis.paused = false
+  }),
   getVoices: vi.fn(() => [{ lang: 'id-ID', name: 'Indonesian' }]),
   addEventListener: vi.fn(),
   removeEventListener: vi.fn(),
@@ -26,6 +32,7 @@ const sintesis = {
 
 beforeEach(() => {
   vi.clearAllMocks()
+  sintesis.paused = false
   sintesis.getVoices.mockReturnValue([{ lang: 'id-ID', name: 'Indonesian' }])
   vi.stubGlobal('speechSynthesis', sintesis)
   vi.stubGlobal('SpeechSynthesisUtterance', UtteranceTiruan)
@@ -79,4 +86,22 @@ test('menunggu voiceschanged bila daftar suara masih kosong', async () => {
   expect(sintesis.speak).toHaveBeenCalledOnce()
   ;(sintesis.speak.mock.calls[0][0] as UtteranceTiruan).onend!()
   await janji
+})
+
+test('narasi baru tetap berbunyi setelah dibatalkan saat dijeda', async () => {
+  const pengendali = new AbortController()
+  const janji = ucapkan('x', 'halo', { signal: pengendali.signal })
+  jedaNarasi(true)
+  pengendali.abort()
+  await janji
+  expect(sintesis.paused).toBe(true)
+
+  const berikut = ucapkan('y', 'lagi')
+  expect(sintesis.resume).toHaveBeenCalled()
+  expect(sintesis.speak).toHaveBeenCalledTimes(2)
+  expect(sintesis.resume.mock.invocationCallOrder.at(-1)!).toBeLessThan(
+    sintesis.speak.mock.invocationCallOrder[1],
+  )
+  ;(sintesis.speak.mock.calls[1][0] as UtteranceTiruan).onend!()
+  await berikut
 })

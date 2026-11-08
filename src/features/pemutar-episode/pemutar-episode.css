@@ -548,6 +548,252 @@
   cursor: default;
 }
 
+/* ---------- POE ---------- */
+
+.pemutar-poe {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Chip tahap G07 */
+.poe-steps {
+  position: absolute;
+  top: 11%;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: auto;
+}
+
+.poe-steps img {
+  display: block;
+  width: clamp(200px, 22.5cqw, 360px);
+  height: auto;
+}
+
+.gtag {
+  position: absolute;
+  top: 3%;
+  right: 2.5%;
+  font: 800 clamp(13px, 1.1cqw, 20px) / 1.2 var(--font-body);
+  color: var(--color-ink);
+  background: var(--color-paper);
+  border: 2px solid var(--color-ink);
+  border-radius: 999px;
+  padding: 6px 16px;
+  box-shadow: 2px 4px 0 #0d25264d;
+  pointer-events: auto;
+}
+
+/* Setelah vonis: penanda G14 berisi tanda, jumlah tebakan di sebelahnya */
+.gtag.ok,
+.gtag.no {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  border: 0;
+  background: none;
+  box-shadow: none;
+}
+
+.gtag img {
+  width: clamp(130px, 12.5cqw, 200px);
+  height: auto;
+}
+
+.gtag.ok span,
+.gtag.no span {
+  padding: 6px 12px;
+  border: 2px solid var(--color-ink);
+  border-radius: 999px;
+  background: var(--color-paper);
+  box-shadow: 2px 4px 0 #0d25264d;
+}
+
+.poe-zone {
+  position: absolute;
+  /* Seperti prototype: x, y zona adalah titik tengahnya */
+  transform: translate(-50%, -50%);
+  /* Zona taruh G02; nampan ATP bersih G01 untuk soal e */
+  background: url('../../assets/images/interaksi-zona.webp') center / 100% 100% no-repeat;
+  pointer-events: none;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 8px;
+}
+
+.poe-zone[data-nampan] {
+  background-image: url('../../assets/images/interaksi-nampan.webp');
+}
+
+.poe-zone-cap {
+  position: absolute;
+  left: 50%;
+  bottom: -2.6cqw;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font: 700 clamp(12px, 1.1cqw, 18px) / 1 var(--font-body);
+  color: var(--color-paper);
+}
+
+.poe-zone-label {
+  font: 700 14px var(--font-head);
+  color: var(--color-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.poe-tokens {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.tok {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  /* Ikut skala adegan: jarak token 120 satuan (7,5cqw), jadi token tidak saling menempel
+     dan token di zona tidak menutupi atom C glukosa */
+  /* Token ATP E01; jarak token soal e 100 satuan (6,25cqw), jadi lebarnya di bawah itu */
+  width: clamp(36px, 5.4cqw, 96px);
+  height: max(30px, 2.7cqw);
+  padding: 0;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  pointer-events: auto;
+  transition:
+    transform 200ms var(--ease-keluar),
+    left 300ms var(--ease-keluar),
+    top 300ms var(--ease-keluar);
+}
+
+.tok:hover {
+  transform: translate(-50%, -50%) scale(1.08);
+}
+
+.tok img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Kartu soal G03, seperti kartu soal a/b */
+.card {
+  position: absolute;
+  border-image: url('../../assets/images/interaksi-kartu-soal.webp') 100 fill / 24px stretch;
+  color: var(--color-ink);
+  padding: 24px 28px;
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.poe-card {
+  /* Posisi bawaan seperti cardAt [62, 20] prototype; soal e memakai [3, 7] */
+  left: var(--kartu-x, 62%);
+  top: var(--kartu-y, 20%);
+  width: 34%;
+}
+
+.card h3 {
+  font: 800 clamp(16px, 1.4cqw, 24px) / 1.25 var(--font-head);
+  margin: 0;
+}
+
+.card p {
+  margin: 0;
+  font: 500 15px / 1.4 var(--font-body);
+}
+
+.poe-reasons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Tombol pilihan G04; terpilih = penanda biru di kiri */
+.chip {
+  border-image: url('../../assets/images/interaksi-tombol-pilihan.webp') 0 90 0 90 fill / 0 14px
+    stretch;
+  color: var(--color-ink);
+  font: 600 clamp(13px, 1.05cqw, 18px) / 1.3 var(--font-body);
+  padding: 10px 18px 10px 22px;
+  min-height: 44px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.chip:hover:not(:disabled, [aria-pressed='true']) {
+  color: var(--color-atp);
+}
+
+.chip[aria-pressed='true'] {
+  border-image-source: url('../../assets/images/interaksi-tombol-pilihan-terpilih.webp');
+  font-weight: 800;
+}
+
+.card.bottom {
+  left: 50%;
+  bottom: 24%;
+  transform: translateX(-50%);
+  width: min(64%, 860px);
+}
+
+.poe-verdict {
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.poe-tanda {
+  display: inline-block;
+  width: 1.3em;
+  height: 1.3em;
+  margin-right: 6px;
+  vertical-align: -0.3em;
+  object-fit: contain;
+}
+
+.poe-verdict.ok {
+  color: #24595c;
+}
+
+.poe-verdict.no {
+  color: #b33927;
+}
+
+.poe-tadi {
+  color: var(--color-muted);
+  font-size: 14px;
+}
+
+.poe-feedback {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.poe-lanjut,
+.poe-kunci {
+  align-self: flex-start;
+  min-height: 44px;
+  padding: 8px 20px;
+}
+
 @media (max-height: 500px) and (orientation: landscape) {
   .pemutar-soal {
     padding: 14px 18px;
@@ -673,5 +919,120 @@
     left: 0;
     width: 18px;
     height: 18px;
+  }
+
+  /* Bilah kontrol menutupi label sitosol di HP miring */
+  [data-objek='label-sitosol'] {
+    display: none;
+  }
+
+  /* Chip tahap di kanan atas, di luar label sitosol dan bilah kontrol; label tebakan di bawahnya */
+  .poe-steps {
+    top: 3%;
+    left: auto;
+    right: 8px;
+    transform: none;
+  }
+
+  .poe-steps img {
+    width: 180px;
+  }
+
+  .gtag {
+    top: 13%;
+    right: 8px;
+    font-size: 12px;
+    padding: 4px 10px;
+  }
+
+  .gtag img {
+    width: 110px;
+  }
+
+  .gtag.ok span,
+  .gtag.no span {
+    padding: 3px 8px;
+  }
+
+  /* Saat menebak, gelembung kalimat memberi tempat untuk kartu di kanan */
+  .pemutar-panggung:has(.poe-card) .pemutar-narator {
+    width: 56%;
+  }
+
+  .pemutar-panggung:has(.poe-card) .pemutar-gelembung {
+    font-size: 12px;
+  }
+
+  /* Kartu Jelaskan tepat di bawah bilah kontrol; alasan berjajar agar seluruh kartu muat */
+  .card.bottom {
+    top: 62px;
+    bottom: auto;
+    width: 92%;
+    max-height: calc(100% - 66px);
+    padding: 8px 12px;
+    gap: 5px;
+    overflow-y: auto;
+  }
+
+  .card.bottom h3 {
+    font-size: 14px;
+  }
+
+  .card.bottom p,
+  .card.bottom .poe-verdict {
+    font-size: 12px;
+    line-height: 1.3;
+  }
+
+  .card.bottom .poe-reasons {
+    flex-direction: row;
+    gap: 6px;
+  }
+
+  .card.bottom .chip {
+    flex: 1;
+    font-size: 12px;
+    line-height: 1.25;
+    padding: 5px 8px;
+  }
+
+  .card.bottom .poe-feedback {
+    gap: 5px;
+  }
+
+  /* HP miring: kartu selalu di kanan */
+  .poe-card {
+    top: 12%;
+    left: auto;
+    right: 1%;
+    width: 41%;
+    max-height: 87%;
+    padding: 8px 10px;
+    gap: 5px;
+    overflow-y: auto;
+  }
+
+  .poe-card h3 {
+    font-size: 14px;
+  }
+
+  .poe-card p {
+    font-size: 12px;
+    line-height: 1.3;
+  }
+
+  .poe-card .poe-reasons {
+    gap: 4px;
+  }
+
+  .poe-card .chip {
+    font-size: 12px;
+    line-height: 1.25;
+    padding: 5px 8px;
+  }
+
+  .poe-card .poe-kunci {
+    font-size: 14px;
+    padding: 6px 12px;
   }
 }

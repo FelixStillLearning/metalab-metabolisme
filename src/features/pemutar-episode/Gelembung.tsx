@@ -1,15 +1,24 @@
 import type { CSSProperties } from 'react'
-import mitokondria from '../../assets/images/maskot-mitokondria-ramah.webp'
 import { usePemutar, type PoseMaskot } from '../../stores/pemutar'
 import { tenangAktif, usePengaturan } from '../../stores/pengaturan'
 import { durasi } from './mesin'
 
-const BERKAS_POSE = import.meta.glob<string>('../../assets/images/maskot/ilmuwan/*.webp', {
-  eager: true,
-  import: 'default',
-})
-const POSE: Partial<Record<PoseMaskot, string>> = Object.fromEntries(
-  Object.entries(BERKAS_POSE).map(([jalur, src]) => [jalur.match(/([^/]+)\.webp$/)![1], src]),
+const perPose = (berkas: Record<string, string>): Partial<Record<PoseMaskot, string>> =>
+  Object.fromEntries(
+    Object.entries(berkas).map(([jalur, src]) => [jalur.match(/([^/]+)\.webp$/)![1], src]),
+  )
+const POSE = perPose(
+  import.meta.glob<string>('../../assets/images/maskot/ilmuwan/*.webp', {
+    eager: true,
+    import: 'default',
+  }),
+)
+// Mitokondria hanya pose yang dipakai naskah; pose lain jatuh ke ramah
+const POSE_MITOKONDRIA = perPose(
+  import.meta.glob<string>('../../assets/images/maskot/mitokondria/*.webp', {
+    eager: true,
+    import: 'default',
+  }),
 )
 const gambarPose = (pose: PoseMaskot) => POSE[pose] ?? POSE['05-menjelaskan']
 
@@ -38,7 +47,7 @@ function Gelembung() {
       </div>
       {pendamping && (
         <img
-          src={mitokondria}
+          src={POSE_MITOKONDRIA[pendamping] ?? POSE_MITOKONDRIA['01-ramah']}
           alt=""
           data-pendamping={pendamping}
           width={256}

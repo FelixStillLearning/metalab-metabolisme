@@ -11,6 +11,7 @@ import { disc, el } from './kertas'
 import { jedaSemua, obj, type Panggung } from './mesin'
 import PanelPengaturan from './PanelPengaturan'
 import PilihanAdegan from './PilihanAdegan'
+import PoeAdegan from './PoeAdegan'
 import './pemutar-episode.css'
 
 export type Bab = { k: string; t: string; poe?: boolean }
@@ -69,7 +70,14 @@ function PemutarEpisode({ judul, label, ringkasan, bab, gambarSampul, jalankan }
   useEffect(() => {
     const kendali = new AbortController()
     pengendali.current = kendali
-    usePemutar.setState({ kalimat: '', pose: '01-ramah', pendamping: null, bab: -1, pilihan: null })
+    usePemutar.setState({
+      kalimat: '',
+      pose: '01-ramah',
+      pendamping: null,
+      bab: -1,
+      pilihan: null,
+      poe: null,
+    })
     const s = svg.current!
     const g = latar.current!
     for (const [x, y, r] of PARTIKEL)
@@ -187,6 +195,7 @@ function PemutarEpisode({ judul, label, ringkasan, bab, gambarSampul, jalankan }
         </svg>
         <Gelembung />
         <PilihanAdegan />
+        <PoeAdegan />
         {!mulai && (
           <div className="pemutar-sampul">
             <div className="pemutar-sampul-gambar">

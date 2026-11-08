@@ -1,5 +1,13 @@
 import { el } from '../../features/pemutar-episode/kertas'
-import { hide, obj, shake, teks, to, type Panggung } from '../../features/pemutar-episode/mesin'
+import {
+  hide,
+  obj,
+  shake,
+  teks,
+  to,
+  type Objek,
+  type Panggung,
+} from '../../features/pemutar-episode/mesin'
 import { mintaPilihan } from '../../features/pemutar-episode/pilihan'
 import { bunyi } from '../../lib/suara'
 import { useJawaban } from '../../stores/jawaban'
@@ -46,6 +54,8 @@ export async function soalAB(p: Panggung) {
   await to(g, { x: 300, y: 440 }, 1100)
 
   usePemutar.setState({ bab: 1 })
+  // Panah dan judul tahap dipudarkan di awal adegan c agar tidak menimpa molekul
+  const penanda: Objek[] = [obj(0, 0, p.world)]
   for (const d of ['M420 440 L660 440', 'M940 440 L1180 440']) {
     el(
       'path',
@@ -57,7 +67,7 @@ export async function soalAB(p: Panggung) {
         'stroke-linecap': 'round',
         opacity: 0.8,
       },
-      p.world,
+      penanda[0],
     )
   }
   await say(p, 'e1-b-01')
@@ -81,9 +91,11 @@ export async function soalAB(p: Panggung) {
     [1060, 'Pembentukan energi'],
   ] as const) {
     const k = obj(x, 290, p.world)
+    penanda.push(k)
     teks(k, 0, 0, judul, 26, 'var(--color-paper)')
     bunyi('melesat')
     await to(hide(k), { o: 1, y: 260 }, 700)
   }
   await say(p, 'e1-b-02')
+  return { glu: g, penanda }
 }

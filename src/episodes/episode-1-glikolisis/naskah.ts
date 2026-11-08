@@ -139,6 +139,6 @@ export async function say(
   usePemutar.setState({ kalimat: teks, pose, pendamping: pendamping ?? null })
   await Promise.all([
     ucapkan(id, teks, { signal: p.signal }),
-    wait(p, Math.max(1600, teks.length * 55) + tambah),
+    wait(p, Math.max(1600, teks.length * 55) + tambah, Infinity),
   ])
 }

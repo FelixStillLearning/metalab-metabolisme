@@ -77,7 +77,9 @@ export async function pembuka(p: Panggung) {
   await to(latar, { o: 1 }, 600)
   p.world.replaceChildren()
   await to(p.cam, { x: 0, y: 0, s: 1 }, 0)
-  teks(obj(800, 80, p.world), 0, 0, 'SITOSOL · TANPA OKSIGEN', 26, 'var(--color-paper)')
+  const tempat = obj(800, 80, p.world)
+  tempat.dataset.objek = 'label-sitosol'
+  teks(tempat, 0, 0, 'SITOSOL · TANPA OKSIGEN', 26, 'var(--color-paper)')
   await to(panel, { o: 0 }, 600)
   panel.remove()
 }

@@ -1,0 +1,117 @@
+import { hide, kinetik, to, type Objek, type Panggung } from '../../features/pemutar-episode/mesin'
+import {
+  mintaJelaskan,
+  mintaTebak,
+  tandaiAmati,
+  tampilkanAmati,
+} from '../../features/pemutar-episode/poe'
+import { bunyi } from '../../lib/suara'
+import { useJawaban } from '../../stores/jawaban'
+import { usePemutar } from '../../stores/pemutar'
+import { badge } from './molekul'
+import { say } from './naskah'
+
+// Amati soal e, seperti bersihAnim() di prototype: 2 dipakai, 4 terbentuk, 2 menggantikan
+// yang dipakai, tersisa 2 ATP bersih
+async function bersihAnim(p: Panggung, g: number) {
+  p.fx.replaceChildren()
+  // Jarak lencana 140 (prototype 120): lencana gambar lebih lebar dari lencana kode
+  const used = [0, 1].map((i) => hide(badge(p, 170 + i * 140, 620, 'ATP', p.fx)))
+  const lu = hide(kinetik(p, 240, 560, '−2 DIPAKAI', 36, 'var(--color-hot)'))
+  await Promise.all([...used.map((u) => to(u, { o: 1 }, 500)), to(lu, { o: 1 }, 500)])
+  await say(p, 'e1-e-02', { tambah: -600 })
+
+  const made = [0, 1, 2, 3].map((i) => hide(badge(p, 460 + i * 140, 620, 'ATP', p.fx)))
+  const lm = hide(kinetik(p, 670, 560, '+4 TERBENTUK', 36, 'var(--color-ok)'))
+  bunyi('atp')
+  await Promise.all([...made.map((m) => to(m, { o: 1 }, 500)), to(lm, { o: 1 }, 500)])
+  await say(p, 'e1-e-03', { tambah: -600 })
+  if (g === 4) await say(p, 'e1-e-04', { tambah: -600 })
+  if (g === 6) await say(p, 'e1-e-05', { tambah: -600 })
+  await say(p, 'e1-e-06', { tambah: -1200 })
+
+  for (let i = 0; i < 2; i++) {
+    await to(made[i], { x: used[i]._x, y: 620 }, 700)
+    bunyi('klik')
+    await Promise.all([to(made[i], { o: 0, s: 0.6 }, 300), to(used[i], { o: 0.15 }, 300)])
+  }
+  await Promise.all([
+    to(lu, { o: 0.25 }, 300),
+    to(lm, { o: 0 }, 300),
+    to(made[2], { x: 340, y: 620, s: 1.2 }, 700),
+    to(made[3], { x: 500, y: 620, s: 1.2 }, 700),
+  ])
+  const net = hide(kinetik(p, 420, 480, 'ATP BERSIH = 4 − 2 = 2', 44, 'var(--color-paper)'))
+  if (g === 2) {
+    bunyi('tepat')
+    tandaiAmati('benar')
+  } else {
+    bunyi('belum-tepat')
+    tandaiAmati(
+      'salah',
+      g === 4
+        ? '2 ATP yang dipakai belum dikurangkan'
+        : g === 6
+          ? 'ATP yang dipakai malah ditambahkan'
+          : 'yang tersisa 4 − 2',
+    )
+  }
+  await to(net, { o: 1, s: 1.08 }, 500)
+  await to(net, { s: 1 }, 300)
+  await say(p, 'e1-e-07')
+}
+
+export async function soalE(p: Panggung, piruvat: Objek[]) {
+  usePemutar.setState({ bab: 4 })
+  await say(p, 'e1-e-01')
+
+  const reasons = [
+    'Glikolisis membentuk 4 ATP, jadi bersihnya 4.',
+    'Terbentuk 4 ATP, dikurangi 2 ATP yang dipakai di awal.',
+    'ATP yang dipakai di awal ikut dihitung, jadi 4 + 2 = 6.',
+  ]
+  const P = await mintaTebak(p.signal, {
+    judul: 'Berapa ATP bersih yang dihasilkan glikolisis?',
+    reasons,
+    right: 2,
+    // Kartu kiri atas seperti prototype; nampan digeser ke kanan dan naik agar tidak menutupi
+    // maskot, token 3 x 2 di antara kartu kiri (desktop) dan kartu kanan (HP miring)
+    kartu: [3, 7],
+    zone: {
+      x: 580,
+      y: 600,
+      w: 680,
+      h: 170,
+      name: 'nampan ATP bersih',
+      cap: 'ATP bersih untuk sel',
+      nampan: true,
+    },
+    supply: [0, 1, 2, 3, 4, 5].map((i) => [640 + (i % 3) * 100, i < 3 ? 330 : 430]),
+    slot: (i, n) => [580 + (i - (n - 1) / 2) * 100, 600],
+  })
+  useJawaban.getState().catatPoe('e', { tebakan: P.g, alasan: P.r })
+  tampilkanAmati(P.g, 'ATP bersih')
+
+  // Sisa bab sebelumnya dipudarkan; yang tersisa hanya asam piruvat dan label sitosol
+  for (const c of Array.from(p.world.children) as Objek[]) {
+    if (!piruvat.includes(c) && !c.dataset.objek) void to(c, { o: 0 }, 400).then(() => c.remove())
+  }
+  await bersihAnim(p, P.g)
+
+  const x = await mintaJelaskan(p.signal, {
+    g: P.g,
+    r: P.r,
+    unit: 'ATP',
+    reasons,
+    back: [
+      'Glikolisis memang membentuk 4 ATP, tetapi 2 di antaranya menggantikan ATP yang dipakai di awal.',
+      'Ya. 4 terbentuk − 2 dipakai = 2 ATP bersih.',
+      'ATP yang dipakai justru dikurangkan, bukan ditambahkan.',
+    ],
+    right: 2,
+    alasanBenar: 1,
+    hasil: 'ATP bersihnya 2',
+  })
+  useJawaban.getState().catatPoe('e', { penjelasan: x })
+  useJawaban.getState().catat('e', '2 ATP bersih (4 terbentuk − 2 dipakai)')
+}

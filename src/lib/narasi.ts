@@ -5,7 +5,8 @@ import { usePengaturan } from '../stores/pengaturan'
 const TEREKAM = new Set<string>()
 
 let howlAktif: Howl | null = null
-let berbicara = false
+// Utterance yang sedang dibacakan. Dipegang di sini agar Chrome tidak membuang utterance sebelum onend terpanggil
+let ucapanAktif: SpeechSynthesisUtterance | null = null
 
 // Dicari tiap kali bicara: daftar suara browser sering baru terisi setelah halaman dibuka
 function suaraIndonesia() {
@@ -50,16 +51,18 @@ export function ucapkan(id: string, teks: string, opsi: { signal?: AbortSignal }
       u.lang = suara.lang
       u.rate = pelan ? 0.85 : 1
       u.onend = u.onerror = () => {
-        berbicara = false
+        ucapanAktif = null
         akhir()
       }
       berhenti = () => {
         window.speechSynthesis.cancel()
-        berbicara = false
+        ucapanAktif = null
         akhir()
       }
       signal?.addEventListener('abort', berhenti)
-      berbicara = true
+      ucapanAktif = u
+      // Chrome tetap dijeda setelah cancel(); tanpa resume, speak() berikutnya tak pernah selesai
+      if (window.speechSynthesis.paused) window.speechSynthesis.resume()
       window.speechSynthesis.speak(u)
     }
 
@@ -90,7 +93,7 @@ export function ucapkan(id: string, teks: string, opsi: { signal?: AbortSignal }
 }
 
 export function jedaNarasi(dijeda: boolean) {
-  if (berbicara) window.speechSynthesis[dijeda ? 'pause' : 'resume']()
+  if (ucapanAktif) window.speechSynthesis[dijeda ? 'pause' : 'resume']()
   if (howlAktif) {
     if (dijeda) howlAktif.pause()
     else howlAktif.play()

@@ -1,5 +1,5 @@
 import { beforeEach, expect, test, vi } from 'vitest'
-import { mintaPilihan } from '../../src/features/pemutar-episode/pilihan'
+import { mintaKetukSemua, mintaPilihan } from '../../src/features/pemutar-episode/pilihan'
 import { usePemutar } from '../../src/stores/pemutar'
 
 const isi = { judul: 'Pilih', opsi: [{ teks: 'salah' }, { teks: 'benar' }] }
@@ -55,4 +55,30 @@ test('kegagalan umpan balik yang terlambat tidak menghapus pilihan putaran baru'
   expect(usePemutar.getState().pilihan).toBe(pilihanBaru)
   pilihanBaru.pilih(1)
   await baru
+})
+
+test('ketuk semua: tiap sasaran sekali, sasaran yang sudah diketuk hilang, selesai setelah semuanya', async () => {
+  const ketuk = vi.fn(async () => {})
+  const selesai = vi.fn()
+  const sasaran = [
+    { teks: 'NAD⁺ atas', posisi: [100, 100] as [number, number] },
+    { teks: 'NAD⁺ bawah', posisi: [100, 300] as [number, number] },
+  ]
+  const janji = mintaKetukSemua(new AbortController().signal, 'Ketuk NAD⁺', sasaran, ketuk).then(
+    selesai,
+  )
+  const pilih = usePemutar.getState().pilihan!.pilih
+  usePemutar.setState({ dijeda: true })
+  await pilih(1)
+  expect(ketuk).not.toHaveBeenCalled()
+  usePemutar.setState({ dijeda: false })
+  await pilih(1)
+  await pilih(1)
+  expect(ketuk).toHaveBeenCalledExactlyOnceWith(1)
+  expect(usePemutar.getState().pilihan!.opsi[1].selesai).toBe(true)
+  expect(selesai).not.toHaveBeenCalled()
+  await pilih(0)
+  await janji
+  expect(ketuk).toHaveBeenCalledTimes(2)
+  expect(usePemutar.getState().pilihan).toBeNull()
 })

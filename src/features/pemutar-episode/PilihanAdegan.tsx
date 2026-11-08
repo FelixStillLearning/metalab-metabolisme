@@ -10,6 +10,7 @@ function PilihanAdegan() {
   }, [pilihan])
   if (!pilihan) return null
   const molekul = !!pilihan.opsi[0].posisi
+  const pertamaTersisa = pilihan.opsi.findIndex((o) => !o.selesai)
   return (
     <section
       className={molekul ? 'pemutar-pilih-molekul' : 'pemutar-soal'}
@@ -24,20 +25,30 @@ function PilihanAdegan() {
         <h2>{pilihan.judul}</h2>
       )}
       <div className="pemutar-opsi">
-        {pilihan.opsi.map(({ teks, posisi }, i) => (
-          <button
-            key={teks}
-            ref={i === 0 ? pertama : undefined}
-            type="button"
-            className={posisi ? 'pemutar-sasaran' : 'pemutar-pilihan'}
-            style={posisi ? { left: `${posisi[0] / 16}%`, top: `${posisi[1] / 9}%` } : undefined}
-            aria-label={teks}
-            disabled={dijeda}
-            onClick={() => pilihan.pilih(i)}
-          >
-            {posisi ? <span className="sr-only">{teks}</span> : teks}
-          </button>
-        ))}
+        {pilihan.opsi.map(({ teks, posisi, ukuran, selesai }, i) =>
+          selesai ? null : (
+            <button
+              key={teks}
+              ref={i === pertamaTersisa ? pertama : undefined}
+              type="button"
+              className={posisi ? 'pemutar-sasaran' : 'pemutar-pilihan'}
+              style={
+                posisi
+                  ? {
+                      left: `${posisi[0] / 16}%`,
+                      top: `${posisi[1] / 9}%`,
+                      ...(ukuran && { width: `${ukuran[0] / 16}%`, height: `${ukuran[1] / 9}%` }),
+                    }
+                  : undefined
+              }
+              aria-label={teks}
+              disabled={dijeda}
+              onClick={() => pilihan.pilih(i)}
+            >
+              {posisi ? <span className="sr-only">{teks}</span> : teks}
+            </button>
+          ),
+        )}
       </div>
     </section>
   )
