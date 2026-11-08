@@ -464,6 +464,105 @@
   margin-right: 2px;
 }
 
+/* ---------- pilihan di dalam adegan ---------- */
+
+.pemutar-pilih-molekul {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.pemutar-petunjuk {
+  position: absolute;
+  top: 11%;
+  right: 2.5%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: var(--color-accent);
+  color: var(--color-ink);
+  font: 800 clamp(13px, 1.1cqw, 20px) var(--font-body);
+}
+
+.pemutar-petunjuk img {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+}
+
+.pemutar-sasaran {
+  position: absolute;
+  width: 22%;
+  height: 29%;
+  min-height: 44px;
+  transform: translate(-50%, -50%);
+  border-radius: 12px;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.pemutar-sasaran:hover,
+.pemutar-sasaran:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+.pemutar-soal {
+  position: absolute;
+  left: 50%;
+  bottom: 19%;
+  transform: translateX(-50%);
+  width: min(48%, 640px);
+  padding: 24px 30px;
+  border-image: url('../../assets/images/interaksi-kartu-soal.webp') 100 fill / 24px stretch;
+  color: var(--color-ink);
+}
+
+.pemutar-soal h2 {
+  margin-bottom: 12px;
+  font: 800 clamp(17px, 1.55cqw, 28px) / 1.25 var(--font-head);
+}
+
+.pemutar-opsi {
+  display: flex;
+  gap: 10px;
+}
+
+.pemutar-pilihan {
+  flex: 1;
+  min-height: 44px;
+  padding: 8px 18px;
+  border-image: url('../../assets/images/interaksi-tombol-pilihan.webp') 0 90 0 90 fill / 0 14px
+    stretch;
+  font: 700 clamp(14px, 1.1cqw, 20px) var(--font-body);
+  cursor: pointer;
+}
+
+.pemutar-pilihan:hover {
+  color: var(--color-atp);
+}
+
+.pemutar-pilihan:disabled,
+.pemutar-sasaran:disabled {
+  cursor: default;
+}
+
+@media (max-height: 500px) and (orientation: landscape) {
+  .pemutar-soal {
+    padding: 14px 18px;
+  }
+
+  .pemutar-soal h2 {
+    font-size: 16px;
+    margin-bottom: 6px;
+  }
+
+  .pemutar-petunjuk {
+    top: 17%;
+  }
+}
+
 /* ---------- ajakan putar HP (I18) ---------- */
 
 .pemutar-putar-hp {

@@ -11,6 +11,12 @@ export type PoseMaskot =
   | '08-menunjuk'
   | '09-melambaikan'
 
+export type SoalPilihan = {
+  judul: string
+  opsi: { teks: string; posisi?: [number, number] }[]
+  pilih: (index: number) => void
+}
+
 type Pemutar = {
   kalimat: string
   pose: PoseMaskot
@@ -18,6 +24,7 @@ type Pemutar = {
   // -1 = pembuka
   bab: number
   dijeda: boolean
+  pilihan: SoalPilihan | null
 }
 
 // Keadaan sesaat pemutar episode; sengaja tidak disimpan
@@ -27,4 +34,5 @@ export const usePemutar = create<Pemutar>()(() => ({
   pendamping: null,
   bab: -1,
   dijeda: false,
+  pilihan: null,
 }))

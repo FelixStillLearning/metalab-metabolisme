@@ -1,6 +1,15 @@
 import sel from '../../assets/images/sel-hewan.webp'
 import PemutarEpisode from '../../features/pemutar-episode/PemutarEpisode'
 import { pembuka } from './pembuka'
+import { soalAB } from './soalAB'
+import { useJawaban } from '../../stores/jawaban'
+import type { Panggung } from '../../features/pemutar-episode/mesin'
+
+async function jalankan(p: Panggung) {
+  useJawaban.getState().mulai()
+  await pembuka(p)
+  await soalAB(p)
+}
 
 const BAB = [
   { k: 'a', t: 'Substrat' },
@@ -20,7 +29,7 @@ function Episode1Glikolisis() {
       ringkasan="Tonton bagaimana sel memecah glukosa. Videonya berhenti di setiap soal Aktivitas 1.7: kamu menjawab langsung di adegan, lalu videonya berlanjut sesuai pilihanmu."
       bab={BAB}
       gambarSampul={sel}
-      jalankan={pembuka}
+      jalankan={jalankan}
     />
   )
 }
