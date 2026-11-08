@@ -7,6 +7,7 @@
   place-items: center;
   background: var(--color-screen);
   color: var(--color-ink);
+  font-family: var(--font-body);
 }
 
 .hasil {
@@ -52,8 +53,34 @@
 
 .hasil h1 {
   margin: 0;
-  font: 800 3cqw/1 var(--font-head);
+  font: 800 3cqw/1 var(--font-body);
   letter-spacing: -0.01em;
+}
+
+.hasil-episode {
+  margin: 0 0 0.6em;
+  font-weight: 700;
+  color: var(--color-screen-3);
+}
+
+.hasil-identitas {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  margin-top: 12px;
+  font-size: max(14px, 1cqw);
+}
+
+.hasil-identitas p {
+  overflow-wrap: anywhere;
+}
+
+.hasil-identitas button {
+  min-height: 44px;
+  padding: 8px 14px;
+  font-weight: 700;
+  cursor: pointer;
 }
 
 .hasil-lead {
@@ -84,7 +111,7 @@
 }
 
 .pair .n {
-  font: 800 2.7cqw/1 var(--font-head);
+  font: 800 2.7cqw/1 var(--font-body);
 }
 
 .pair .n small {
@@ -187,7 +214,7 @@
 }
 
 .dg .pin .k {
-  font: 800 21px/1 var(--font-head);
+  font: 800 21px/1 var(--font-body);
 }
 
 .dg .pin .a {
@@ -196,7 +223,7 @@
 }
 
 .dg .pin .besar {
-  font: 800 44px/1 var(--font-head);
+  font: 800 44px/1 var(--font-body);
   fill: var(--color-atp);
 }
 
@@ -290,7 +317,7 @@
     width: 26px;
     height: 26px;
     background: url('../../assets/images/interaksi-pin.webp') center / contain no-repeat;
-    font: 800 15px/1 var(--font-head);
+    font: 800 15px/1 var(--font-body);
   }
 
   .hasil-sisi {

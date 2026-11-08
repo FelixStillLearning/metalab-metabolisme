@@ -122,3 +122,24 @@ test('HP tegak: Lembar Hasil tanpa ajakan putar HP dan tanpa geser mendatar', as
   await expect(page.getByRole('button', { name: 'Simpan penjelasan' })).toBeVisible()
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(360)
 })
+
+test('identitas dapat dikoreksi dari hasil, tanpa mengubah jawaban tersimpan', async ({ page }) => {
+  await siapkan(page)
+  await page.goto('/#/episode/1/hasil')
+  const sebelum = await jawaban(page)
+  await page.getByRole('button', { name: 'Ubah identitas' }).click()
+  const dialog = page.getByRole('dialog')
+  await dialog.getByLabel('Nama', { exact: true }).fill('Siswa Uji')
+  await dialog.getByLabel('Kelas', { exact: true }).fill('XII IPA 1')
+  await dialog.getByRole('button', { name: 'Simpan identitas' }).click()
+  await expect(page.locator('.hasil-identitas')).toContainText('Siswa Uji · XII IPA 1')
+  await page.reload()
+  await expect(page.locator('.hasil-identitas')).toContainText('Siswa Uji · XII IPA 1')
+  expect(await jawaban(page)).toEqual(sebelum)
+  await expect(page.locator('.hasil')).not.toContainText('Aktivitas 1.7')
+  await expect(page.locator('.hasil-episode')).toHaveText('Episode 1 · Glikolisis')
+  const font = await page.locator('.hasil h1').evaluate((el) => getComputedStyle(el).fontFamily)
+  for (const selector of ['.hasil h2', '.pair .n', '.hasil textarea', '.dg .pin .besar']) {
+    await expect(page.locator(selector).first()).toHaveCSS('font-family', font)
+  }
+})
