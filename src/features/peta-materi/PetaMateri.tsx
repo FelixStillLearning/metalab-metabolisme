@@ -14,6 +14,7 @@ import latarHp from '../../assets/images/latar-peta-hp.webp'
 import latar from '../../assets/images/latar-peta.webp'
 import maskot from '../../assets/images/maskot-mitokondria-ramah.webp'
 import TombolSuara from '../../components/TombolSuara'
+import PengaturVolume from '../../components/PengaturVolume'
 import { putar, siapkan } from '../../lib/suara'
 import './peta-materi.css'
 
@@ -74,6 +75,7 @@ function PetaMateri() {
         </h1>
         <div className="flex items-center gap-3">
           <TombolSuara />
+          <PengaturVolume />
           <Link
             to="/"
             onClick={() => putar('kembali')}

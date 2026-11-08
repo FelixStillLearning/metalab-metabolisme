@@ -57,8 +57,17 @@
   letter-spacing: -0.01em;
 }
 
+.hasil-atas {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
 .hasil-episode {
-  margin: 0 0 0.6em;
+  margin: 0;
   font-weight: 700;
   color: var(--color-screen-3);
 }

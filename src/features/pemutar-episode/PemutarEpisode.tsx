@@ -4,9 +4,9 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Link } from 'react-router'
 import ikonPutarHp from '../../assets/svg/ui-putar-hp.svg?raw'
 import TombolSuara from '../../components/TombolSuara'
+import PengaturVolume from '../../components/PengaturVolume'
 import { musik } from '../../lib/suara'
 import { usePemutar } from '../../stores/pemutar'
-import { usePengaturan } from '../../stores/pengaturan'
 import Gelembung from './Gelembung'
 import { disc, el } from './kertas'
 import { jedaSemua, kendali, obj, type Objek, type Panggung } from './mesin'
@@ -115,16 +115,6 @@ function PemutarEpisode({
       sudahMulai.current = false
     }
   }, [])
-
-  // Narasi yang sedang berjalan ikut berhenti saat narasi atau semua suara dimatikan
-  useEffect(
-    () =>
-      usePengaturan.subscribe((s, lama) => {
-        if ((lama.narasi && !s.narasi) || (lama.suaraAktif && !s.suaraAktif))
-          window.speechSynthesis?.cancel()
-      }),
-    [],
-  )
 
   // HP diputar ke tegak di tengah episode: dijeda, dan tidak lanjut sendiri saat miring lagi
   useEffect(() => {
@@ -271,6 +261,7 @@ function PemutarEpisode({
           {dijeda ? <Play aria-hidden="true" /> : <Pause aria-hidden="true" />}
         </button>
         <TombolSuara className="pemutar-ib" />
+        <PengaturVolume className="pemutar-ib" />
         <span className="pemutar-posisi" aria-live="polite">
           {babIni ? (
             <>

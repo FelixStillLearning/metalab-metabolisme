@@ -5,6 +5,8 @@ import { ucapkan } from '../../lib/narasi'
 import { bolehBersuaraSendiri, bunyi } from '../../lib/suara'
 import { useJawaban } from '../../stores/jawaban'
 import IdentitasSiswa from '../identitas-siswa/IdentitasSiswa'
+import TombolSuara from '../../components/TombolSuara'
+import PengaturVolume from '../../components/PengaturVolume'
 import { useSiswa } from '../../stores/siswa'
 import { tenangAktif } from '../../stores/pengaturan'
 import './lembar-hasil.css'
@@ -60,7 +62,13 @@ function LembarHasil({ judul, lead, bagan, poe, pertanyaan, cetak, rute, narasi 
     <main className="hasil-halaman">
       <div className="hasil" data-tenang={tenangAktif() || undefined}>
         <header className="hasil-kepala">
-          <p className="hasil-episode">Episode 1 · Glikolisis</p>
+          <div className="hasil-atas">
+            <p className="hasil-episode">Episode 1 · Glikolisis</p>
+            <div className="flex gap-2">
+              <TombolSuara />
+              <PengaturVolume />
+            </div>
+          </div>
           <h1>{judul}</h1>
           <p className="hasil-lead">{lead}</p>
           <div className="hasil-identitas">
