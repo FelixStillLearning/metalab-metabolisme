@@ -31,7 +31,20 @@ test('soal a dan b memberi umpan balik dan menyimpan jawaban tanpa skor', async 
     page.getByRole('heading', { name: 'Ada berapa tahap utama dalam glikolisis?' }),
   ).toBeVisible()
   expect((await draf(page)).a).toBe('Glukosa (6 atom C)')
-  await page.getByRole('button', { name: '1 tahap', exact: true }).click()
+  const satu = page.getByRole('button', { name: '1 tahap', exact: true })
+  await expect(satu).toHaveCSS('font-family', /Atkinson Hyperlegible/)
+  if (await page.evaluate(() => matchMedia('(hover: hover)').matches)) {
+    await page.getByRole('button', { name: '2 tahap', exact: true }).hover()
+    await expect(page.getByRole('button', { name: '2 tahap', exact: true })).toHaveCSS(
+      'outline-style',
+      'dashed',
+    )
+  }
+  await satu.click()
+  await expect(satu).toHaveAttribute('aria-pressed', 'true')
+  await expect(satu).toHaveCSS('background-color', 'rgb(63, 91, 169)')
+  await expect(satu).toHaveCSS('color', 'rgb(245, 241, 232)')
+  await expect(satu).toHaveCSS('border-image-source', 'none')
   await expect(page.locator('[data-gelembung]')).toContainText('dua panah putus-putus')
   expect((await draf(page)).b).toBeUndefined()
   await page.getByRole('button', { name: '2 tahap', exact: true }).click()

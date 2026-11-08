@@ -73,12 +73,16 @@ test('soal g dan h, lalu Lembar Hasil dari jawaban putaran ini', async ({ page }
   // h: rumpang diisi berurutan, pilihan salah menahan
   const terisi = page.locator('[data-rumpang="terisi"]')
   await tombol(page, '6 CO₂').click({ timeout: 20000 })
+  await expect(tombol(page, '6 CO₂')).toHaveAttribute('aria-pressed', 'true')
+  await expect(tombol(page, '6 CO₂')).toHaveCSS('background-color', 'rgb(63, 91, 169)')
+  await expect(tombol(page, '6 CO₂')).toHaveCSS('font-family', /Atkinson Hyperlegible/)
   await expect(gelembung(page)).toHaveText(
     'Karbon glukosa masih utuh di asam piruvat: 3 + 3 = 6, belum ada CO₂.',
   )
   await expect(terisi).toHaveCount(0)
   await tombol(page, '2 asam piruvat (3 C)').click()
   await expect(terisi).toHaveCount(1)
+  await expect(page.locator('.pemutar-lengkapi [aria-pressed="true"]')).toHaveCount(0)
   await tombol(page, 'membran krista').click()
   await expect(gelembung(page)).toHaveText('Membran krista adalah tempat transpor elektron.')
   await tombol(page, 'sitosol').click()

@@ -49,7 +49,16 @@ test('POE c: tebak, amati investasi energi, pembelahan 6C jadi 2 PGAL, dan jelas
   const alasan2 = page.getByRole('button', {
     name: 'Glukosa perlu dua fosfat agar terbelah, dan tiap ATP memberi satu fosfat.',
   })
+  const alasan1 = page.locator('.poe-reasons .chip').first()
+  await alasan1.click()
+  await expect(alasan1).toHaveAttribute('aria-pressed', 'true')
   await alasan2.click()
+  await expect(alasan1).toHaveAttribute('aria-pressed', 'false')
+  await expect(alasan2).toHaveAttribute('aria-pressed', 'true')
+  await expect(alasan2).toHaveCSS('background-color', 'rgb(63, 91, 169)')
+  await expect(alasan2).toHaveCSS('color', 'rgb(245, 241, 232)')
+  await expect(alasan2).toHaveCSS('font-family', /Atkinson Hyperlegible/)
+  await expect(alasan2).toHaveCSS('font-weight', '700')
   await expect(tombolKunci).toBeEnabled()
 
   // Kunci tebakan
@@ -283,9 +292,9 @@ test('POE c: chip tahap, label, zona glukosa, token, dan kartu tebakan tidak ber
   const alasan = page.getByRole('button', { name: ALASAN_BENAR })
   await alasan.click()
   await alasan.hover()
-  await expect
-    .poll(() => alasan.evaluate((e) => getComputedStyle(e).borderImageSource))
-    .toContain('tombol-pilihan-terpilih')
+  await expect(alasan).toHaveCSS('background-color', 'rgb(63, 91, 169)')
+  await expect(alasan).toHaveCSS('color', 'rgb(245, 241, 232)')
+  await expect(alasan).toHaveCSS('border-image-source', 'none')
 
   // Ketiga token di zona glukosa
   for (let i = 1; i <= 3; i++) {

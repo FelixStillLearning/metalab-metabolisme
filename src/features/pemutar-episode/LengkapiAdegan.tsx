@@ -1,9 +1,10 @@
-import { Fragment, useEffect, useRef } from 'react'
+import { Fragment, useEffect, useRef, useState } from 'react'
 import { usePemutar } from '../../stores/pemutar'
 
 // Lengkapi kalimat: kalimat utuh dengan rumpang, rumpang aktif disorot, pilihannya di bawah
 function LengkapiAdegan() {
   const { lengkapi, dijeda } = usePemutar()
+  const [terpilih, setTerpilih] = useState<{ opsi: string[]; indeks: number } | null>(null)
   const pertama = useRef<HTMLButtonElement>(null)
   const aktif = lengkapi?.terisi.length
   useEffect(() => {
@@ -38,8 +39,12 @@ function LengkapiAdegan() {
             ref={i === 0 ? pertama : undefined}
             type="button"
             className="pemutar-pilihan"
+            aria-pressed={terpilih?.opsi === opsi && terpilih.indeks === i}
             disabled={dijeda}
-            onClick={() => pilih(i)}
+            onClick={() => {
+              setTerpilih({ opsi, indeks: i })
+              pilih(i)
+            }}
           >
             {teks}
           </button>

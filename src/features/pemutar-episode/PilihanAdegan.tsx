@@ -1,9 +1,12 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import tangan from '../../assets/images/interaksi-tangan.webp'
-import { usePemutar } from '../../stores/pemutar'
+import { usePemutar, type SoalPilihan } from '../../stores/pemutar'
 
 function PilihanAdegan() {
   const { pilihan, dijeda } = usePemutar()
+  const [terpilih, setTerpilih] = useState<{ opsi: SoalPilihan['opsi']; indeks: number } | null>(
+    null,
+  )
   const pertama = useRef<HTMLButtonElement>(null)
   useEffect(() => {
     pertama.current?.focus()
@@ -42,8 +45,14 @@ function PilihanAdegan() {
                   : undefined
               }
               aria-label={teks}
+              aria-pressed={
+                posisi ? undefined : terpilih?.opsi === pilihan.opsi && terpilih.indeks === i
+              }
               disabled={dijeda}
-              onClick={() => pilihan.pilih(i)}
+              onClick={() => {
+                if (!posisi) setTerpilih({ opsi: pilihan.opsi, indeks: i })
+                pilihan.pilih(i)
+              }}
             >
               {posisi ? <span className="sr-only">{teks}</span> : teks}
             </button>
