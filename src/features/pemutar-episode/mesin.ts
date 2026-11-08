@@ -253,7 +253,7 @@ export async function comic(
       [19, 26],
       [-18, 28],
     ]
-    cut(letter, potongan, fill)
+    cut(letter, potongan, fill, {}, 1, { bayangan: true })
     teks(letter, 0, 13, char, 36, 'var(--color-ink)')
     hide(letter)
     letter._s = 0.5
@@ -284,7 +284,7 @@ export function burstBehind(p: Panggung, g: Objek) {
       const r = i % 2 ? small : large
       return [Math.cos(a) * r, Math.sin(a) * r]
     })
-    cut(burst, titik, fill, {}, 4)
+    cut(burst, titik, fill, {}, 4, { bayangan: true })
   }
   hide(burst)
   burst._s = 0.5

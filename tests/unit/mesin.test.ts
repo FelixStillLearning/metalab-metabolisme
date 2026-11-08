@@ -9,7 +9,14 @@ import {
   wait,
   type Panggung,
 } from '../../src/features/pemutar-episode/mesin'
-import { label, skeleton } from '../../src/features/pemutar-episode/kertas'
+import {
+  aturTitik,
+  cut,
+  hapusBentuk,
+  label,
+  skeleton,
+  strip,
+} from '../../src/features/pemutar-episode/kertas'
 import { usePengaturan } from '../../src/stores/pengaturan'
 
 const NS = 'http://www.w3.org/2000/svg'
@@ -66,6 +73,53 @@ test('skeleton membuat satu atom C per titik', () => {
   const pasang = titik.map((_, i): [number, number] => [i, (i + 1) % 6])
   skeleton(g, titik, pasang)
   expect(g.querySelectorAll('[data-carbon]').length).toBe(6)
+})
+
+test('bentuk berbayangan punya salinan bayangan di belakangnya', () => {
+  const g = document.createElementNS(NS, 'g')
+  const titik = Array.from({ length: 6 }, (_, i): [number, number] => [i * 40, 0])
+  skeleton(g, titik, [
+    [0, 1],
+    [1, 2],
+  ])
+  expect(g.querySelectorAll('[data-carbon]').length).toBe(6)
+  const bentuk = g.querySelector('[data-carbon] polygon:not([data-bayangan])')
+  const bayangan = bentuk?.previousElementSibling
+  expect(bayangan?.hasAttribute('data-bayangan')).toBe(true)
+  expect(bayangan?.getAttribute('fill')).toBe('#0d2526')
+  expect(bayangan?.getAttribute('opacity')).toBe('0.38')
+  expect(bayangan?.getAttribute('transform')).toBe('translate(3 5)')
+  expect(bayangan?.getAttribute('points')).toBe(bentuk?.getAttribute('points'))
+  expect(bayangan?.hasAttribute('data-carbon')).toBe(false)
+})
+
+test('strip tanpa pilihan bayangan tidak berbayangan', () => {
+  const g = document.createElementNS(NS, 'g')
+  const bentuk = strip(g, 0, 0, 50, 0)
+  expect(g.querySelector('[data-bayangan]')).toBeNull()
+  expect(bentuk.bayangan).toBeUndefined()
+})
+
+test('hapusBentuk dan aturTitik mengubah bentuk beserta bayangannya', () => {
+  const g = document.createElementNS(NS, 'g')
+  const bentuk = cut(
+    g,
+    [
+      [0, 0],
+      [10, 0],
+      [10, 10],
+    ],
+    'red',
+    {},
+    1,
+    { bayangan: true },
+  )
+  aturTitik(bentuk, '-98,-26 96,-27 99,24')
+  expect(bentuk.getAttribute('points')).toBe('-98,-26 96,-27 99,24')
+  expect(bentuk.bayangan?.getAttribute('points')).toBe('-98,-26 96,-27 99,24')
+  expect(bentuk.bayangan?.getAttribute('transform')).toBe('translate(3 5)')
+  hapusBentuk(bentuk)
+  expect(g.children.length).toBe(0)
 })
 
 test('primitif kertas tanpa filter', () => {

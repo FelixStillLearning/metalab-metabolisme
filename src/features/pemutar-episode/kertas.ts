@@ -1,12 +1,14 @@
 // Primitif kertas potong dari prototype desain final: tepi bergerigi dengan benih tetap,
 // jadi bentuk yang sama selalu tergambar sama. Bayangan kertas berupa salinan bentuk yang
-// digeser di belakangnya, bukan filter SVG.
+// digeser di belakangnya, bukan filter SVG; hanya bentuk yang di prototype berbayangan memakainya.
 
 const NS = 'http://www.w3.org/2000/svg'
 const WARNA_BAYANGAN = '#0d2526'
 
 export type Titik = [number, number]
 type Atribut = Record<string, string | number>
+type Opsi = { bayangan?: boolean }
+export type Bentuk = SVGPolygonElement & { bayangan?: SVGPolygonElement }
 
 let benih = 101
 const jitter = (n: number) => (((benih = (benih * 16807) % 2147483647) / 2147483647) * 2 - 1) * n
@@ -28,21 +30,38 @@ export function cut(
   fill: string,
   attrs: Atribut = {},
   rough = 1,
-) {
+  { bayangan = false }: Opsi = {},
+): Bentuk {
   const titik = points
     .map(([x, y]) => `${(x + jitter(rough)).toFixed(2)},${(y + jitter(rough)).toFixed(2)}`)
     .join(' ')
-  el(
-    'polygon',
-    {
-      points: titik,
-      fill: WARNA_BAYANGAN,
-      opacity: 0.38 * Number(attrs.opacity ?? 1),
-      transform: 'translate(3 5)',
-    },
-    parent,
-  )
-  return el('polygon', { points: titik, fill, ...attrs }, parent)
+  const salinan = bayangan
+    ? el(
+        'polygon',
+        {
+          points: titik,
+          fill: WARNA_BAYANGAN,
+          opacity: 0.38 * Number(attrs.opacity ?? 1),
+          transform: 'translate(3 5)',
+          'data-bayangan': '',
+        },
+        parent,
+      )
+    : undefined
+  return Object.assign(el('polygon', { points: titik, fill, ...attrs }, parent), {
+    bayangan: salinan,
+  })
+}
+
+// Bentuk dan bayangannya selalu diubah bersama
+export function hapusBentuk(bentuk: Bentuk) {
+  bentuk.bayangan?.remove()
+  bentuk.remove()
+}
+
+export function aturTitik(bentuk: Bentuk, points: string) {
+  bentuk.setAttribute('points', points)
+  bentuk.bayangan?.setAttribute('points', points)
 }
 
 export function disc(
@@ -52,12 +71,13 @@ export function disc(
   radius: number,
   fill: string,
   attrs: Atribut = {},
+  opsi: Opsi = {},
 ) {
   const titik = Array.from({ length: 18 }, (_, i): Titik => {
     const a = (i / 18) * Math.PI * 2
     return [x + Math.cos(a) * radius, y + Math.sin(a) * radius]
   })
-  return cut(parent, titik, fill, attrs, 0.65)
+  return cut(parent, titik, fill, attrs, 0.65, opsi)
 }
 
 export function strip(
@@ -69,6 +89,7 @@ export function strip(
   width = 8,
   fill = 'var(--color-paper)',
   attrs: Atribut = {},
+  opsi: Opsi = {},
 ) {
   const panjang = Math.hypot(x2 - x1, y2 - y1) || 1
   const nx = (-(y2 - y1) / panjang) * (width / 2)
@@ -79,7 +100,7 @@ export function strip(
     [x2 - nx, y2 - ny],
     [x1 - nx, y1 - ny],
   ]
-  return cut(parent, titik, fill, attrs, 0.5)
+  return cut(parent, titik, fill, attrs, 0.5, opsi)
 }
 
 export function label(parent: Element, x: number, y: number, value: string, size = 22) {
@@ -95,6 +116,9 @@ export function label(parent: Element, x: number, y: number, value: string, size
       [-w / 2 - 1, h / 2 + 1],
     ],
     'var(--color-paper)',
+    {},
+    1,
+    { bayangan: true },
   )
   const text = el(
     'text',
@@ -115,7 +139,7 @@ export function label(parent: Element, x: number, y: number, value: string, size
 
 export function carbon(parent: Element, x: number, y: number, radius = 21) {
   const group = el('g', { 'data-carbon': '' }, parent)
-  disc(group, x, y, radius, 'var(--color-paper)')
+  disc(group, x, y, radius, 'var(--color-paper)', {}, { bayangan: true })
   const text = el(
     'text',
     {
@@ -134,6 +158,17 @@ export function carbon(parent: Element, x: number, y: number, radius = 21) {
 
 export function skeleton(parent: Element, points: Titik[], pairs: [number, number][]) {
   const bonds = el('g', {}, parent)
-  for (const [a, b] of pairs) strip(bonds, ...points[a], ...points[b])
+  for (const [a, b] of pairs)
+    strip(
+      bonds,
+      ...points[a],
+      ...points[b],
+      8,
+      'var(--color-paper)',
+      {},
+      {
+        bayangan: true,
+      },
+    )
   return points.map(([x, y]) => carbon(parent, x, y))
 }
