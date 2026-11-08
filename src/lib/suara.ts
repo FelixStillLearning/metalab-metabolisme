@@ -34,3 +34,25 @@ export function putar(nama: NamaSuara) {
 
 // Browser menolak suara sebelum halaman pernah disentuh, jadi suara otomatis hanya diputar sesudahnya
 export const bolehBersuaraSendiri = () => navigator.userActivation?.hasBeenActive ?? false
+
+export type SlotSuara =
+  | 'ketuk'
+  | 'tepat'
+  | 'belum-tepat'
+  | 'muncul'
+  | 'melesat'
+  | 'klik'
+  | 'getar'
+  | 'belah'
+  | 'atp'
+  | 'kunci'
+  | 'jatuh'
+  | 'selesai'
+
+// Slot belum punya berkas: diisi ketika suara finalnya ada, sampai itu bunyi() diam
+const BERKAS_SLOT: Partial<Record<SlotSuara, NamaSuara>> = {}
+
+export function bunyi(slot: SlotSuara) {
+  const nama = BERKAS_SLOT[slot]
+  if (nama && usePengaturan.getState().efek) putar(nama)
+}

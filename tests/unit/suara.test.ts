@@ -1,6 +1,6 @@
 import { Howl, Howler } from 'howler'
 import { beforeEach, expect, test, vi } from 'vitest'
-import { putar } from '../../src/lib/suara'
+import { bunyi, putar } from '../../src/lib/suara'
 import { usePengaturan } from '../../src/stores/pengaturan'
 
 const { play } = vi.hoisted(() => ({ play: vi.fn() }))
@@ -47,4 +47,9 @@ test('perubahan pengaturan langsung membisukan pemutar dan dapat dinyalakan lagi
   expect(Howler.mute).toHaveBeenLastCalledWith(false)
   putar('mulai')
   expect(play).toHaveBeenCalledTimes(2)
+})
+
+test('slot tanpa berkas tidak membuat audio', () => {
+  bunyi('ketuk')
+  expect(Howl).not.toHaveBeenCalled()
 })
