@@ -313,7 +313,7 @@
   }
 }
 
-/* HP miring: tinggi sempit, ikon disembunyikan supaya isi kartu tetap muat tanpa gulir ke bawah */
+/* HP miring: tinggi sempit, isi dipadatkan supaya kartu tetap muat tanpa gulir ke bawah */
 @media (max-height: 500px) {
   .peta-materi .peta-jalur {
     min-height: 0;
@@ -367,7 +367,15 @@
     display: none;
   }
 
+  /* Ikon kecil hanya di kartu utama yang penuh; ikon episode dan ikon lajur disembunyikan
+     karena tingginya tidak cukup */
   .peta-materi .peta-ikon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .peta-materi .peta-episode .peta-ikon,
+  .peta-materi .peta-jalur:has(.peta-laci:not([hidden])) .peta-samping .peta-ikon {
     display: none;
   }
 
