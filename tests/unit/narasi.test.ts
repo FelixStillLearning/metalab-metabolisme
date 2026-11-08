@@ -20,7 +20,8 @@ const sintesis = {
   pause: vi.fn(),
   resume: vi.fn(),
   getVoices: vi.fn(() => [{ lang: 'id-ID', name: 'Indonesian' }]),
-  onvoiceschanged: null as (() => void) | null,
+  addEventListener: vi.fn(),
+  removeEventListener: vi.fn(),
 }
 
 beforeEach(() => {
@@ -65,4 +66,17 @@ test('abort menghentikan narasi', async () => {
   pengendali.abort()
   await janji
   expect(sintesis.cancel).toHaveBeenCalled()
+})
+
+test('menunggu voiceschanged bila daftar suara masih kosong', async () => {
+  sintesis.getVoices.mockReturnValue([])
+  const janji = ucapkan('x', 'halo')
+  expect(sintesis.speak).not.toHaveBeenCalled()
+  sintesis.getVoices.mockReturnValue([{ lang: 'id-ID', name: 'Indonesian' }])
+  const [jenis, panggil] = sintesis.addEventListener.mock.calls[0]
+  expect(jenis).toBe('voiceschanged')
+  panggil()
+  expect(sintesis.speak).toHaveBeenCalledOnce()
+  ;(sintesis.speak.mock.calls[0][0] as UtteranceTiruan).onend!()
+  await janji
 })

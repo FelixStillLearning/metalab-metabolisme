@@ -44,24 +44,48 @@ export function ucapkan(id: string, teks: string, opsi: { signal?: AbortSignal }
       return
     }
 
-    const suara = suaraIndonesia()
-    if (!suara) return akhir()
-    const u = new SpeechSynthesisUtterance(lafal(teks))
-    u.voice = suara
-    u.lang = suara.lang
-    u.rate = pelan ? 0.85 : 1
-    u.onend = u.onerror = () => {
-      berbicara = false
-      akhir()
+    const bicara = (suara: SpeechSynthesisVoice) => {
+      const u = new SpeechSynthesisUtterance(lafal(teks))
+      u.voice = suara
+      u.lang = suara.lang
+      u.rate = pelan ? 0.85 : 1
+      u.onend = u.onerror = () => {
+        berbicara = false
+        akhir()
+      }
+      berhenti = () => {
+        window.speechSynthesis.cancel()
+        berbicara = false
+        akhir()
+      }
+      signal?.addEventListener('abort', berhenti)
+      berbicara = true
+      window.speechSynthesis.speak(u)
     }
+
+    const suara = suaraIndonesia()
+    if (suara) return bicara(suara)
+    // Chrome mengisi daftar suara belakangan: bila masih kosong, tunggu sebentar sebelum menyerah
+    const sintesis = window.speechSynthesis
+    if (!sintesis || sintesis.getVoices().length > 0) return akhir()
+    const batal = () => {
+      clearTimeout(timer)
+      sintesis.removeEventListener('voiceschanged', coba)
+      signal?.removeEventListener('abort', berhenti)
+    }
+    const coba = () => {
+      batal()
+      const siap = suaraIndonesia()
+      if (siap) bicara(siap)
+      else akhir()
+    }
+    const timer = setTimeout(coba, 1500)
+    sintesis.addEventListener('voiceschanged', coba)
     berhenti = () => {
-      window.speechSynthesis.cancel()
-      berbicara = false
+      batal()
       akhir()
     }
     signal?.addEventListener('abort', berhenti)
-    berbicara = true
-    window.speechSynthesis.speak(u)
   })
 }
 
