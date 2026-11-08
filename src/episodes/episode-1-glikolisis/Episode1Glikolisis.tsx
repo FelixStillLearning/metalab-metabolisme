@@ -33,8 +33,8 @@ function Episode1Glikolisis() {
   return (
     <PemutarEpisode
       judul="Glikolisis"
-      label="Aktivitas 1.7 · Episode 01"
-      ringkasan="Tonton bagaimana sel memecah glukosa. Videonya berhenti di setiap soal Aktivitas 1.7: kamu menjawab langsung di adegan, lalu videonya berlanjut sesuai pilihanmu."
+      label="Episode 1"
+      ringkasan="Ikuti perjalanan glukosa di dalam sel. Amati prosesnya dan jawab pertanyaan untuk mengetahui bagaimana energi terbentuk."
       bab={[...BAB]}
       gambarSampul={sel}
       otomatis={otomatis}

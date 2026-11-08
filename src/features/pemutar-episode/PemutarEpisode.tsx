@@ -238,15 +238,17 @@ function PemutarEpisode({
               <span className="pemutar-label">{label}</span>
               <h1>{judul}</h1>
               <p>{ringkasan}</p>
-              <button
-                type="button"
-                className="tombol-utama"
-                disabled={mulai}
-                onClick={mulaiEpisode}
-              >
-                Mulai episode
-              </button>
-              {kembali}
+              <div className="pemutar-sampul-aksi">
+                <button
+                  type="button"
+                  className="tombol-utama"
+                  disabled={mulai}
+                  onClick={mulaiEpisode}
+                >
+                  Mulai episode
+                </button>
+                {kembali}
+              </div>
             </div>
           </div>
         )}

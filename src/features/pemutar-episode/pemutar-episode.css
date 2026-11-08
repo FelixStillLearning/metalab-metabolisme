@@ -117,6 +117,14 @@
   line-height: 1.5;
 }
 
+.pemutar-sampul-aksi {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.2cqw;
+  margin-top: 0.6cqw;
+}
+
 .pemutar-sampul .tombol-utama,
 .pemutar-akhir .tombol-utama {
   padding: 0.5em 1.6em 0.7em;
@@ -126,7 +134,7 @@
 }
 
 .pemutar-sampul .tombol-utama {
-  margin-top: 1cqw;
+  margin-top: 0;
 }
 
 .pemutar-sampul .tombol-utama:hover,
@@ -155,17 +163,33 @@
 .pemutar-kembali {
   display: inline-flex;
   align-items: center;
-  gap: 0.4em;
-  margin-top: 8px;
-  color: var(--color-paper);
-  font-size: clamp(13px, 1.1cqw, 18px);
-  text-decoration: underline;
-  text-underline-offset: 5px;
+  gap: 0.5em;
+  padding: 0.45em 1.2em 0.55em;
+  border-radius: 999px;
+  background: var(--color-paper);
+  box-shadow: var(--shadow-kertas-sm);
+  color: var(--color-ink);
+  font: 800 clamp(13px, 1.15cqw, 18px) / 1.2 var(--font-head);
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    translate var(--durasi-ui) var(--ease-pose),
+    box-shadow var(--durasi-ui) var(--ease-pose);
+}
+
+.pemutar-kembali:hover {
+  translate: 0 -3px;
+  box-shadow: 2px 4px 0 #0d252640;
+}
+
+.pemutar-kembali:active {
+  translate: 0 1px;
 }
 
 .pemutar-kembali svg {
-  width: 1.1em;
-  height: 1.1em;
+  width: 1.15em;
+  height: 1.15em;
+  flex-shrink: 0;
 }
 
 /* ---------- narator dan gelembung ---------- */
@@ -992,6 +1016,16 @@
   .pemutar-label {
     padding: 5px 9px;
     font-size: 12px;
+  }
+
+  .pemutar-sampul-aksi {
+    gap: 8px;
+    margin-top: 4px;
+  }
+
+  .pemutar-sampul .pemutar-kembali {
+    padding: 0.35em 0.9em 0.45em;
+    font-size: 13px;
   }
 
   .pemutar-narator,

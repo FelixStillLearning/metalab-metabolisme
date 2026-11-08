@@ -12,7 +12,7 @@ test.beforeEach(async ({ page }) => {
 
 test('sampul episode menampilkan judul dan tombol mulai', async ({ page }) => {
   await expect(page.getByRole('heading', { level: 1, name: 'Glikolisis' })).toBeVisible()
-  await expect(page.getByText('Aktivitas 1.7 · Episode 01')).toBeVisible()
+  await expect(page.getByText('Episode 1')).toBeVisible()
   await expect(page.getByRole('button', { name: 'Mulai episode' })).toBeVisible()
   await expect(page.getByRole('link', { name: 'Peta materi', exact: true })).toBeVisible()
 })
