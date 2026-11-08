@@ -74,7 +74,9 @@ test('soal g dan h, lalu Lembar Hasil dari jawaban putaran ini', async ({ page }
   const terisi = page.locator('[data-rumpang="terisi"]')
   await tombol(page, '6 CO₂').click({ timeout: 20000 })
   await expect(tombol(page, '6 CO₂')).toHaveAttribute('aria-pressed', 'true')
-  await expect(tombol(page, '6 CO₂')).toHaveCSS('background-color', 'rgb(63, 91, 169)')
+  await expect
+    .poll(() => tombol(page, '6 CO₂').evaluate((el) => getComputedStyle(el, '::before').filter))
+    .toContain('hue-rotate')
   await expect(tombol(page, '6 CO₂')).toHaveCSS('font-family', /Atkinson Hyperlegible/)
   await expect(gelembung(page)).toHaveText(
     'Karbon glukosa masih utuh di asam piruvat: 3 + 3 = 6, belum ada CO₂.',

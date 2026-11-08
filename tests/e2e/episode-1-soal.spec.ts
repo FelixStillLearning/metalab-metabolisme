@@ -36,15 +36,19 @@ test('soal a dan b memberi umpan balik dan menyimpan jawaban tanpa skor', async 
   if (await page.evaluate(() => matchMedia('(hover: hover)').matches)) {
     await page.getByRole('button', { name: '2 tahap', exact: true }).hover()
     await expect(page.getByRole('button', { name: '2 tahap', exact: true })).toHaveCSS(
-      'outline-style',
-      'dashed',
+      'filter',
+      /drop-shadow/,
     )
   }
   await satu.click()
   await expect(satu).toHaveAttribute('aria-pressed', 'true')
-  await expect(satu).toHaveCSS('background-color', 'rgb(63, 91, 169)')
+  await expect
+    .poll(() => satu.evaluate((el) => getComputedStyle(el, '::before').filter))
+    .toContain('hue-rotate')
   await expect(satu).toHaveCSS('color', 'rgb(245, 241, 232)')
-  await expect(satu).toHaveCSS('border-image-source', 'none')
+  await expect
+    .poll(() => satu.evaluate((el) => getComputedStyle(el, '::before').borderImageSource))
+    .toContain('interaksi-tombol-pilihan')
   await expect(page.locator('[data-gelembung]')).toContainText('dua panah putus-putus')
   expect((await draf(page)).b).toBeUndefined()
   await page.getByRole('button', { name: '2 tahap', exact: true }).click()

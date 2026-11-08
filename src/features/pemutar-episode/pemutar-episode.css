@@ -552,31 +552,44 @@
   flex: 1;
   min-height: 44px;
   padding: 8px 18px;
-  border-image: url('../../assets/images/interaksi-tombol-pilihan.webp') 0 90 0 90 fill / 0 14px
-    stretch;
   cursor: pointer;
 }
 
 /* Satu gaya jawaban untuk pilihan biasa, rumpang, dan alasan POE. */
 .pemutar-pilihan,
 .chip {
-  border-radius: 4px;
+  position: relative;
+  isolation: isolate;
   color: var(--color-ink);
   font: 700 clamp(14px, 1.1cqw, 20px) / 1.35 var(--font-body);
 }
 
+/* Bentuk dan tekstur kertas sama pada semua keadaan; warna hanya mengubah lapisan gambar. */
+.pemutar-pilihan::before,
+.chip::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  border-image: url('../../assets/images/interaksi-tombol-pilihan.webp') 0 90 0 90 fill / 0 14px
+    stretch;
+}
+
 @media (hover: hover) {
   :is(.pemutar-pilihan, .chip):hover:not(:disabled, [aria-pressed='true']) {
-    outline: 2px dashed var(--color-atp);
-    outline-offset: -4px;
+    filter: drop-shadow(0 3px 0 #0d25264d);
   }
 }
 
 :is(.pemutar-pilihan, .chip)[aria-pressed='true'],
 :is(.pemutar-pilihan, .chip):active:not(:disabled) {
-  border-image-source: none;
-  background: var(--color-atp);
   color: var(--color-paper);
+}
+
+:is(.pemutar-pilihan, .chip)[aria-pressed='true']::before,
+:is(.pemutar-pilihan, .chip):active:not(:disabled)::before {
+  filter: brightness(0.35) sepia(1) saturate(4) hue-rotate(175deg);
 }
 
 :is(.pemutar-pilihan, .chip):focus-visible {
@@ -809,10 +822,8 @@
   gap: 8px;
 }
 
-/* Tombol pilihan G04: aset kertas dipakai untuk keadaan belum dipilih. */
+/* Ruang teks alasan POE di atas lapisan kertas G04. */
 .chip {
-  border-image: url('../../assets/images/interaksi-tombol-pilihan.webp') 0 90 0 90 fill / 0 14px
-    stretch;
   padding: 10px 18px 10px 22px;
   min-height: 44px;
   text-align: left;
