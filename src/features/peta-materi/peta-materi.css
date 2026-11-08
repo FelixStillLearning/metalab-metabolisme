@@ -25,7 +25,7 @@
   align-items: stretch;
   gap: 20px;
   min-height: 260px;
-  max-height: 680px;
+  max-height: 760px;
   overflow-x: auto;
   overscroll-behavior-x: contain;
   scroll-padding-inline: 16px;
@@ -46,7 +46,7 @@
   flex-direction: column;
   align-items: flex-start;
   gap: 10px;
-  width: clamp(260px, 74vw, 320px);
+  width: clamp(260px, 21vw, 380px);
   padding: 24px 22px;
 }
 
@@ -77,10 +77,6 @@
   gap: 24px;
 }
 
-.peta-materi .peta-pemicu {
-  width: clamp(260px, 74vw, 300px);
-}
-
 .peta-materi .peta-pemicu:focus-visible {
   outline: 4px solid var(--color-accent);
   outline-offset: 6px;
@@ -96,13 +92,28 @@
   pointer-events: none;
 }
 
+/* Laci akordeon: bingkai (latar) berubah lebar mengikuti --collapsible-panel-width dari Base UI
+   (piksel saat animasi, auto saat diam) dan memotong isinya; isi berlebar tetap supaya tidak
+   tersusun ulang selama bingkai berubah. Bingkai flex supaya isi meregang setinggi laci. */
 .peta-materi .peta-laci {
   --kertas: #e4dcc8;
   display: flex;
   flex: 0 0 auto;
+  width: var(--collapsible-panel-width);
+  overflow: hidden;
+}
+
+.peta-materi .peta-laci-isi {
+  display: flex;
   flex-direction: column;
   gap: 18px;
   padding: 22px 26px;
+}
+
+@media (orientation: landscape), (min-width: 768px) {
+  .peta-materi .peta-laci-isi {
+    width: max-content;
+  }
 }
 
 /* Laci dipasang sejak awal (keepMounted) supaya membukanya tidak memasang ulang kartu */
@@ -111,9 +122,24 @@
 }
 
 .peta-materi .peta-episode {
+  --sela: 28px;
   display: flex;
   flex: 1;
   gap: 28px;
+}
+
+/* Arah keluar-masuk kartu episode: dari posisi kartu 2. HP tegak mengganti arahnya dari atas. */
+.peta-materi .peta-episode > li {
+  --dari: calc(-1 * (var(--i) + 1) * (100% + var(--sela))) 0;
+}
+
+.peta-materi .peta-laci {
+  z-index: 1;
+}
+
+/* Kartu 2 di atas laci, jadi episode tampak keluar dari baliknya */
+.peta-materi .peta-pemicu {
+  z-index: 2;
 }
 
 .peta-materi .peta-episode > li {
@@ -136,11 +162,6 @@
   object-fit: contain;
 }
 
-.peta-materi .peta-lanjutan .peta-ikon {
-  width: 56px;
-  height: 56px;
-}
-
 /* Sambungan putus-putus antarepisode, menunjukkan urutan tahap */
 .peta-materi .peta-episode > li:not(:last-child)::after {
   content: '';
@@ -151,24 +172,112 @@
   border-top: 5px dashed var(--color-screen);
 }
 
-.peta-materi .peta-lanjutan {
+/* Bagian yang belum tersedia (Anaerob, Fotosintesis): bentuk sama, warna teal pudar */
+.peta-materi .peta-belum {
   --kertas: #9fb4b0;
+}
+
+/* Selama laci terbuka, kartu lain mengecil menjadi lajur tegak supaya laci mendapat ruang; saat
+   ditutup langsung melebar bersamaan dengan laci menyusut. Tidak berlaku di HP tegak. */
+@media (orientation: landscape), (min-width: 768px) {
+  /* Bila semua kartu muat, jalur berada di tengah; margin otomatis menjadi nol saat jalur penuh,
+     jadi awal jalur tetap bisa digeser (beda dengan justify-content: center) */
+  .peta-materi .peta-jalur > :first-child {
+    margin-left: auto;
+  }
+
+  .peta-materi .peta-jalur > :last-child {
+    margin-right: auto;
+  }
+
+  .peta-materi .peta-jalur:has(.peta-pemicu[data-panel-open]) .peta-samping {
+    width: 96px;
+    padding: 24px 12px;
+  }
+
+  /* Isi lajur (teks tegak) berlaku selama laci terlihat, termasuk selama menutup, jadi teks baru
+     mendatar saat kartu sudah penuh; tidak ada teks mendatar yang terlipat di lajur sempit.
+     (Bukan [data-ending-style]: Base UI memasangnya satu frame setelah status buka dilepas.) */
+  .peta-materi .peta-jalur:has(.peta-laci:not([hidden])) .peta-samping {
+    align-items: center;
+    gap: 14px;
+  }
+
+  .peta-materi .peta-jalur:has(.peta-laci:not([hidden])) .peta-samping .peta-nomor {
+    font-size: 40px;
+  }
+
+  .peta-materi .peta-jalur:has(.peta-laci:not([hidden])) .peta-samping .peta-ikon {
+    width: 56px;
+    height: 56px;
+  }
+
+  .peta-materi .peta-jalur:has(.peta-laci:not([hidden])) .peta-samping .peta-nama {
+    font-size: 28px;
+  }
+
+  .peta-materi .peta-jalur:has(.peta-laci:not([hidden])) .peta-samping :is(h2, p) {
+    writing-mode: vertical-rl;
+  }
+}
+
+/* Maskot mitokondria di kiri bawah dengan gelembung di kanannya, sejajar kepala. Di layar mendatar disisihkan pita
+   di bawah jalur supaya gelembung tidak menutupi isi kartu. Maskot tidak menghalangi klik. */
+.peta-materi {
+  --maskot: clamp(120px, 19dvh, 190px);
+  position: relative;
+}
+
+@media (orientation: landscape) and (min-height: 501px),
+  (min-width: 768px) and (min-height: 501px) {
+  .peta-materi {
+    padding-bottom: calc(var(--maskot) * 0.8);
+  }
+}
+
+.peta-materi .peta-maskot {
+  position: absolute;
+  bottom: 8px;
+  left: clamp(24px, 4vw, 80px);
+  z-index: 2;
   display: flex;
-  flex: 0 0 auto;
-  flex-direction: column;
-  align-items: center;
+  flex-direction: row-reverse;
+  align-items: flex-start;
   gap: 14px;
-  width: 96px;
-  padding: 24px 12px;
+  margin: 0;
+  pointer-events: none;
 }
 
-.peta-materi .peta-lanjutan .peta-nomor {
-  font-size: 40px;
+.peta-materi .peta-maskot img {
+  width: var(--maskot);
+  height: auto;
 }
 
-.peta-materi .peta-lanjutan h2,
-.peta-materi .peta-lanjutan p {
-  writing-mode: vertical-rl;
+.peta-materi .peta-maskot p {
+  position: relative;
+  max-width: 260px;
+  margin-top: calc(var(--maskot) * 0.12);
+  padding: 10px 16px;
+  border-radius: 6px;
+  background: var(--color-paper);
+  box-shadow: var(--shadow-kertas-sm);
+  color: var(--color-ink);
+  font-family: var(--font-head);
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.25;
+  text-wrap: balance;
+}
+
+.peta-materi .peta-maskot p::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -14px;
+  width: 16px;
+  height: 18px;
+  background: var(--color-paper);
+  clip-path: polygon(100% 0, 0 55%, 100% 100%);
 }
 
 @media (min-width: 640px) {
@@ -220,7 +329,7 @@
     font-size: 24px;
   }
 
-  .peta-materi .peta-laci {
+  .peta-materi .peta-laci-isi {
     gap: 8px;
     padding: 10px 16px;
     font-size: 14px;
@@ -236,19 +345,26 @@
   }
 
   /* Teks tegak disusun berdampingan, bukan bertumpuk, supaya kartu tidak lebih tinggi dari layar */
-  .peta-materi .peta-lanjutan {
-    flex-direction: row;
-    align-items: flex-start;
+  .peta-materi .peta-jalur:has(.peta-pemicu[data-panel-open]) .peta-samping {
     width: auto;
     padding: 16px 12px;
   }
 
-  .peta-materi .peta-lanjutan .peta-nomor {
+  .peta-materi .peta-jalur:has(.peta-laci:not([hidden])) .peta-samping {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  .peta-materi .peta-jalur:has(.peta-laci:not([hidden])) .peta-samping .peta-nomor {
     font-size: 28px;
   }
 
-  .peta-materi .peta-lanjutan .peta-nama {
+  .peta-materi .peta-jalur:has(.peta-laci:not([hidden])) .peta-samping .peta-nama {
     font-size: 20px;
+  }
+
+  .peta-materi .peta-maskot {
+    display: none;
   }
 
   .peta-materi .peta-ikon {
@@ -266,15 +382,12 @@
     padding: 16px;
   }
 
-  .peta-materi .peta-pemicu {
-    width: 200px;
-  }
-
   .peta-materi .peta-nama {
     font-size: 22px;
   }
 
   .peta-materi .peta-episode {
+    --sela: 20px;
     gap: 20px;
   }
 
@@ -324,7 +437,13 @@
     gap: 20px;
   }
 
+  /* HP tegak: laci membuka ke bawah, jadi yang berubah tingginya */
   .peta-materi .peta-laci {
+    width: auto;
+    height: var(--collapsible-panel-height);
+  }
+
+  .peta-materi .peta-laci-isi {
     padding: 16px;
   }
 
@@ -347,20 +466,24 @@
     border-left: 5px dashed var(--color-screen);
   }
 
-  .peta-materi .peta-lanjutan {
-    flex-direction: row;
-    flex-wrap: wrap;
-    width: auto;
-    padding: 16px 20px;
+  .peta-materi .peta-episode > li {
+    --dari: 0 calc(-1 * (var(--i) + 1) * (100% + 24px));
   }
 
-  .peta-materi .peta-lanjutan .peta-nomor {
-    font-size: 32px;
+  /* HP tegak: maskot ikut alur, di bawah kartu terakhir; lebih kecil supaya gelembung muat dua
+     baris dan tetap sejajar kepala */
+  .peta-materi {
+    --maskot: 120px;
   }
 
-  .peta-materi .peta-lanjutan h2,
-  .peta-materi .peta-lanjutan p {
-    writing-mode: horizontal-tb;
+  .peta-materi .peta-maskot {
+    position: static;
+    align-self: flex-start;
+    padding: 0 16px 8px;
+  }
+
+  .peta-materi .peta-maskot p {
+    margin-top: 0;
   }
 }
 
@@ -383,22 +506,59 @@
     translate: 0 -4px;
   }
 
+  /* Akordeon: lebar laci dan kartu samping berubah bersamaan (480 ms, kurva sama), jadi kartu 3
+     dan 4 ikut tertarik/terdorong mengikuti tepi laci. Base UI menunggu transisi laci ini
+     sebelum menyembunyikannya. Kartu episode terpotong tepi laci, jadi tampak keluar-masuk
+     kartu 2. */
   .peta-materi .peta-laci {
-    animation: peta-laci 420ms var(--ease-keluar) backwards;
+    transition: width 480ms var(--ease-busur);
   }
 
-  /* Tutup: kartu dilepas satu per satu dari episode 4 ke 1 (3 x 60 ms + 200 ms), lalu laci meluncur.
-     Base UI hanya menunggu animasi laci sendiri, jadi laci diberi jeda selama kartu dilepas. */
+  .peta-materi .peta-laci[data-starting-style],
   .peta-materi .peta-laci[data-ending-style] {
-    animation: peta-laci-tutup 240ms var(--ease-ancang) 300ms forwards;
+    width: 0;
   }
 
-  .peta-materi .peta-laci[data-ending-style] .peta-episode > li {
-    animation: peta-lepas 200ms var(--ease-ancang) calc((3 - var(--i)) * 60ms) forwards;
+  @media (orientation: portrait) and (max-width: 767px) {
+    .peta-materi .peta-laci {
+      transition-property: height;
+    }
+
+    .peta-materi .peta-laci[data-starting-style],
+    .peta-materi .peta-laci[data-ending-style] {
+      width: auto;
+      height: 0;
+    }
   }
 
   .peta-materi .peta-episode > li {
-    animation: peta-tempel 520ms var(--ease-letup) calc(160ms + var(--i) * 110ms) backwards;
+    animation: peta-keluar 520ms var(--ease-keluar) calc(80ms + var(--i) * 70ms) backwards;
+  }
+
+  /* Tutup: kartu meluncur masuk ke kartu 2 (terjauh lebih dulu), selesai sebelum laci (460 ms) */
+  .peta-materi .peta-laci[data-ending-style] .peta-episode > li {
+    animation: peta-masuk 340ms var(--ease-busur) calc((3 - var(--i)) * 40ms) forwards;
+  }
+
+  /* Kartu samping tanpa memudar (permintaan pengembang). interpolate-size membuat lebar auto
+     (HP miring) ikut beranimasi bila didukung browser. */
+  .peta-materi {
+    interpolate-size: allow-keywords;
+  }
+
+  .peta-materi .peta-samping {
+    transition:
+      width 480ms var(--ease-busur),
+      padding 480ms var(--ease-busur);
+  }
+
+  .peta-materi .peta-maskot img {
+    animation: peta-maskot 560ms var(--ease-letup) 500ms backwards;
+  }
+
+  /* Gelembung ditempel sekali saat halaman dibuka; kalimat berganti tanpa animasi */
+  .peta-materi .peta-maskot p {
+    animation: peta-tempel 420ms var(--ease-letup) 300ms backwards;
   }
 }
 
@@ -409,25 +569,26 @@
   }
 }
 
-@keyframes peta-lepas {
-  to {
-    opacity: 0;
-    scale: 0.6;
-  }
-}
-
-@keyframes peta-laci-tutup {
-  to {
-    opacity: 0;
-    translate: -32px 0;
-    scale: 0.96;
-  }
-}
-
-@keyframes peta-laci {
+@keyframes peta-maskot {
   from {
     opacity: 0;
-    translate: -32px 0;
-    scale: 0.96;
+    translate: 0 40px;
+  }
+}
+
+/* Jarak ke kartu 2: (urutan + 1) x (lebar kartu sendiri + sela antarkartu) */
+@keyframes peta-keluar {
+  from {
+    opacity: 0;
+    translate: var(--dari);
+    scale: 0.85;
+  }
+}
+
+@keyframes peta-masuk {
+  to {
+    opacity: 0;
+    translate: var(--dari);
+    scale: 0.85;
   }
 }

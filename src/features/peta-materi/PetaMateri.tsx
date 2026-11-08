@@ -12,6 +12,7 @@ import episode3 from '../../assets/images/episode-3.webp'
 import episode4 from '../../assets/images/episode-4.webp'
 import latarHp from '../../assets/images/latar-peta-hp.webp'
 import latar from '../../assets/images/latar-peta.webp'
+import maskot from '../../assets/images/maskot-mitokondria-ramah.webp'
 import TombolSuara from '../../components/TombolSuara'
 import { putar, siapkan } from '../../lib/suara'
 import './peta-materi.css'
@@ -50,17 +51,23 @@ function PetaMateri() {
 
   // Saat dibuka, jalur digeser agar laci terlihat utuh dan kartu aerob ikut terlihat bila muat.
   // Bila laci lebih lebar dari layar (HP), awal laci yang didahulukan. offsetLeft tidak terpengaruh animasi.
+  // Dihitung setelah akordeon selesai (transisi 480 ms di CSS), saat posisi kartu sudah final.
   useEffect(() => {
     const tombol = tombolAerob.current
     const isi = laci.current
     const jalur = isi?.closest<HTMLElement>('.peta-jalur')
     if (!terbuka || !tombol || !isi || !jalur) return
-    const tepi = parseFloat(getComputedStyle(jalur).paddingLeft)
-    const kananLaci = isi.offsetLeft + isi.offsetWidth + tepi - jalur.clientWidth
-    jalur.scrollLeft = Math.min(
-      isi.offsetLeft - tepi,
-      Math.max(tombol.offsetLeft - tepi, kananLaci),
-    )
+    const geser = () => {
+      const tepi = parseFloat(getComputedStyle(jalur).paddingLeft)
+      const kananLaci = isi.offsetLeft + isi.offsetWidth + tepi - jalur.clientWidth
+      jalur.scrollLeft = Math.min(
+        isi.offsetLeft - tepi,
+        Math.max(tombol.offsetLeft - tepi, kananLaci),
+      )
+    }
+    const halus = !matchMedia('(prefers-reduced-motion: reduce)').matches
+    const tunda = setTimeout(geser, halus ? 500 : 0)
+    return () => clearTimeout(tunda)
   }, [terbuka])
 
   return (
@@ -87,7 +94,7 @@ function PetaMateri() {
 
       <section aria-label="Jalur materi" className="peta-jalur">
         <section
-          className="peta-kertas peta-kartu"
+          className="peta-kertas peta-kartu peta-samping"
           style={urutan(0)}
           aria-labelledby="judul-pengantar"
         >
@@ -128,54 +135,60 @@ function PetaMateri() {
           </h2>
 
           <Collapsible.Panel ref={laci} keepMounted className="peta-kertas peta-laci">
-            {/* Tombol tutup di kiri: di HP laci lebih lebar dari layar, tepi kanannya tidak terlihat */}
-            <div className="flex flex-wrap items-center gap-4">
-              <button
-                type="button"
-                onClick={() => {
-                  ubah(false)
-                  tombolAerob.current?.focus()
-                }}
-                className="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-lg bg-paper px-3 font-head font-extrabold shadow-kertas-sm"
-              >
-                Tutup episode <X aria-hidden="true" className="size-5" />
-              </button>
-              <p className="font-head text-xl font-extrabold text-balance">
-                Respirasi Aerob: dari glukosa sampai ATP
+            <div className="peta-laci-isi">
+              {/* Tombol tutup di kiri: di HP laci lebih lebar dari layar, tepi kanannya tidak terlihat */}
+              <div className="flex flex-wrap items-center gap-4">
+                <button
+                  type="button"
+                  onClick={() => {
+                    ubah(false)
+                    tombolAerob.current?.focus()
+                  }}
+                  className="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-lg bg-paper px-3 font-head font-extrabold shadow-kertas-sm"
+                >
+                  Tutup episode <X aria-hidden="true" className="size-5" />
+                </button>
+                <p className="font-head text-xl font-extrabold text-balance">
+                  Respirasi Aerob: dari glukosa sampai ATP
+                </p>
+              </div>
+              <ol aria-label="Episode respirasi aerob" className="peta-episode">
+                {EPISODE.map(({ judul, tempat, ikon }, i) => (
+                  <li key={judul} className="peta-kertas peta-kartu" style={urutan(i)}>
+                    <span className="peta-nomor" aria-hidden="true">
+                      {i + 1}
+                    </span>
+                    <img src={ikon} alt="" width={240} height={240} className="peta-ikon" />
+                    <h3 className="peta-nama">{judul}</h3>
+                    <p className="text-muted">{tempat}</p>
+                    {i === 0 ? (
+                      <Link
+                        to="/episode/1"
+                        aria-label="Buka Glikolisis"
+                        className="tombol-utama mt-auto inline-flex min-h-12 items-center gap-2 px-5 pt-2 pb-3 font-head font-extrabold transition-transform duration-(--durasi-ui) ease-pose hover:-translate-y-0.5 active:translate-y-0.5"
+                      >
+                        Buka <ArrowRight aria-hidden="true" className="size-4" />
+                      </Link>
+                    ) : (
+                      <p className="mt-auto font-bold text-muted">Belum tersedia</p>
+                    )}
+                  </li>
+                ))}
+              </ol>
+              <p className="font-bold text-pretty">
+                Glukosa → 2 asam piruvat → 2 asetil KoA → NADH, FADH<sub>2</sub>, CO<sub>2</sub> →
+                34 ATP + H<sub>2</sub>O
               </p>
             </div>
-            <ol aria-label="Episode respirasi aerob" className="peta-episode">
-              {EPISODE.map(({ judul, tempat, ikon }, i) => (
-                <li key={judul} className="peta-kertas peta-kartu" style={urutan(i)}>
-                  <span className="peta-nomor" aria-hidden="true">
-                    {i + 1}
-                  </span>
-                  <img src={ikon} alt="" width={240} height={240} className="peta-ikon" />
-                  <h3 className="peta-nama">{judul}</h3>
-                  <p className="text-muted">{tempat}</p>
-                  {i === 0 ? (
-                    <Link
-                      to="/episode/1"
-                      aria-label="Buka Glikolisis"
-                      className="tombol-utama mt-auto inline-flex min-h-12 items-center gap-2 px-5 pt-2 pb-3 font-head font-extrabold transition-transform duration-(--durasi-ui) ease-pose hover:-translate-y-0.5 active:translate-y-0.5"
-                    >
-                      Buka <ArrowRight aria-hidden="true" className="size-4" />
-                    </Link>
-                  ) : (
-                    <p className="mt-auto font-bold text-muted">Belum tersedia</p>
-                  )}
-                </li>
-              ))}
-            </ol>
-            <p className="font-bold text-pretty">
-              Glukosa → 2 asam piruvat → 2 asetil KoA → NADH, FADH<sub>2</sub>, CO<sub>2</sub> → 34
-              ATP + H<sub>2</sub>O
-            </p>
           </Collapsible.Panel>
         </Collapsible.Root>
 
         {LANJUTAN.map(({ judul, ikon }, i) => (
-          <section key={judul} className="peta-kertas peta-lanjutan" style={urutan(i + 2)}>
+          <section
+            key={judul}
+            className="peta-kertas peta-kartu peta-samping peta-belum"
+            style={urutan(i + 2)}
+          >
             <span className="peta-nomor" aria-hidden="true">
               {i + 3}
             </span>
@@ -185,6 +198,12 @@ function PetaMateri() {
           </section>
         ))}
       </section>
+
+      {/* Kalimat DRAF; nanti mengikuti progres siswa bersama konsep kunci */}
+      <figure className="peta-maskot">
+        <p>{terbuka ? 'Mulai dari Glikolisis, ya!' : 'Ketuk Respirasi Aerob, yuk!'}</p>
+        <img src={maskot} alt="" width={328} height={327} />
+      </figure>
     </main>
   )
 }

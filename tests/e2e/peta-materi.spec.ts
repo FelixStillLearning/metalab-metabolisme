@@ -124,11 +124,29 @@ test('HP tegak: kartu dan episode menurun, tanpa geser ke samping', async ({ pag
 test('kartu beranimasi saat dibuka dan diam saat gerak dikurangi', async ({ page }) => {
   await page.getByRole('button', { name: 'Respirasi Aerob', exact: true }).click()
   const kartu = page.getByRole('list', { name: 'Episode respirasi aerob' }).getByRole('listitem')
-  await expect(kartu.first()).toHaveCSS('animation-name', 'peta-tempel')
+  // Laci melebar dari kartu 2 (lebar sebenarnya, akordeon), episode meluncur keluar satu per satu
+  // (HP tegak: laci membuka ke bawah, jadi tingginya yang beranimasi)
+  await expect(page.locator('.peta-laci')).toHaveCSS('transition-property', /width|height/)
+  await expect(kartu.first()).toHaveCSS('animation-name', 'peta-keluar')
   const jeda = await kartu.evaluateAll((items) =>
     items.map((el) => parseFloat(getComputedStyle(el).animationDelay)),
   )
   expect(jeda.every((n, i) => i === 0 || n > jeda[i - 1])).toBe(true)
+  const lapis = await page.evaluate(() =>
+    ['.peta-pemicu', '.peta-laci'].map((q) =>
+      Number(getComputedStyle(document.querySelector(q)!).zIndex),
+    ),
+  )
+  expect(lapis[0]).toBeGreaterThan(lapis[1])
+  // Kartu lain mengecil dengan transisi lebar, bukan melompat, dan isinya tidak memudar
+  await expect(page.locator('.peta-samping').first()).toHaveCSS('transition-property', /width/)
+  const pudar = await page.evaluate(
+    () =>
+      document
+        .getAnimations()
+        .filter((a) => (a as CSSAnimation).animationName?.startsWith('peta-pudar')).length,
+  )
+  expect(pudar).toBe(0)
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.reload()
   await page.getByRole('button', { name: 'Respirasi Aerob', exact: true }).click()
@@ -201,22 +219,34 @@ test('laci beranimasi saat ditutup, lalu tersembunyi; tanpa animasi saat gerak d
   await page.getByRole('button', { name: 'Respirasi Aerob', exact: true }).click()
   await tungguGerak(page)
   await page.getByRole('button', { name: 'Tutup episode', exact: true }).click()
-  await expect(laci).toHaveCSS('animation-name', 'peta-laci-tutup')
-  // Kartu dilepas satu per satu dari yang terakhir, kebalikan urutan saat dibuka
+  await expect(laci).toHaveAttribute('data-ending-style', '')
+  await expect(laci).toHaveCSS('transition-property', /width|height/)
+  // Kartu meluncur masuk kembali ke kartu 2, dimulai dari yang terjauh
   const kartu = laci.getByRole('listitem')
-  await expect(kartu.first()).toHaveCSS('animation-name', 'peta-lepas')
+  await expect(kartu.first()).toHaveCSS('animation-name', 'peta-masuk')
   const jeda = await kartu.evaluateAll((items) =>
     items.map((el) => parseFloat(getComputedStyle(el).animationDelay)),
   )
   expect(jeda.every((n, i) => i === 0 || n < jeda[i - 1])).toBe(true)
   await expect(laci).toBeHidden()
+  // Setelah laci hilang, isi kartu lain tidak memudar ulang (tidak tampak seperti dimuat ulang)
+  // dan jalur sudah kembali ke awal tanpa melompat
+  const pudar = await page.evaluate(
+    () =>
+      document
+        .getAnimations()
+        .filter((a) => (a as CSSAnimation).animationName?.startsWith('peta-pudar')).length,
+  )
+  expect(pudar).toBe(0)
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.getByRole('button', { name: 'Respirasi Aerob', exact: true }).click()
   await page.getByRole('button', { name: 'Tutup episode', exact: true }).click()
   await expect(laci).toBeHidden({ timeout: 100 })
 })
 
-test('di layar lebar jalur kartu berada di tengah ruang bawah judul', async ({ page }, info) => {
+test('di layar lebar jalur kartu berada di tengah antara judul dan pita maskot', async ({
+  page,
+}, info) => {
   test.skip(info.project.name !== 'desktop', 'khusus layar lebar')
   for (const [w, h] of [
     [1440, 900],
@@ -226,8 +256,172 @@ test('di layar lebar jalur kartu berada di tengah ruang bawah judul', async ({ p
     await tungguGerak(page)
     const kepala = (await page.locator('main > header').boundingBox())!
     const jalur = (await page.getByRole('region', { name: 'Jalur materi' }).boundingBox())!
+    // Pita bawah (padding-bottom main) disisihkan untuk maskot, jadi tidak dihitung
+    const pita = await page
+      .locator('main')
+      .evaluate((el) => parseFloat(getComputedStyle(el).paddingBottom))
     const atas = jalur.y - (kepala.y + kepala.height)
-    const bawah = h - (jalur.y + jalur.height)
+    const bawah = h - pita - (jalur.y + jalur.height)
     expect(Math.abs(atas - bawah)).toBeLessThan(32)
   }
+})
+
+test('kartu 3 dan 4 sebentuk kartu 1 dan 2, warnanya menandai belum tersedia', async ({
+  page,
+}, info) => {
+  test.skip(info.project.name === 'hp-tegak', 'HP tegak memakai susunan menurun')
+  await tungguGerak(page)
+  const kartu = (nama: string) =>
+    page.getByRole('heading', { name: nama, exact: true }).locator('..')
+  const pengantar = (await kartu('Pengantar').boundingBox())!
+  for (const nama of ['Respirasi Anaerob', 'Fotosintesis']) {
+    const k = (await kartu(nama).boundingBox())!
+    expect(Math.abs(k.width - pengantar.width)).toBeLessThan(40)
+    expect(Math.abs(k.height - pengantar.height)).toBeLessThan(4)
+    await expect(page.getByRole('heading', { name: nama, exact: true })).toHaveCSS(
+      'writing-mode',
+      'horizontal-tb',
+    )
+    expect(await kartu(nama).evaluate((el) => getComputedStyle(el).backgroundColor)).not.toBe(
+      await kartu('Pengantar').evaluate((el) => getComputedStyle(el).backgroundColor),
+    )
+  }
+})
+
+test('maskot mitokondria di kiri bawah, kalimatnya mengikuti keadaan peta', async ({
+  page,
+}, info) => {
+  const maskot = page.locator('main img[src*="maskot-mitokondria"]')
+  if (info.project.name === 'hp-miring') {
+    await expect(maskot).toBeHidden()
+    return
+  }
+  await tungguGerak(page)
+  await expect(maskot).toBeVisible()
+  const gelembung = page.locator('.peta-maskot p')
+  const awal = await gelembung.textContent()
+  expect(awal).toMatch(/Respirasi Aerob/)
+  if (info.project.name === 'desktop') {
+    const kotak = (await maskot.boundingBox())!
+    const layar = page.viewportSize()!
+    expect(kotak.x).toBeLessThan(layar.width * 0.15)
+    expect(kotak.x).toBeGreaterThanOrEqual(40) // tidak menempel di pojok
+    expect(kotak.y + kotak.height).toBeGreaterThan(layar.height * 0.8)
+  }
+  await page.getByRole('button', { name: 'Respirasi Aerob', exact: true }).click()
+  await expect(gelembung).toContainText('Glikolisis')
+  // Kalimat berganti tanpa gelembung ditempel ulang (tampak seperti dimuat ulang)
+  expect(await gelembung.evaluate((el) => el.getAnimations().length)).toBe(0)
+  await page.getByRole('button', { name: 'Tutup episode', exact: true }).click()
+  await expect(gelembung).toContainText('Respirasi Aerob')
+  expect(await gelembung.evaluate((el) => el.getAnimations().length)).toBe(0)
+})
+
+test('saat laci dibuka, kartu 1, 3, dan 4 mengecil menjadi lajur; kembali penuh setelah ditutup', async ({
+  page,
+}, info) => {
+  test.skip(info.project.name === 'hp-tegak', 'HP tegak memakai susunan menurun')
+  const nama = ['Pengantar', 'Respirasi Anaerob', 'Fotosintesis']
+  const judul = (n: string) => page.getByRole('heading', { name: n, exact: true })
+  const lebar = async (n: string) => (await judul(n).locator('..').boundingBox())!.width
+  await tungguGerak(page)
+  const penuh = await Promise.all(nama.map(lebar))
+  await page.getByRole('button', { name: 'Respirasi Aerob', exact: true }).click()
+  await tungguGerak(page)
+  for (const [i, n] of nama.entries()) {
+    await expect(judul(n)).toHaveCSS('writing-mode', 'vertical-rl')
+    expect(await lebar(n)).toBeLessThan(penuh[i] * 0.8)
+  }
+  await page.getByRole('button', { name: 'Tutup episode', exact: true }).click()
+  await expect(page.locator('.peta-laci')).toBeHidden()
+  for (const [i, n] of nama.entries()) {
+    await expect(judul(n)).toHaveCSS('writing-mode', 'horizontal-tb')
+    expect(Math.abs((await lebar(n)) - penuh[i])).toBeLessThan(2)
+  }
+})
+
+test('saat tertutup keempat kartu sama lebar dan berada di tengah layar lebar', async ({
+  page,
+}, info) => {
+  test.skip(info.project.name === 'hp-tegak', 'HP tegak memakai susunan menurun')
+  if (info.project.name === 'desktop') await page.setViewportSize({ width: 1920, height: 1080 })
+  await tungguGerak(page)
+  const kartu = (nama: string) =>
+    page.getByRole('heading', { name: nama, exact: true }).locator('..').boundingBox()
+  const aerob = (await page
+    .getByRole('button', { name: 'Respirasi Aerob', exact: true })
+    .boundingBox())!
+  const pertama = (await kartu('Pengantar'))!
+  const terakhir = (await kartu('Fotosintesis'))!
+  expect(Math.abs(aerob.width - pertama.width)).toBeLessThan(2)
+  if (info.project.name === 'desktop') {
+    const kanan = 1920 - (terakhir.x + terakhir.width)
+    expect(Math.abs(pertama.x - kanan)).toBeLessThan(8)
+  }
+})
+
+test('akordeon: kartu samping melebar bersamaan dengan laci menyusut, bukan sesudahnya', async ({
+  page,
+}, info) => {
+  test.skip(info.project.name === 'hp-tegak', 'HP tegak memakai susunan menurun')
+  const laci = page.locator('.peta-laci')
+  const pengantar = page.getByRole('heading', { name: 'Pengantar', exact: true }).locator('..')
+  await tungguGerak(page)
+  const penuh = (await pengantar.boundingBox())!.width
+  await page.getByRole('button', { name: 'Respirasi Aerob', exact: true }).click()
+  await tungguGerak(page)
+  const lajur = (await pengantar.boundingBox())!.width
+  const lebarLaci = (await laci.boundingBox())!.width
+  await page.getByRole('button', { name: 'Tutup episode', exact: true }).click()
+  // Di tengah penutupan: laci masih terlihat tapi sudah menyempit, kartu samping sudah melebar
+  await page.waitForTimeout(240)
+  expect(await laci.isVisible()).toBe(true)
+  expect((await laci.boundingBox())!.width).toBeLessThan(lebarLaci * 0.9)
+  const tengah = (await pengantar.boundingBox())!.width
+  expect(tengah).toBeGreaterThan(lajur + 10)
+  expect(tengah).toBeLessThan(penuh - 10)
+  await expect(laci).toBeHidden()
+  await tungguGerak(page)
+  expect(Math.abs((await pengantar.boundingBox())!.width - penuh)).toBeLessThan(2)
+})
+
+test('kartu episode setinggi laci, sampai ke bawah', async ({ page }, info) => {
+  test.skip(info.project.name === 'hp-tegak', 'HP tegak: kartu setinggi isinya')
+  await page.getByRole('button', { name: 'Respirasi Aerob', exact: true }).click()
+  await tungguGerak(page)
+  const laci = (await page.locator('.peta-laci').boundingBox())!
+  const kartu = (await page
+    .getByRole('list', { name: 'Episode respirasi aerob' })
+    .getByRole('listitem')
+    .first()
+    .boundingBox())!
+  // Di bawah kartu hanya tersisa baris ringkasan alur dan jarak tepi laci
+  expect(laci.y + laci.height - (kartu.y + kartu.height)).toBeLessThan(90)
+})
+
+test('saat menutup, teks kartu samping tetap tegak sampai kartu penuh, lalu langsung mendatar', async ({
+  page,
+}, info) => {
+  test.skip(info.project.name === 'hp-tegak', 'HP tegak memakai susunan menurun')
+  const judul = page.getByRole('heading', { name: 'Pengantar', exact: true })
+  await page.getByRole('button', { name: 'Respirasi Aerob', exact: true }).click()
+  await tungguGerak(page)
+  await page.getByRole('button', { name: 'Tutup episode', exact: true }).click()
+  // Di tengah penutupan kartu masih sempit: teks belum boleh mendatar (terlipat)
+  await page.waitForTimeout(150)
+  await expect(page.locator('.peta-laci')).toBeVisible()
+  await expect(judul).toHaveCSS('writing-mode', 'vertical-rl')
+  await expect(page.locator('.peta-laci')).toBeHidden()
+  await expect(judul).toHaveCSS('writing-mode', 'horizontal-tb')
+})
+
+test('maskot peta cukup besar dan gelembungnya sejajar kepala', async ({ page }, info) => {
+  test.skip(info.project.name === 'hp-miring', 'maskot disembunyikan di HP miring')
+  await tungguGerak(page)
+  const maskot = (await page.locator('.peta-maskot img').boundingBox())!
+  const gelembung = (await page.locator('.peta-maskot p').boundingBox())!
+  if (info.project.name === 'desktop') expect(maskot.height).toBeGreaterThanOrEqual(150)
+  // Tengah gelembung di sepertiga atas maskot (setinggi kepala)
+  expect(gelembung.y + gelembung.height / 2).toBeLessThan(maskot.y + maskot.height / 3)
+  expect(gelembung.y + gelembung.height / 2).toBeGreaterThan(maskot.y)
 })
