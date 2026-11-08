@@ -8,7 +8,7 @@ import organelMitokondria from '../../assets/images/organel-mitokondria.webp'
 import ikonPutarHp from '../../assets/svg/ui-putar-hp.svg?raw'
 import TombolSuara from '../../components/TombolSuara'
 import PengaturVolume from '../../components/PengaturVolume'
-import { musik } from '../../lib/suara'
+import { bunyi, musik } from '../../lib/suara'
 import { usePemutar } from '../../stores/pemutar'
 import { usePengaturan } from '../../stores/pengaturan'
 import Gelembung from './Gelembung'
@@ -174,6 +174,7 @@ function PemutarEpisode({
     if (sudahMulai.current) return
     sudahMulai.current = true
     setMulai(true)
+    if (!otomatis && !langsung) bunyi('mulai')
     musik(true)
     // Episode dipakai miring: di perangkat sentuh minta layar penuh lalu kunci mendatar
     if (matchMedia('(pointer: coarse)').matches) {
@@ -218,7 +219,7 @@ function PemutarEpisode({
   )
   const babIni = bab[babSekarang]
   const kembali = (
-    <Link to="/peta-materi" className="pemutar-kembali">
+    <Link to="/peta-materi" className="pemutar-kembali" onClick={() => bunyi('kembali')}>
       <ArrowLeft aria-hidden="true" />
       Peta materi
     </Link>

@@ -15,7 +15,7 @@ import latar from '../../assets/images/latar-peta.webp'
 import maskot from '../../assets/images/maskot-mitokondria-ramah.webp'
 import TombolSuara from '../../components/TombolSuara'
 import PengaturVolume from '../../components/PengaturVolume'
-import { putar, siapkan } from '../../lib/suara'
+import { bunyi, putar, siapkan } from '../../lib/suara'
 import './peta-materi.css'
 
 const EPISODE = [
@@ -48,7 +48,7 @@ function PetaMateri() {
     putar(buka ? 'buka-peta' : 'tutup-peta')
   }
 
-  useEffect(() => siapkan('buka-peta', 'tutup-peta', 'kembali'), [])
+  useEffect(() => siapkan('buka-peta', 'tutup-peta', 'kembali', 'melesat'), [])
 
   // Kembali ke awal setelah akordeon selesai agar kartu Pengantar tetap terlihat di kiri.
   useEffect(() => {
@@ -160,6 +160,7 @@ function PetaMateri() {
                       <Link
                         to="/episode/1"
                         aria-label="Buka Glikolisis"
+                        onClick={() => bunyi('melesat')}
                         className="tombol-utama mt-auto inline-flex min-h-12 items-center gap-2 px-5 pt-2 pb-3 font-head font-extrabold transition-transform duration-(--durasi-ui) ease-pose hover:-translate-y-0.5 active:translate-y-0.5"
                       >
                         Buka <ArrowRight aria-hidden="true" className="size-4" />

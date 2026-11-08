@@ -58,6 +58,8 @@ export function putar(nama: NamaSuara) {
 export const bolehBersuaraSendiri = () => navigator.userActivation?.hasBeenActive ?? false
 
 export type SlotSuara =
+  | 'mulai'
+  | 'kembali'
   | 'ketuk'
   | 'tepat'
   | 'belum-tepat'
@@ -73,6 +75,8 @@ export type SlotSuara =
 
 // Momen di adegan memanggil nama slot; berkasnya cukup diganti di sini
 const BERKAS_SLOT: Record<SlotSuara, NamaSuara> = {
+  mulai: 'mulai',
+  kembali: 'kembali',
   ketuk: 'ketuk',
   tepat: 'tepat',
   'belum-tepat': 'belum-tepat',
