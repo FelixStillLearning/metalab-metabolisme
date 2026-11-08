@@ -425,3 +425,22 @@ test('maskot peta cukup besar dan gelembungnya sejajar kepala', async ({ page },
   expect(gelembung.y + gelembung.height / 2).toBeLessThan(maskot.y + maskot.height / 3)
   expect(gelembung.y + gelembung.height / 2).toBeGreaterThan(maskot.y)
 })
+
+test('HP miring: kartu utama memakai ikon kecil dan tetap muat setinggi layar', async ({
+  page,
+}, info) => {
+  test.skip(info.project.name !== 'hp-miring', 'khusus HP miring')
+  await tungguGerak(page)
+  for (const nama of ['Pengantar', 'Respirasi Aerob', 'Respirasi Anaerob', 'Fotosintesis']) {
+    // Kartu Respirasi Aerob adalah tombolnya; kartu lain adalah induk judulnya
+    const kartu =
+      nama === 'Respirasi Aerob'
+        ? page.getByRole('button', { name: nama, exact: true })
+        : page.getByRole('heading', { name: nama, exact: true }).locator('..')
+    const ikon = kartu.locator('img')
+    await expect(ikon).toBeVisible()
+    expect((await ikon.boundingBox())!.height).toBeLessThanOrEqual(48)
+    expect(await kartu.evaluate((el) => el.scrollHeight <= el.clientHeight + 1)).toBe(true)
+  }
+  expect(await page.evaluate(() => document.documentElement.scrollHeight <= innerHeight)).toBe(true)
+})

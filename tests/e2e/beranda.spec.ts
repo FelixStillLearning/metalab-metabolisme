@@ -234,3 +234,15 @@ test('gelembung maskot beranda sejajar kepala', async ({ page }, info) => {
   expect(gelembung.y + gelembung.height / 2).toBeLessThan(maskot.y + maskot.height / 3)
   expect(gelembung.y + gelembung.height / 2).toBeGreaterThan(maskot.y)
 })
+
+test('maskot beranda cukup besar', async ({ page }, info) => {
+  test.skip(info.project.name === 'hp-miring', 'maskot disembunyikan di HP miring')
+  await page.goto('/')
+  await tungguMasukSelesai(page)
+  const maskot = (await page.locator('[data-hiasan="maskot"]').boundingBox())!
+  if (info.project.name === 'desktop') {
+    expect(maskot.height).toBeGreaterThanOrEqual(page.viewportSize()!.height * 0.38)
+  } else {
+    expect(maskot.width).toBeGreaterThanOrEqual(165)
+  }
+})
