@@ -164,3 +164,70 @@ test('kartu lurus dan tanpa filter supaya rapi dan gerak tidak tersendat', async
   expect(gaya.length).toBeGreaterThanOrEqual(9)
   for (const g of gaya) expect(g).toEqual({ rotate: 'none', filter: 'none', clip: 'none' })
 })
+
+test('kartu memakai ikon bagian dan episode dari daftar aset', async ({ page }, info) => {
+  test.skip(info.project.name === 'hp-miring', 'ikon disembunyikan di layar pendek')
+  const ikonKartu = (nama: string) =>
+    page.getByRole('heading', { name: nama, exact: true }).locator('..').locator('img')
+  await expect(ikonKartu('Pengantar')).toHaveAttribute('src', /episode-0/)
+  await expect(ikonKartu('Respirasi Anaerob')).toHaveAttribute('src', /bagian-anaerob/)
+  await expect(ikonKartu('Fotosintesis')).toHaveAttribute('src', /bagian-fotosintesis/)
+  await page.getByRole('button', { name: 'Respirasi Aerob', exact: true }).click()
+  const kartu = page.getByRole('list', { name: 'Episode respirasi aerob' }).getByRole('listitem')
+  for (let i = 0; i < 4; i++) {
+    const ikon = kartu.nth(i).locator('img')
+    await expect(ikon).toHaveAttribute('src', new RegExp(`episode-${i + 1}`))
+    await expect(ikon).toBeVisible()
+  }
+  for (const gambar of await page.locator('main img').all()) {
+    await expect
+      .poll(() => gambar.evaluate((el: HTMLImageElement) => el.naturalWidth))
+      .toBeGreaterThan(0)
+  }
+})
+
+test('tombol buka episode memakai gambar tombol utama', async ({ page }) => {
+  await page.getByRole('button', { name: 'Respirasi Aerob', exact: true }).click()
+  await expect(page.getByRole('link', { name: 'Buka Glikolisis' })).toHaveCSS(
+    'border-image-source',
+    /tombol-utama.*\.webp/,
+  )
+})
+
+test('laci beranimasi saat ditutup, lalu tersembunyi; tanpa animasi saat gerak dikurangi', async ({
+  page,
+}) => {
+  const laci = page.locator('.peta-laci')
+  await page.getByRole('button', { name: 'Respirasi Aerob', exact: true }).click()
+  await tungguGerak(page)
+  await page.getByRole('button', { name: 'Tutup episode', exact: true }).click()
+  await expect(laci).toHaveCSS('animation-name', 'peta-laci-tutup')
+  // Kartu dilepas satu per satu dari yang terakhir, kebalikan urutan saat dibuka
+  const kartu = laci.getByRole('listitem')
+  await expect(kartu.first()).toHaveCSS('animation-name', 'peta-lepas')
+  const jeda = await kartu.evaluateAll((items) =>
+    items.map((el) => parseFloat(getComputedStyle(el).animationDelay)),
+  )
+  expect(jeda.every((n, i) => i === 0 || n < jeda[i - 1])).toBe(true)
+  await expect(laci).toBeHidden()
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  await page.getByRole('button', { name: 'Respirasi Aerob', exact: true }).click()
+  await page.getByRole('button', { name: 'Tutup episode', exact: true }).click()
+  await expect(laci).toBeHidden({ timeout: 100 })
+})
+
+test('di layar lebar jalur kartu berada di tengah ruang bawah judul', async ({ page }, info) => {
+  test.skip(info.project.name !== 'desktop', 'khusus layar lebar')
+  for (const [w, h] of [
+    [1440, 900],
+    [1920, 1080],
+  ]) {
+    await page.setViewportSize({ width: w, height: h })
+    await tungguGerak(page)
+    const kepala = (await page.locator('main > header').boundingBox())!
+    const jalur = (await page.getByRole('region', { name: 'Jalur materi' }).boundingBox())!
+    const atas = jalur.y - (kepala.y + kepala.height)
+    const bawah = h - (jalur.y + jalur.height)
+    expect(Math.abs(atas - bawah)).toBeLessThan(32)
+  }
+})

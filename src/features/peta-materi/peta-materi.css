@@ -16,10 +16,12 @@
   box-shadow: var(--shadow-kertas-sm);
 }
 
+/* margin-block auto: sisa tinggi layar dibagi rata di atas dan bawah jalur (layar lebar) */
 .peta-materi .peta-jalur {
   position: relative;
   display: flex;
   flex: 1;
+  margin-block: auto;
   align-items: stretch;
   gap: 20px;
   min-height: 260px;
@@ -121,6 +123,22 @@
 
 .peta-materi .peta-episode > li .peta-nama {
   font-size: 24px;
+}
+
+/* Ikon episode di atas pita teal muda selebar kartu: karbon krem di ikon tidak terbaca langsung
+   di atas kertas krem, dan ikon yang melebar (episode 2 dan 4) tetap tampil besar */
+.peta-materi .peta-episode .peta-ikon {
+  width: 100%;
+  height: 96px;
+  padding: 12px;
+  border-radius: 8px;
+  background: var(--color-ok);
+  object-fit: contain;
+}
+
+.peta-materi .peta-lanjutan .peta-ikon {
+  width: 56px;
+  height: 56px;
 }
 
 /* Sambungan putus-putus antarepisode, menunjukkan urutan tahap */
@@ -331,6 +349,7 @@
 
   .peta-materi .peta-lanjutan {
     flex-direction: row;
+    flex-wrap: wrap;
     width: auto;
     padding: 16px 20px;
   }
@@ -368,6 +387,16 @@
     animation: peta-laci 420ms var(--ease-keluar) backwards;
   }
 
+  /* Tutup: kartu dilepas satu per satu dari episode 4 ke 1 (3 x 60 ms + 200 ms), lalu laci meluncur.
+     Base UI hanya menunggu animasi laci sendiri, jadi laci diberi jeda selama kartu dilepas. */
+  .peta-materi .peta-laci[data-ending-style] {
+    animation: peta-laci-tutup 240ms var(--ease-ancang) 300ms forwards;
+  }
+
+  .peta-materi .peta-laci[data-ending-style] .peta-episode > li {
+    animation: peta-lepas 200ms var(--ease-ancang) calc((3 - var(--i)) * 60ms) forwards;
+  }
+
   .peta-materi .peta-episode > li {
     animation: peta-tempel 520ms var(--ease-letup) calc(160ms + var(--i) * 110ms) backwards;
   }
@@ -377,6 +406,21 @@
   from {
     opacity: 0;
     scale: 0.6;
+  }
+}
+
+@keyframes peta-lepas {
+  to {
+    opacity: 0;
+    scale: 0.6;
+  }
+}
+
+@keyframes peta-laci-tutup {
+  to {
+    opacity: 0;
+    translate: -32px 0;
+    scale: 0.96;
   }
 }
 

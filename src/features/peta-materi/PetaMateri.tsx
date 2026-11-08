@@ -3,7 +3,13 @@ import { ArrowLeft, ArrowRight, ChevronRight, X } from 'lucide-react'
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { Link } from 'react-router'
 import aerob from '../../assets/images/bagian-aerob.webp'
-import pengantar from '../../assets/images/bagian-pengantar.webp'
+import anaerob from '../../assets/images/bagian-anaerob.webp'
+import fotosintesis from '../../assets/images/bagian-fotosintesis.webp'
+import episode0 from '../../assets/images/episode-0.webp'
+import episode1 from '../../assets/images/episode-1.webp'
+import episode2 from '../../assets/images/episode-2.webp'
+import episode3 from '../../assets/images/episode-3.webp'
+import episode4 from '../../assets/images/episode-4.webp'
 import latarHp from '../../assets/images/latar-peta-hp.webp'
 import latar from '../../assets/images/latar-peta.webp'
 import TombolSuara from '../../components/TombolSuara'
@@ -11,10 +17,15 @@ import { putar, siapkan } from '../../lib/suara'
 import './peta-materi.css'
 
 const EPISODE = [
-  { judul: 'Glikolisis', tempat: 'Sitosol' },
-  { judul: 'Dekarboksilasi oksidatif', tempat: 'Matriks' },
-  { judul: 'Siklus Krebs', tempat: 'Matriks' },
-  { judul: 'Transpor elektron', tempat: 'Membran krista' },
+  { judul: 'Glikolisis', tempat: 'Sitosol', ikon: episode1 },
+  { judul: 'Dekarboksilasi oksidatif', tempat: 'Matriks', ikon: episode2 },
+  { judul: 'Siklus Krebs', tempat: 'Matriks', ikon: episode3 },
+  { judul: 'Transpor elektron', tempat: 'Membran krista', ikon: episode4 },
+]
+
+const LANJUTAN = [
+  { judul: 'Respirasi Anaerob', ikon: anaerob },
+  { judul: 'Fotosintesis', ikon: fotosintesis },
 ]
 
 const gambarLatar = {
@@ -83,7 +94,7 @@ function PetaMateri() {
           <span className="peta-nomor" aria-hidden="true">
             1
           </span>
-          <img src={pengantar} alt="" width={240} height={240} className="peta-ikon" />
+          <img src={episode0} alt="" width={240} height={240} className="peta-ikon" />
           <h2 id="judul-pengantar" className="peta-nama">
             Pengantar
           </h2>
@@ -134,18 +145,19 @@ function PetaMateri() {
               </p>
             </div>
             <ol aria-label="Episode respirasi aerob" className="peta-episode">
-              {EPISODE.map(({ judul, tempat }, i) => (
+              {EPISODE.map(({ judul, tempat, ikon }, i) => (
                 <li key={judul} className="peta-kertas peta-kartu" style={urutan(i)}>
                   <span className="peta-nomor" aria-hidden="true">
                     {i + 1}
                   </span>
+                  <img src={ikon} alt="" width={240} height={240} className="peta-ikon" />
                   <h3 className="peta-nama">{judul}</h3>
                   <p className="text-muted">{tempat}</p>
                   {i === 0 ? (
                     <Link
                       to="/episode/1"
                       aria-label="Buka Glikolisis"
-                      className="mt-auto inline-flex min-h-12 items-center gap-2 rounded-lg bg-atp px-4 py-2 font-head font-extrabold text-paper shadow-kertas-sm transition-transform duration-(--durasi-ui) ease-pose hover:-translate-y-0.5"
+                      className="tombol-utama mt-auto inline-flex min-h-12 items-center gap-2 px-5 pt-2 pb-3 font-head font-extrabold transition-transform duration-(--durasi-ui) ease-pose hover:-translate-y-0.5 active:translate-y-0.5"
                     >
                       Buka <ArrowRight aria-hidden="true" className="size-4" />
                     </Link>
@@ -162,11 +174,12 @@ function PetaMateri() {
           </Collapsible.Panel>
         </Collapsible.Root>
 
-        {['Respirasi Anaerob', 'Fotosintesis'].map((judul, i) => (
+        {LANJUTAN.map(({ judul, ikon }, i) => (
           <section key={judul} className="peta-kertas peta-lanjutan" style={urutan(i + 2)}>
             <span className="peta-nomor" aria-hidden="true">
               {i + 3}
             </span>
+            <img src={ikon} alt="" width={240} height={240} className="peta-ikon" />
             <h2 className="peta-nama">{judul}</h2>
             <p className="font-bold text-muted">Belum tersedia</p>
           </section>
