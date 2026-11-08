@@ -1,6 +1,7 @@
 import { Play } from 'lucide-react'
 import { Fragment, useEffect, useRef, useState, type CSSProperties } from 'react'
-import { Link } from 'react-router'
+import { useNavigate } from 'react-router'
+import IdentitasSiswa from '../identitas-siswa/IdentitasSiswa'
 import garisGerak from '../../assets/images/efek-garis-gerak.webp'
 import letupan from '../../assets/images/efek-letupan.webp'
 import glukosa from '../../assets/images/glukosa.webp'
@@ -56,6 +57,7 @@ function useSuaraMasuk(putaran: number) {
 
 // Ukuran di layar mendatar dibatasi tinggi layar juga, supaya HP miring 800x360 tetap muat tanpa menggulir.
 function Beranda() {
+  const navigate = useNavigate()
   // putaran: animasi masuk diputar ulang; ulangPop: letupan sel; ketukan: kalimat maskot
   const [putaran, setPutaran] = useState(0)
   const [ulangPop, setUlangPop] = useState(0)
@@ -138,15 +140,20 @@ function Beranda() {
           >
             dari glukosa sampai ATP
           </p>
-          <Link
-            to="/peta-materi"
-            onClick={() => putar('mulai')}
-            style={tunda(360)}
-            className="tempel tombol-utama mt-1 inline-flex min-h-12 items-center gap-3 px-8 pt-3 pb-4 font-head text-[22px] font-extrabold transition-transform duration-(--durasi-ui) ease-pose hover:-translate-y-1 active:translate-y-0.5 landscape:text-[clamp(16px,min(2.1vw,4.5dvh),40px)]"
-          >
-            <Play aria-hidden="true" fill="currentColor" className="size-[0.8em]" />
-            Mulai belajar
-          </Link>
+          <IdentitasSiswa
+            setelahSimpan={() => navigate('/peta-materi')}
+            pemicu={
+              <button
+                type="button"
+                onClick={() => putar('mulai')}
+                style={tunda(360)}
+                className="tempel tombol-utama mt-1 inline-flex min-h-12 items-center gap-3 px-8 pt-3 pb-4 font-head text-[22px] font-extrabold transition-transform duration-(--durasi-ui) ease-pose hover:-translate-y-1 active:translate-y-0.5 landscape:text-[clamp(16px,min(2.1vw,4.5dvh),40px)]"
+              >
+                <Play aria-hidden="true" fill="currentColor" className="size-[0.8em]" />
+                Mulai belajar
+              </button>
+            }
+          />
         </div>
 
         <div className="flex flex-col gap-2 portrait:mt-4">

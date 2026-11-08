@@ -4,6 +4,8 @@ import { Link, useNavigate } from 'react-router'
 import { ucapkan } from '../../lib/narasi'
 import { bolehBersuaraSendiri, bunyi } from '../../lib/suara'
 import { useJawaban } from '../../stores/jawaban'
+import IdentitasSiswa from '../identitas-siswa/IdentitasSiswa'
+import { useSiswa } from '../../stores/siswa'
 import { tenangAktif } from '../../stores/pengaturan'
 import './lembar-hasil.css'
 
@@ -29,6 +31,7 @@ type Props = {
 // Lembar Hasil seperti sheet() prototype: bagan milik siswa, tebakan POE berpasangan,
 // penjelasan bebas, dan lembar cetak untuk guru. Hanya dibaca dari hasil tersimpan.
 function LembarHasil({ judul, lead, bagan, poe, pertanyaan, cetak, rute, narasi }: Props) {
+  const { nama, kelas } = useSiswa()
   const tersimpan = useJawaban((s) => s.penjelasan)
   const simpanPenjelasan = useJawaban((s) => s.simpanPenjelasan)
   const [isi, setIsi] = useState(tersimpan)
@@ -57,8 +60,19 @@ function LembarHasil({ judul, lead, bagan, poe, pertanyaan, cetak, rute, narasi 
     <main className="hasil-halaman">
       <div className="hasil" data-tenang={tenangAktif() || undefined}>
         <header className="hasil-kepala">
+          <p className="hasil-episode">Episode 1 · Glikolisis</p>
           <h1>{judul}</h1>
           <p className="hasil-lead">{lead}</p>
+          <div className="hasil-identitas">
+            <p>{nama && kelas ? `${nama} · ${kelas}` : 'Nama dan kelas belum diisi.'}</p>
+            <IdentitasSiswa
+              pemicu={
+                <button type="button" className="hasil-tombol">
+                  Ubah identitas
+                </button>
+              }
+            />
+          </div>
         </header>
         <div className="hasil-bagan">{bagan}</div>
         <div className="hasil-sisi">
@@ -136,8 +150,22 @@ function LembarHasil({ judul, lead, bagan, poe, pertanyaan, cetak, rute, narasi 
 
       <div className="hasil-cetak">
         <h2>{cetak.judul}</h2>
-        <p>Nama: ____________________ Kelas: ________</p>
+        <dl className="hasil-cetak-identitas">
+          <div>
+            <dt>Nama:</dt>
+            <dd>{nama || '____________________'}</dd>
+          </div>
+          <div>
+            <dt>Kelas:</dt>
+            <dd>{kelas || '________'}</dd>
+          </div>
+        </dl>
         <table>
+          <colgroup>
+            <col style={{ width: '8%' }} />
+            <col style={{ width: '25%' }} />
+            <col />
+          </colgroup>
           <thead>
             <tr>
               <th>Soal</th>
@@ -157,6 +185,12 @@ function LembarHasil({ judul, lead, bagan, poe, pertanyaan, cetak, rute, narasi 
         </table>
         <h3>Catatan POE (tidak dinilai)</h3>
         <table>
+          <colgroup>
+            <col style={{ width: '8%' }} />
+            <col style={{ width: '12%' }} />
+            <col style={{ width: '40%' }} />
+            <col />
+          </colgroup>
           <thead>
             <tr>
               <th>Soal</th>
@@ -177,7 +211,7 @@ function LembarHasil({ judul, lead, bagan, poe, pertanyaan, cetak, rute, narasi 
           </tbody>
         </table>
         <h3>Penjelasan siswa</h3>
-        <p>{isi.trim() || '-'}</p>
+        <p className="hasil-cetak-penjelasan">{isi.trim() || '-'}</p>
       </div>
     </main>
   )

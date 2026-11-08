@@ -230,7 +230,7 @@ function HasilEpisode1() {
   return (
     <LembarHasil
       judul="Bagan glikolisismu"
-      lead="Jawabanmu dari Aktivitas 1.7, menempel di bagian prosesnya."
+      lead="Jawabanmu dari Episode 1 ditampilkan pada bagan glikolisis."
       bagan={<Bagan hasil={hasil} />}
       poe={daftarPoe.map(({ k, q, alasan, p }) => ({
         k,

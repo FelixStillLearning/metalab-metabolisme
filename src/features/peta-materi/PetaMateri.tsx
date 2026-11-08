@@ -49,24 +49,17 @@ function PetaMateri() {
 
   useEffect(() => siapkan('buka-peta', 'tutup-peta', 'kembali'), [])
 
-  // Saat dibuka, jalur digeser agar laci terlihat utuh dan kartu aerob ikut terlihat bila muat.
-  // Bila laci lebih lebar dari layar (HP), awal laci yang didahulukan. offsetLeft tidak terpengaruh animasi.
-  // Dihitung setelah akordeon selesai (transisi 480 ms di CSS), saat posisi kartu sudah final.
+  // Kembali ke awal setelah akordeon selesai agar kartu Pengantar tetap terlihat di kiri.
   useEffect(() => {
-    const tombol = tombolAerob.current
-    const isi = laci.current
-    const jalur = isi?.closest<HTMLElement>('.peta-jalur')
-    if (!terbuka || !tombol || !isi || !jalur) return
-    const geser = () => {
-      const tepi = parseFloat(getComputedStyle(jalur).paddingLeft)
-      const kananLaci = isi.offsetLeft + isi.offsetWidth + tepi - jalur.clientWidth
-      jalur.scrollLeft = Math.min(
-        isi.offsetLeft - tepi,
-        Math.max(tombol.offsetLeft - tepi, kananLaci),
-      )
-    }
+    const jalur = laci.current?.closest<HTMLElement>('.peta-jalur')
+    if (!terbuka || !jalur) return
     const halus = !matchMedia('(prefers-reduced-motion: reduce)').matches
-    const tunda = setTimeout(geser, halus ? 500 : 0)
+    const tunda = setTimeout(
+      () => {
+        jalur.scrollLeft = 0
+      },
+      halus ? 500 : 0,
+    )
     return () => clearTimeout(tunda)
   }, [terbuka])
 
