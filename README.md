@@ -129,4 +129,4 @@ Mitra: SMA Negeri 16 Bandung.
 
 ## Lisensi
 
-Hak cipta program akan didaftarkan. Sampai ada keputusan lisensi, seluruh hak atas kode dan aset dalam repositori ini dilindungi.
+Hak cipta program akan didaftarkan. Sampai ada keputusan lisensi, seluruh hak atas kode dan aset milik proyek dalam repositori ini dilindungi. Aset pihak ketiga mengikuti lisensi pemiliknya; lihat [audit sumber audio Episode 1](public/audio/SUMBER.md) untuk status enam suara pilihan tim.
