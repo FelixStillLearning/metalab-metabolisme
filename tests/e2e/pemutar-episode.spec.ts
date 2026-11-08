@@ -1,7 +1,7 @@
 import { expect, test, type Page } from '@playwright/test'
 
 const KALIMAT_1 = /^Kamu makan nasi/
-const KALIMAT_2 = /^Pemecahan glukosa dimulai di sitosol/
+const KALIMAT_2 = /^Itu mitokondria/
 
 const gelembung = (page: Page) => page.locator('[data-gelembung]')
 const mulai = (page: Page) => page.getByRole('button', { name: 'Mulai episode' }).click()
@@ -19,19 +19,19 @@ test('sampul episode menampilkan judul dan tombol mulai', async ({ page }) => {
 
 test('jeda menghentikan gerak dan kalimat', async ({ page }, info) => {
   test.skip(info.project.name === 'hp-tegak', 'HP tegak hanya menampilkan ajakan putar HP')
-  // Tanpa mode cepat: tiap kalimat 2 detik, jadi jeda 2,5 detik pasti melewati pergantian kalimat
+  // Tanpa mode cepat: kalimat pertama tampil sekitar 5,3 detik, jadi jeda 6 detik pasti melewatinya
   await page.goto('/#/episode/1')
   await page.reload()
   await mulai(page)
   await expect(gelembung(page)).toHaveText(KALIMAT_1)
   await page.getByRole('button', { name: 'Jeda (spasi)' }).click()
   await expect(page.getByRole('button', { name: 'Lanjut (spasi)' })).toBeVisible()
-  await page.waitForTimeout(2500)
+  await page.waitForTimeout(6000)
   await expect(gelembung(page)).toHaveText(KALIMAT_1)
   await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur())
   await page.keyboard.press('Space')
   await expect(page.getByRole('button', { name: 'Jeda (spasi)' })).toBeVisible()
-  await expect(gelembung(page)).toHaveText(KALIMAT_2)
+  await expect(gelembung(page)).toHaveText(KALIMAT_2, { timeout: 10000 })
 })
 
 test('panel pengaturan menjeda dan menyimpan saklar', async ({ page }, info) => {
@@ -101,7 +101,7 @@ test('HP miring: panggung dan kontrol muat di layar', async ({ page }, info) => 
   expect(kotak.y + kotak.height).toBeLessThanOrEqual(360)
   await expect(page.getByRole('button', { name: 'Jeda (spasi)' })).toBeInViewport()
   await expect(page.getByRole('button', { name: 'Pengaturan', exact: true })).toBeInViewport()
-  // Kalimat kedua memanggil pendamping; di HP miring ia tidak ditampilkan
+  // Kalimat tentang mitokondria memanggil pendamping; di HP miring ia tidak ditampilkan
   await expect(gelembung(page)).toHaveText(KALIMAT_2)
   await expect(page.locator('[data-pendamping]')).toBeAttached()
   await expect(page.locator('[data-pendamping]')).toBeHidden()

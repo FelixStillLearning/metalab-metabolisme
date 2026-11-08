@@ -1,7 +1,6 @@
 import sel from '../../assets/images/sel-hewan.webp'
 import PemutarEpisode from '../../features/pemutar-episode/PemutarEpisode'
-import { wait, type Panggung } from '../../features/pemutar-episode/mesin'
-import { usePemutar } from '../../stores/pemutar'
+import { pembuka } from './pembuka'
 
 const BAB = [
   { k: 'a', t: 'Substrat' },
@@ -12,22 +11,6 @@ const BAB = [
   { k: 'g', t: 'Hasil' },
   { k: 'h', t: 'Pengertian' },
 ]
-
-// Sementara: dua kalimat pembuka dari prototype, sampai adegan pembuka selesai dibangun
-async function pembuka(p: Panggung) {
-  usePemutar.setState({
-    kalimat:
-      'Kamu makan nasi. Di dalam tubuh, nasi dicerna menjadi glukosa, lalu glukosa masuk ke dalam sel.',
-    pose: '01-ramah',
-  })
-  await wait(p, 2000)
-  usePemutar.setState({
-    kalimat: 'Pemecahan glukosa dimulai di sitosol, cairan sel di luar mitokondria.',
-    pose: '05-menjelaskan',
-    pendamping: '01-ramah',
-  })
-  await wait(p, 2000)
-}
 
 function Episode1Glikolisis() {
   return (
