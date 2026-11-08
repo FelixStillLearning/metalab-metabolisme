@@ -124,3 +124,21 @@ test('diputar ke tegak di tengah episode menjeda', async ({ page }, info) => {
   await page.waitForTimeout(500)
   await expect(page.getByRole('button', { name: 'Lanjut (spasi)' })).toBeVisible()
 })
+
+test('kembali ke peta di tengah episode tanpa error', async ({ page }, info) => {
+  test.skip(info.project.name === 'hp-tegak', 'HP tegak hanya menampilkan ajakan putar HP')
+  const galat: string[] = []
+  page.on('pageerror', (e) => galat.push(e.message))
+  page.on('console', (m) => {
+    if (m.type() === 'error') galat.push(m.text())
+  })
+  // Tanpa mode cepat agar adegan masih berjalan saat halaman ditinggal
+  await page.goto('/#/episode/1')
+  await page.reload()
+  await mulai(page)
+  await expect(gelembung(page)).toHaveText(KALIMAT_1)
+  await page.goto('/#/peta-materi')
+  await expect(page.getByRole('heading', { level: 1, name: 'Peta materi' })).toBeVisible()
+  await page.waitForTimeout(1000)
+  expect(galat).toEqual([])
+})

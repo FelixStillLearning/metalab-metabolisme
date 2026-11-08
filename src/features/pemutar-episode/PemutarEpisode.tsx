@@ -1,3 +1,4 @@
+import { gsap } from 'gsap'
 import { ArrowLeft, Pause, Play, Settings } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router'
@@ -68,11 +69,14 @@ function PemutarEpisode({ judul, label, ringkasan, bab, gambarSampul, jalankan }
     const kendali = new AbortController()
     pengendali.current = kendali
     usePemutar.setState({ kalimat: '', pose: '01-ramah', pendamping: null, bab: -1 })
+    const s = svg.current!
     const g = latar.current!
     for (const [x, y, r] of PARTIKEL)
       disc(g, x, y, r, 'var(--color-paper)', { opacity: 0.65 }, { bayangan: true })
     return () => {
       kendali.abort()
+      // Gerak yang sedang berjalan ikut dihentikan; janjinya tidak pernah selesai, adegan sudah batal
+      gsap.killTweensOf([s, ...s.querySelectorAll('*')])
       window.speechSynthesis?.cancel()
       jedaSemua(false)
       g.replaceChildren()
