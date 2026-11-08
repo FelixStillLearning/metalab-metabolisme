@@ -223,14 +223,14 @@ function Beranda() {
           </div>
 
           <div className="flex items-start gap-4 [@media(orientation:landscape)_and_(max-height:500px)]:hidden landscape:absolute landscape:right-[3vw] landscape:bottom-[3dvh] landscape:z-20 landscape:flex-row-reverse">
-            <div className="relative">
+            <div className="relative shrink-0">
               <img
                 src={maskot}
                 alt=""
                 data-hiasan="maskot"
                 width={418}
                 height={418}
-                className="maskot h-auto w-[150px] landscape:w-[min(34dvh,320px)]"
+                className="maskot h-auto w-[170px] landscape:w-[min(40dvh,380px)]"
               />
               <button
                 type="button"
