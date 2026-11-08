@@ -40,15 +40,14 @@ test('POE c: tebak, amati investasi energi, pembelahan 6C jadi 2 PGAL, dan jelas
   const tombolKunci = page.getByRole('button', { name: 'Kunci tebakan, lanjutkan video' })
   await expect(tombolKunci).toBeDisabled()
 
-  await expect(page.locator('[data-petunjuk]')).toHaveText('Ketuk ATP untuk menaruhnya di glukosa.')
-  await expect(page.locator('.tok .pemutar-ajakan')).toHaveCount(3)
+  await expect(page.locator('[data-petunjuk]')).toHaveText('Ketuk ATP ke glukosa.')
+  await expect(page.locator('.pemutar-ajakan')).toHaveCount(0)
   // Taruh 2 ATP
   await page.getByRole('button', { name: 'ATP 1', exact: true }).click()
   await page.getByRole('button', { name: 'ATP 2', exact: true }).click()
   await expect(page.locator('#cnt')).toHaveText('2 ATP')
   await expect(page.locator('.tok.placed .pemutar-ajakan')).toHaveCount(0)
-  await expect(page.locator('.tok .pemutar-ajakan')).toHaveCount(1)
-  await expect(page.locator('[data-petunjuk]')).toHaveText('Pilih alasan untuk tebakanmu.')
+  await expect(page.locator('[data-petunjuk]')).toHaveText('Pilih alasan tebakanmu.')
 
   // Pilih alasan
   const alasan2 = page.getByRole('button', {
@@ -266,7 +265,7 @@ for (const n of [1, 2, 3]) {
     await tiapUkuran(page, info.project.name, async (pesan, width, height) => {
       await kartuMuat(page, '.poe-card-explain', pesan, width, height)
       if (width > 1000) {
-        const gelembung = await kotak(page, '.pemutar-gelembung')
+        const gelembung = await kotak(page, '.pemutar-panduan')
         expect(bertumpuk(await kotak(page, '.poe-card-explain'), gelembung), pesan).toBe(false)
       }
     })
@@ -290,7 +289,7 @@ test('POE c: chip tahap, label, zona glukosa, token, dan kartu tebakan tidak ber
     const zona = await kotak(page, '.poe-zone')
     const cincin = await gabungan(page, `[data-molecule="glukosa"] ${KARBON}`)
     expect(berisi(zona, cincin), pesan).toBe(true)
-    expect(bertumpuk(zona, await kotak(page, '.pemutar-gelembung')), pesan).toBe(false)
+    expect(bertumpuk(zona, await kotak(page, '.pemutar-panduan')), pesan).toBe(false)
 
     // Kartu muat di layar: semua alasan dan tombol Kunci terlihat tanpa gulir
     await kartuMuat(page, '.poe-card', pesan, width, height)

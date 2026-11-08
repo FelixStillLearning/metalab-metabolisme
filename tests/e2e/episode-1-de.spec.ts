@@ -40,9 +40,7 @@ async function soalD(page: Page) {
   await expect(page.locator('[data-petunjuk]')).toHaveText('Ketuk NAD⁺ untuk menangkap elektron', {
     timeout: 15000,
   })
-  await expect(page.locator('.pemutar-sasaran .pemutar-ajakan')).toHaveCount(2)
   await tombol(page, 'NAD⁺ 1').click({ timeout: 15000 })
-  await expect(page.locator('.pemutar-sasaran .pemutar-ajakan')).toHaveCount(1)
   await tombol(page, 'NAD⁺ 2').click()
   await expect(page.locator('[data-carrier="NADH"]')).toHaveCount(2, { timeout: 15000 })
   for (const n of await page.locator('[data-carrier="NADH"]').all()) {

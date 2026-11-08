@@ -22,11 +22,15 @@ test('soal a dan b memberi umpan balik dan menyimpan jawaban tanpa skor', async 
   await expect(page.locator('[data-petunjuk]')).toHaveText(
     'Ketuk molekul yang menjadi bahan awal glikolisis.',
   )
-  await expect(glukosa(page).locator('.pemutar-ajakan')).toBeVisible()
-  await expect(glukosa(page).locator('.pemutar-ajakan')).toHaveCSS(
-    'animation-name',
-    'pemutar-ajakan',
+  await expect(page.locator('.pemutar-gelembung [data-petunjuk]')).toHaveCount(0)
+  await expect(page.getByRole('status', { name: 'Petunjuk interaksi' })).toContainText(
+    'Ketuk molekul',
   )
+  await expect(page.locator('.pemutar-panduan')).toHaveCSS('opacity', '1')
+  await expect(page.locator('.pemutar-panduan')).toHaveCSS('pointer-events', 'none')
+  await expect(page.locator('.pemutar-ajakan')).toHaveCount(0)
+  await expect(page.locator('.pemutar-panduan img')).toHaveCount(0)
+  await expect(page.locator('.pemutar-panduan-ikon')).toHaveCount(1)
   await expect(page.locator('[data-molecule="glukosa"] [data-carbon]')).toHaveCount(6)
   await expect(page.locator('[data-molecule="piruvat"] [data-carbon]')).toHaveCount(3)
   await expect(page.locator('[data-molecule="o2"]')).toHaveAttribute('data-oksigen', '2')
@@ -74,7 +78,6 @@ test('soal a dan b memberi umpan balik dan menyimpan jawaban tanpa skor', async 
 test('pilihan bisa memakai keyboard dan tidak terjawab selama jeda', async ({ page }) => {
   await page.getByRole('button', { name: 'Jeda (spasi)' }).click()
   await expect(glukosa(page)).toBeDisabled()
-  await expect(glukosa(page).locator('.pemutar-ajakan')).toHaveCSS('animation-play-state', 'paused')
   expect(await draf(page)).toEqual({})
   await page.getByRole('button', { name: 'Lanjut (spasi)' }).click()
   const piruvat = page.getByRole('button', { name: 'Asam piruvat (3 atom C)', exact: true })
@@ -103,7 +106,7 @@ test('meninggalkan pilihan membatalkan penantian dan membuka ulang dari awal', a
   expect(galat).toEqual([])
 })
 
-test('petunjuk interaksi tetap tampil tanpa subtitle, penanda diam pada mode tenang', async ({
+test('popup petunjuk tetap tampil tanpa subtitle dan langsung tampil pada mode tenang', async ({
   page,
 }) => {
   await page.getByRole('button', { name: 'Pengaturan', exact: true }).click()
@@ -113,7 +116,8 @@ test('petunjuk interaksi tetap tampil tanpa subtitle, penanda diam pada mode ten
   await panel.getByRole('button', { name: 'Tutup pengaturan' }).click()
   await expect(page.locator('[data-petunjuk]')).toBeVisible()
   await expect(page.locator('[data-gelembung]')).toBeHidden()
-  await expect(glukosa(page).locator('.pemutar-ajakan')).toHaveCSS('animation-name', 'none')
+  await expect(page.locator('.pemutar-panduan')).toHaveCSS('opacity', '1')
+  await expect(page.locator('.pemutar-panduan')).toHaveCSS('transform', 'none')
   await glukosa(page).click()
   await expect(page.locator('[data-petunjuk]')).toHaveText('Pilih salah satu jawaban di kartu.')
 })

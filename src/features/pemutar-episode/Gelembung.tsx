@@ -2,6 +2,7 @@ import type { CSSProperties } from 'react'
 import { usePemutar, type PoseMaskot } from '../../stores/pemutar'
 import { tenangAktif, usePengaturan } from '../../stores/pengaturan'
 import { durasi } from './mesin'
+import { petunjukInteraksi } from './petunjuk'
 
 const perPose = (berkas: Record<string, string>): Partial<Record<PoseMaskot, string>> =>
   Object.fromEntries(
@@ -21,24 +22,6 @@ const POSE_MITOKONDRIA = perPose(
   }),
 )
 const gambarPose = (pose: PoseMaskot) => POSE[pose] ?? POSE['05-menjelaskan']
-
-function petunjukInteraksi({ pilihan, lengkapi, poe }: ReturnType<typeof usePemutar.getState>) {
-  if (pilihan) {
-    if (pilihan.opsi.every((o) => o.selesai)) return ''
-    return pilihan.opsi[0]?.posisi ? pilihan.judul : 'Pilih salah satu jawaban di kartu.'
-  }
-  if (lengkapi) return `Pilih jawaban untuk rumpang ${lengkapi.terisi.length + 1}.`
-  if (poe?.tahap === 'tebak') {
-    if (!poe.placed.length) return `Ketuk ATP untuk menaruhnya di ${poe.zone.name}.`
-    if (poe.alasan === null) return 'Pilih alasan untuk tebakanmu.'
-    return 'Sudah yakin? Ketuk Kunci tebakan untuk melihat prosesnya.'
-  }
-  if (poe?.tahap === 'jelaskan')
-    return poe.explainDone
-      ? 'Ketuk Lanjutkan video.'
-      : 'Pilih alasan yang sesuai dengan proses tadi.'
-  return ''
-}
 
 // Narator di kiri gelembung kalimat; pendamping mitokondria di kanan (disembunyikan di HP miring).
 // Wadah aria-live selalu ada agar kalimat pertama juga dibacakan pembaca layar.
@@ -66,16 +49,12 @@ function Gelembung() {
         className="pemutar-maskot"
       />
       <div
-        key={petunjuk || kalimat}
+        key={kalimat}
         className="pemutar-gelembung"
+        hidden={!tampilSubtitle}
         data-masuk={!!masuk}
         style={masuk}
       >
-        {petunjuk && (
-          <span className="pemutar-arahan" data-petunjuk>
-            {petunjuk}
-          </span>
-        )}
         <span data-gelembung hidden={!tampilSubtitle}>
           {kalimat}
         </span>

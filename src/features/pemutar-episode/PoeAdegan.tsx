@@ -7,7 +7,6 @@ import tahapAmati from '../../assets/images/interaksi-tahap-poe-amati.webp'
 import tahapJelaskan from '../../assets/images/interaksi-tahap-poe-jelaskan.webp'
 import tahapTebak from '../../assets/images/interaksi-tahap-poe-tebak.webp'
 import gambarAtp from '../../assets/images/pembawa-atp.webp'
-import tangan from '../../assets/images/interaksi-tangan.webp'
 import { usePemutar } from '../../stores/pemutar'
 
 const GAMBAR_TAHAP = { tebak: tahapTebak, amati: tahapAmati, jelaskan: tahapJelaskan }
@@ -100,7 +99,6 @@ export function PoeAdegan() {
                   onClick={() => poe.taruhToken(i)}
                 >
                   <img src={gambarAtp} alt="" width={128} height={52} />
-                  {!isPlaced && <img src={tangan} alt="" className="pemutar-ajakan" />}
                 </button>
               )
             })}

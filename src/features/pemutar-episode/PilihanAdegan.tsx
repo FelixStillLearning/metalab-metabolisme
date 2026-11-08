@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react'
-import tangan from '../../assets/images/interaksi-tangan.webp'
 import { usePemutar, type SoalPilihan } from '../../stores/pemutar'
 
 function PilihanAdegan() {
@@ -47,14 +46,7 @@ function PilihanAdegan() {
                 pilihan.pilih(i)
               }}
             >
-              {posisi ? (
-                <>
-                  <img src={tangan} alt="" className="pemutar-ajakan" />
-                  <span className="sr-only">{teks}</span>
-                </>
-              ) : (
-                teks
-              )}
+              {posisi ? <span className="sr-only">{teks}</span> : teks}
             </button>
           ),
         )}
