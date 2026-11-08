@@ -388,6 +388,11 @@
   display: none;
 }
 
+@page {
+  size: A4 portrait;
+  margin: 16mm;
+}
+
 @media print {
   body,
   .hasil-halaman {
@@ -404,20 +409,81 @@
   .hasil-cetak {
     display: block;
     font:
-      12pt/1.4 'Times New Roman',
+      12pt/1.35 'Times New Roman',
       serif;
   }
 
   .hasil-cetak table {
     width: 100%;
     border-collapse: collapse;
+    table-layout: fixed;
+    margin: 0 0 6mm;
+  }
+
+  .hasil-cetak h2,
+  .hasil-cetak h3 {
+    font-family: inherit;
+    font-weight: 700;
+    break-after: avoid;
+  }
+
+  .hasil-cetak h2 {
+    margin: 0 0 6mm;
+    font-size: 16pt;
+    text-align: center;
+  }
+
+  .hasil-cetak h3 {
+    margin: 6mm 0 3mm;
+    font-size: 12pt;
+  }
+
+  .hasil-cetak-identitas {
+    display: grid;
+    gap: 2mm;
+    margin-bottom: 6mm;
+    break-inside: avoid;
+  }
+
+  .hasil-cetak-identitas > div {
+    display: grid;
+    grid-template-columns: 16mm 1fr;
+  }
+
+  .hasil-cetak-identitas dt {
+    font-weight: 700;
+  }
+
+  .hasil-cetak-identitas dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .hasil-cetak tr {
+    break-inside: avoid;
+  }
+
+  .hasil-cetak thead {
+    display: table-header-group;
+  }
+
+  .hasil-cetak-penjelasan {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    orphans: 3;
+    widows: 3;
   }
 
   .hasil-cetak td,
   .hasil-cetak th {
-    padding: 4px 6px;
+    padding: 2mm;
+    overflow-wrap: anywhere;
     border: 1px solid #000;
     text-align: left;
     vertical-align: top;
+  }
+
+  .hasil-cetak th {
+    font-weight: 700;
   }
 }

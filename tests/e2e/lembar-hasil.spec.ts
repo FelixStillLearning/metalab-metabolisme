@@ -87,11 +87,28 @@ test('cetak untuk guru: lembar cetak berisi nama, jawaban, catatan POE, penjelas
     window.print = () => {}
   })
   await page.goto('/#/episode/1/hasil')
+  await page.getByRole('button', { name: 'Ubah identitas' }).click()
+  await page.getByLabel('Nama', { exact: true }).fill('Siswa Uji')
+  await page.getByLabel('Kelas', { exact: true }).fill('XII IPA 1')
+  await page.getByRole('button', { name: 'Simpan identitas' }).click()
+  await page
+    .getByLabel('Kenapa glikolisis menghasilkan 2 ATP bersih, bukan 4?', { exact: false })
+    .fill('Dua ATP dipakai di awal.\nEmpat ATP terbentuk kemudian.')
   await page.getByRole('button', { name: 'Cetak untuk guru' }).click()
   await page.emulateMedia({ media: 'print' })
   const cetak = page.locator('.hasil-cetak')
   await expect(cetak).toBeVisible()
-  await expect(cetak).toContainText('Nama:')
+  await expect(cetak).toContainText('Siswa Uji')
+  await expect(cetak).toContainText('XII IPA 1')
+  await expect(cetak).toContainText('Lembar Hasil Aktivitas 1.7 (Glikolisis)')
+  await expect(cetak).not.toContainText('Episode 1')
+  await expect(cetak.locator('.hasil-cetak-penjelasan')).toHaveText(
+    'Dua ATP dipakai di awal.\nEmpat ATP terbentuk kemudian.',
+  )
+  for (const selector of ['h2', 'h3', 'td', 'th']) {
+    await expect(cetak.locator(selector).first()).toHaveCSS('font-family', /Times New Roman/)
+  }
+  await expect(cetak.locator('h3').first()).toHaveCSS('break-after', 'avoid')
   await expect(cetak).toContainText(HASIL.d)
   await expect(cetak.locator('tr')).toHaveCount(1 + 7 + 1 + 2)
   await expect(page.locator('.hasil')).toBeHidden()

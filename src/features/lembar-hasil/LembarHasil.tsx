@@ -150,8 +150,22 @@ function LembarHasil({ judul, lead, bagan, poe, pertanyaan, cetak, rute, narasi 
 
       <div className="hasil-cetak">
         <h2>{cetak.judul}</h2>
-        <p>Nama: ____________________ Kelas: ________</p>
+        <dl className="hasil-cetak-identitas">
+          <div>
+            <dt>Nama:</dt>
+            <dd>{nama || '____________________'}</dd>
+          </div>
+          <div>
+            <dt>Kelas:</dt>
+            <dd>{kelas || '________'}</dd>
+          </div>
+        </dl>
         <table>
+          <colgroup>
+            <col style={{ width: '8%' }} />
+            <col style={{ width: '25%' }} />
+            <col />
+          </colgroup>
           <thead>
             <tr>
               <th>Soal</th>
@@ -171,6 +185,12 @@ function LembarHasil({ judul, lead, bagan, poe, pertanyaan, cetak, rute, narasi 
         </table>
         <h3>Catatan POE (tidak dinilai)</h3>
         <table>
+          <colgroup>
+            <col style={{ width: '8%' }} />
+            <col style={{ width: '12%' }} />
+            <col style={{ width: '40%' }} />
+            <col />
+          </colgroup>
           <thead>
             <tr>
               <th>Soal</th>
@@ -191,7 +211,7 @@ function LembarHasil({ judul, lead, bagan, poe, pertanyaan, cetak, rute, narasi 
           </tbody>
         </table>
         <h3>Penjelasan siswa</h3>
-        <p>{isi.trim() || '-'}</p>
+        <p className="hasil-cetak-penjelasan">{isi.trim() || '-'}</p>
       </div>
     </main>
   )
