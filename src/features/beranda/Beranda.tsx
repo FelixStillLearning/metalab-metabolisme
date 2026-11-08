@@ -1,4 +1,4 @@
-import { Play, Volume2, VolumeX } from 'lucide-react'
+import { Play } from 'lucide-react'
 import { Fragment, useEffect, useRef, useState, type CSSProperties } from 'react'
 import { Link } from 'react-router'
 import garisGerak from '../../assets/images/efek-garis-gerak.webp'
@@ -10,7 +10,7 @@ import logo from '../../assets/images/logo-metalab.webp'
 import maskot from '../../assets/images/maskot-ilmuwan-melambai.webp'
 import sel from '../../assets/images/sel-hewan.webp'
 import { bolehBersuaraSendiri, putar, type NamaSuara } from '../../lib/suara'
-import { usePengaturan } from '../../stores/pengaturan'
+import TombolSuara from '../../components/TombolSuara'
 import './beranda.css'
 
 const gambarLatar = { '--latar': `url("${latar}")`, '--latar-hp': `url("${latarHp}")` }
@@ -54,25 +54,6 @@ function useSuaraMasuk(putaran: number) {
   }, [putaran])
 }
 
-function TombolSuara({ saatDinyalakan }: { saatDinyalakan: () => void }) {
-  const aktif = usePengaturan((s) => s.suaraAktif)
-  const aturSuara = usePengaturan((s) => s.aturSuara)
-  const Ikon = aktif ? Volume2 : VolumeX
-  return (
-    <button
-      type="button"
-      aria-label={aktif ? 'Matikan suara' : 'Nyalakan suara'}
-      onClick={() => {
-        aturSuara(!aktif)
-        if (!aktif) saatDinyalakan()
-      }}
-      className="absolute top-4 right-4 z-30 grid size-12 place-items-center rounded-full bg-paper text-ink shadow-kertas-sm transition-transform duration-(--durasi-ui) ease-pose hover:-translate-y-0.5 active:translate-y-0.5"
-    >
-      <Ikon aria-hidden="true" className="size-6" />
-    </button>
-  )
-}
-
 // Ukuran di layar mendatar dibatasi tinggi layar juga, supaya HP miring 800x360 tetap muat tanpa menggulir.
 function Beranda() {
   // putaran: animasi masuk diputar ulang; ulangPop: letupan sel; ketukan: kalimat maskot
@@ -107,7 +88,7 @@ function Beranda() {
       style={gaya(gambarLatar)}
       className="beranda relative isolate grid min-h-dvh grid-cols-1 content-start gap-6 overflow-hidden bg-screen bg-(image:--latar-hp) bg-cover bg-center bg-no-repeat px-4 py-6 landscape:grid-cols-[6fr_5fr] landscape:content-center landscape:items-center landscape:gap-x-[4vw] landscape:gap-y-[2dvh] landscape:bg-(image:--latar) landscape:px-[7vw] landscape:py-[5dvh]"
     >
-      <TombolSuara saatDinyalakan={putarUlangSemua} />
+      <TombolSuara saatDinyalakan={putarUlangSemua} className="absolute top-4 right-4 z-30" />
       <div key={putaran} className="contents">
         <div className="absolute inset-0 -z-10">
           {PARTIKEL.map(([kiri, atas, ukuran, dx, dy, durasi]) => (
@@ -161,7 +142,7 @@ function Beranda() {
             to="/peta-materi"
             onClick={() => putar('mulai')}
             style={tunda(360)}
-            className="tempel mt-1 inline-flex min-h-12 items-center gap-3 rounded-xl bg-atp px-7 py-3 font-head text-[22px] font-extrabold text-paper shadow-kertas transition-transform duration-(--durasi-ui) ease-pose hover:-translate-y-1 active:translate-y-0.5 landscape:text-[clamp(16px,min(2.1vw,4.5dvh),40px)]"
+            className="tempel tombol-utama mt-1 inline-flex min-h-12 items-center gap-3 px-8 pt-3 pb-4 font-head text-[22px] font-extrabold transition-transform duration-(--durasi-ui) ease-pose hover:-translate-y-1 active:translate-y-0.5 landscape:text-[clamp(16px,min(2.1vw,4.5dvh),40px)]"
           >
             <Play aria-hidden="true" fill="currentColor" className="size-[0.8em]" />
             Mulai belajar
@@ -241,7 +222,7 @@ function Beranda() {
             </div>
           </div>
 
-          <div className="flex items-center gap-4 [@media(orientation:landscape)_and_(max-height:500px)]:hidden landscape:absolute landscape:right-[3vw] landscape:bottom-[3dvh] landscape:z-20 landscape:flex-row-reverse">
+          <div className="flex items-start gap-4 [@media(orientation:landscape)_and_(max-height:500px)]:hidden landscape:absolute landscape:right-[3vw] landscape:bottom-[3dvh] landscape:z-20 landscape:flex-row-reverse">
             <div className="relative">
               <img
                 src={maskot}
@@ -263,7 +244,7 @@ function Beranda() {
                 key={ketukan}
                 data-hiasan="gelembung"
                 style={tunda(ketukan ? 0 : 2100)}
-                className="gelembung tempel relative max-w-[10em] rounded-sm bg-paper px-5 py-3 font-head text-[18px] leading-tight font-extrabold text-ink shadow-kertas landscape:text-[clamp(18px,min(1.9vw,3.4dvh),32px)]"
+                className="gelembung tempel relative max-w-[10em] rounded-sm landscape:mt-[min(3dvh,28px)] bg-paper px-5 py-3 font-head text-[18px] leading-tight font-extrabold text-ink shadow-kertas landscape:text-[clamp(18px,min(1.9vw,3.4dvh),32px)]"
               >
                 {KALIMAT[ketukan % KALIMAT.length]}
               </p>

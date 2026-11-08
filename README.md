@@ -8,12 +8,9 @@ Judul kegiatan: Rancang Bangun Media Pembelajaran Interaktif Berbasis Web pada M
 
 ## Status
 
-Tahap Assembly (MDLC). Kerangka proyek dan library sudah terpasang. Urutan pengerjaan berikutnya:
+Tahap Assembly (MDLC). Kerangka proyek, token gaya, router, beranda, serta tampilan dan navigasi peta materi sudah tersedia. Panel Respirasi Aerob menampilkan empat episode; tautan Glikolisis membuka halaman sementara yang dapat kembali ke peta. Materi lain ditandai belum tersedia, dan progres siswa belum disimpan.
 
-1. Token gaya dan komponen dasar
-2. Beranda
-3. Peta materi
-4. Episode 1, Glikolisis (Aktivitas 1.7)
+Pengerjaan berikutnya: Episode 1, Glikolisis (Aktivitas 1.7).
 
 Episode lain dikerjakan setelah Episode 1 selesai diuji.
 
