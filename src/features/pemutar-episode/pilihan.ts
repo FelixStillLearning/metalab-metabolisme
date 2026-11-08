@@ -1,5 +1,6 @@
 import { bunyi } from '../../lib/suara'
 import { usePemutar, type SoalPilihan } from '../../stores/pemutar'
+import { kendali } from './mesin'
 
 export function mintaPilihan(
   signal: AbortSignal,
@@ -7,6 +8,8 @@ export function mintaPilihan(
   benar: number,
   salah: (index: number) => void | Promise<void>,
 ) {
+  // Putar ulang otomatis langsung memakai jawaban benar, seperti quickPick() prototype
+  if (kendali.otomatis) return Promise.resolve()
   return new Promise<void>((selesai, gagal) => {
     let aktif = true
     let sibuk = false
@@ -58,14 +61,23 @@ export function mintaPilihan(
 
 // Ketuk tiap objek satu per satu, urutan bebas, seperti tapEach() di prototype.
 // ketuk(i) dijalankan sekali per sasaran; selesai setelah semua ketukan selesai.
-export function mintaKetukSemua(
+// Pengecoh (ketuk kumpulkan, soal g prototype) tidak terkumpul: salah(i) memberi umpan balik.
+export async function mintaKetukSemua(
   signal: AbortSignal,
   judul: string,
   sasaran: SoalPilihan['opsi'],
   ketuk: (index: number) => Promise<void>,
+  pengecoh?: { indeks: number[]; salah: (index: number) => void | Promise<void> },
 ) {
+  const bukanPengecoh = (i: number) => !pengecoh?.indeks.includes(i)
+  if (kendali.otomatis) {
+    for (let i = 0; i < sasaran.length; i++) if (bukanPengecoh(i)) await ketuk(i)
+    return
+  }
   return new Promise<void>((selesai, gagal) => {
-    let sisa = sasaran.length
+    let sisa = sasaran.filter((_, i) => bukanPengecoh(i)).length
+    // Pengecoh yang sedang memberi umpan balik; pengecoh lain tetap bisa diketuk
+    const sibuk = new Set<number>()
     const bersih = () => {
       signal.removeEventListener('abort', batal)
       usePemutar.setState({ pilihan: null })
@@ -86,6 +98,20 @@ export function mintaKetukSemua(
         pilihan.opsi[index].selesai
       )
         return
+      if (!bukanPengecoh(index)) {
+        if (sibuk.has(index)) return
+        sibuk.add(index)
+        bunyi('belum-tepat')
+        try {
+          await pengecoh!.salah(index)
+        } catch (e) {
+          bersih()
+          return gagal(e)
+        } finally {
+          sibuk.delete(index)
+        }
+        return
+      }
       bunyi('ketuk')
       usePemutar.setState({
         pilihan: {

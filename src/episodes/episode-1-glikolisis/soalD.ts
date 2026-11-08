@@ -73,6 +73,7 @@ export async function soalD(p: Panggung, [m1, m2]: [Separuh, Separuh]) {
         }),
       )
       relabel(n, 'NADH')
+      bunyi('atp')
 
       // PGAL mengikat satu fosfat bebas: 1,3-bifosfogliserat, 3 C dan 2 P
       const ph = i ? m2 : m1

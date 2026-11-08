@@ -1,4 +1,5 @@
-import { beforeEach, expect, test } from 'vitest'
+import { afterEach, beforeEach, expect, test } from 'vitest'
+import { kendali } from '../../src/features/pemutar-episode/mesin'
 import {
   mintaJelaskan,
   mintaTebak,
@@ -14,6 +15,9 @@ import {
 
 beforeEach(() => {
   usePemutar.setState({ poe: null, dijeda: false })
+})
+afterEach(() => {
+  kendali.otomatis = false
 })
 
 test('mintaTebak menahan penguncian sampai ada token dan alasan dipilih', async () => {
@@ -119,4 +123,37 @@ test.each([
   const state = usePemutar.getState().poe as PoeJelaskanState
   expect(state.verdictTepat).toBe(tepat)
   expect(state.verdictText).toContain(teks)
+})
+
+test('mode otomatis: tebakan dan penjelasan langsung benar tanpa kartu', async () => {
+  kendali.otomatis = true
+  const signal = new AbortController().signal
+  const P = await mintaTebak(signal, {
+    judul: 'Berapa ATP?',
+    reasons: ['Alasan 1', 'Alasan 2', 'Alasan 3'],
+    right: 2,
+    zone: { x: 300, y: 430, w: 380, h: 390, name: 'glukosa' },
+    supply: [],
+    slot: (i) => [i * 100, 0],
+  })
+  expect(P).toEqual({
+    g: 2,
+    r: 1,
+    from: [
+      [0, 0],
+      [100, 0],
+    ],
+  })
+  const x = await mintaJelaskan(signal, {
+    g: 2,
+    r: 1,
+    unit: 'ATP',
+    reasons: ['a', 'b', 'c'],
+    back: ['a', 'b', 'c'],
+    right: 2,
+    alasanBenar: 1,
+    hasil: '2 ATP',
+  })
+  expect(x).toBe(1)
+  expect(usePemutar.getState().poe).toBeNull()
 })

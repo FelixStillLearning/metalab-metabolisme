@@ -4,12 +4,14 @@ import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router'
 import ikonPutarHp from '../../assets/svg/ui-putar-hp.svg?raw'
 import TombolSuara from '../../components/TombolSuara'
+import { musik } from '../../lib/suara'
 import { usePemutar } from '../../stores/pemutar'
 import { usePengaturan } from '../../stores/pengaturan'
 import Gelembung from './Gelembung'
 import { disc, el } from './kertas'
-import { jedaSemua, obj, type Panggung } from './mesin'
+import { jedaSemua, kendali, obj, type Objek, type Panggung } from './mesin'
 import PanelPengaturan from './PanelPengaturan'
+import LengkapiAdegan from './LengkapiAdegan'
 import PilihanAdegan from './PilihanAdegan'
 import PoeAdegan from './PoeAdegan'
 import './pemutar-episode.css'
@@ -24,6 +26,8 @@ type Props = {
   bab: Bab[]
   gambarSampul: string
   jalankan: (p: Panggung) => Promise<void>
+  // Putar ulang tanpa jeda dari Lembar Hasil: mulai sendiri, soal dijawab otomatis
+  otomatis?: boolean
 }
 
 // Sama dengan media query ajakan putar HP di pemutar-episode.css
@@ -46,7 +50,15 @@ function layarPenuh() {
   janji?.catch(() => {})
 }
 
-function PemutarEpisode({ judul, label, ringkasan, bab, gambarSampul, jalankan }: Props) {
+function PemutarEpisode({
+  judul,
+  label,
+  ringkasan,
+  bab,
+  gambarSampul,
+  jalankan,
+  otomatis = false,
+}: Props) {
   const [mulai, setMulai] = useState(false)
   const [panelBuka, setPanelBuka] = useState(false)
   const babSekarang = usePemutar((s) => s.bab)
@@ -57,6 +69,7 @@ function PemutarEpisode({ judul, label, ringkasan, bab, gambarSampul, jalankan }
   const tombolPengaturan = useRef<HTMLButtonElement>(null)
   const saklarPertama = useRef<HTMLInputElement>(null)
   const pengendali = useRef<AbortController>(null)
+  const kamera = useRef<Objek>(null)
   // Ref, bukan state: dua ketukan cepat terjadi sebelum React sempat menggambar ulang
   const sudahMulai = useRef(false)
   const dijedaPanel = useRef(false)
@@ -76,6 +89,7 @@ function PemutarEpisode({ judul, label, ringkasan, bab, gambarSampul, jalankan }
       pendamping: null,
       bab: -1,
       pilihan: null,
+      lengkapi: null,
       poe: null,
     })
     const s = svg.current!
@@ -87,8 +101,11 @@ function PemutarEpisode({ judul, label, ringkasan, bab, gambarSampul, jalankan }
       // Gerak yang sedang berjalan ikut dihentikan; janjinya tidak pernah selesai, adegan sudah batal
       gsap.killTweensOf([s, ...s.querySelectorAll('*')])
       window.speechSynthesis?.cancel()
+      musik(false)
       jedaSemua(false)
       g.replaceChildren()
+      kamera.current?.remove()
+      sudahMulai.current = false
     }
   }, [])
 
@@ -152,6 +169,7 @@ function PemutarEpisode({ judul, label, ringkasan, bab, gambarSampul, jalankan }
     if (sudahMulai.current) return
     sudahMulai.current = true
     setMulai(true)
+    musik(true)
     // Episode dipakai miring: di perangkat sentuh minta layar penuh lalu kunci mendatar
     if (matchMedia('(pointer: coarse)').matches) {
       document.documentElement
@@ -161,6 +179,7 @@ function PemutarEpisode({ judul, label, ringkasan, bab, gambarSampul, jalankan }
     }
     const s = svg.current!
     const cam = obj(0, 0, s)
+    kamera.current = cam
     s.insertBefore(cam, fx.current)
     const panggung: Panggung = {
       svg: s,
@@ -174,6 +193,20 @@ function PemutarEpisode({ judul, label, ringkasan, bab, gambarSampul, jalankan }
       if ((e as Error)?.name !== 'AbortError') throw e
     })
   }
+
+  // Dipasang setelah pengendali di atas, jadi tiap pemasangan memakai AbortController-nya sendiri
+  useEffect(() => {
+    if (!otomatis) return
+    kendali.otomatis = true
+    mulaiEpisode()
+    // Dimulai saat HP tegak: dijeda sampai siswa memutar HP lalu menekan lanjut
+    if (matchMedia(TEGAK).matches) jedaSemua(true)
+    return () => {
+      kendali.otomatis = false
+    }
+    // Hanya saat dipasang: mulaiEpisode membaca ref, jadi versi lamanya tetap benar
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [otomatis])
 
   const status = bab.map((_, j): StatusBab =>
     j < babSekarang ? 'selesai' : j === babSekarang ? 'sekarang' : '',
@@ -195,6 +228,7 @@ function PemutarEpisode({ judul, label, ringkasan, bab, gambarSampul, jalankan }
         </svg>
         <Gelembung />
         <PilihanAdegan />
+        <LengkapiAdegan />
         <PoeAdegan />
         {!mulai && (
           <div className="pemutar-sampul">

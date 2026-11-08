@@ -548,6 +548,47 @@
   cursor: default;
 }
 
+/* Lengkapi kalimat: lebih lebar dari kartu soal biasa; rumpang aktif disorot oker */
+.pemutar-lengkapi {
+  width: min(66%, 900px);
+}
+
+.pemutar-kalimat {
+  margin-bottom: 14px;
+  font: 600 clamp(14px, 1.3cqw, 23px) / 1.6 var(--font-body);
+}
+
+.pemutar-kalimat [data-rumpang] {
+  display: inline-block;
+  min-width: 5.5em;
+  padding: 0 0.35em;
+  border-bottom: 3px solid var(--color-muted);
+  line-height: 1.35;
+  text-align: center;
+}
+
+.pemutar-kalimat [data-rumpang='terisi'] {
+  min-width: 0;
+  border-bottom-color: var(--color-atp);
+  color: var(--color-atp);
+  font-weight: 800;
+}
+
+.pemutar-kalimat [data-rumpang='aktif'] {
+  background: var(--color-accent);
+  border-bottom-color: var(--color-ink);
+}
+
+.pemutar-kalimat [data-rumpang='aktif']::before,
+.pemutar-kalimat [data-rumpang='kosong']::before {
+  content: '?';
+  font-weight: 800;
+}
+
+.pemutar-kalimat [data-rumpang='kosong']::before {
+  content: '\00a0';
+}
+
 /* ---------- POE ---------- */
 
 .pemutar-poe {
@@ -806,6 +847,26 @@
 
   .pemutar-petunjuk {
     top: 17%;
+  }
+
+  .pemutar-lengkapi {
+    bottom: 21%;
+    width: 92%;
+  }
+
+  .pemutar-kalimat {
+    margin-bottom: 8px;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .pemutar-lengkapi .pemutar-opsi {
+    gap: 6px;
+  }
+
+  .pemutar-lengkapi .pemutar-pilihan {
+    padding: 6px 10px;
+    font-size: 13px;
   }
 }
 

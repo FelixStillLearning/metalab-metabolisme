@@ -35,17 +35,20 @@ const tungguGlukosaBergerak = (page: Page) =>
 
 let galat: string[]
 let hilang: string[]
+let audio: string[]
 
 test.beforeEach(async ({ page }, info) => {
   test.skip(info.project.name === 'hp-tegak', 'HP tegak hanya menampilkan ajakan putar HP')
   galat = []
   hilang = []
+  audio = []
   page.on('pageerror', (e) => galat.push(e.message))
   page.on('console', (m) => {
     if (m.type() === 'error') galat.push(m.text())
   })
   page.on('response', (r) => {
     if (r.status() === 404) hilang.push(r.url())
+    if (r.url().includes('/audio/')) audio.push(r.url())
   })
   await page.goto('/#/episode/1?cepat')
 })
@@ -138,8 +141,10 @@ test('kembali ke peta di tengah pembuka menghentikan episode', async ({ page }) 
   expect(galat).toEqual([])
 })
 
-test('tanpa berkas suara yang hilang', async ({ page }) => {
+test('suara episode dimuat tanpa berkas yang hilang', async ({ page }) => {
   await tombolMulai(page).click()
   await expect(sitosol(page)).toHaveCSS('opacity', '1', { timeout: 15000 })
+  expect(audio.some((u) => /audio\/musik-latar\.(ogg|mp3)$/.test(u))).toBe(true)
+  expect(audio.some((u) => /audio\/melesat\.(ogg|mp3)$/.test(u))).toBe(true)
   expect(hilang).toEqual([])
 })

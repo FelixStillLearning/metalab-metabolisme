@@ -1,5 +1,6 @@
 import { bunyi } from '../../lib/suara'
 import { usePemutar, type PoeTebakState } from '../../stores/pemutar'
+import { kendali } from './mesin'
 
 export type HasilTebak = {
   g: number
@@ -19,6 +20,15 @@ export function mintaTebak(
     kartu?: [number, number]
   },
 ): Promise<HasilTebak> {
+  // Putar ulang otomatis: jumlah benar dengan alasan kedua, seperti dragPredict() prototype
+  if (kendali.otomatis) {
+    const { right, slot } = konfigurasi
+    return Promise.resolve({
+      g: right,
+      r: 1,
+      from: Array.from({ length: right }, (_, i) => slot(i, right)),
+    })
+  }
   return new Promise<HasilTebak>((selesai, gagal) => {
     let aktif = true
     const bersih = () => {
@@ -123,6 +133,10 @@ export function mintaJelaskan(
     hasil: string
   },
 ): Promise<number> {
+  if (kendali.otomatis) {
+    usePemutar.setState({ poe: null })
+    return Promise.resolve(opsi.alasanBenar)
+  }
   return new Promise<number>((selesai, gagal) => {
     let aktif = true
     let firstSelected: number | null = null

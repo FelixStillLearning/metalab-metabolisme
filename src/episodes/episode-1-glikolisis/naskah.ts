@@ -1,6 +1,6 @@
 // Narasi utama Episode 1, disalin dari naskah narasi versi 1 (ID sama dengan nama berkas rekaman).
 // Kalimat yang berubah dicatat juga di riwayat naskah agar rekaman ikut diperbarui.
-import { wait, type Panggung } from '../../features/pemutar-episode/mesin'
+import { kendali, wait, type Panggung } from '../../features/pemutar-episode/mesin'
 import { ucapkan } from '../../lib/narasi'
 import { usePemutar, type PoseMaskot } from '../../stores/pemutar'
 
@@ -129,7 +129,7 @@ export const NASKAH = {
 export type IdNaskah = keyof typeof NASKAH
 
 // Seperti say() di prototype: kalimat tampil paling sedikit 1,6 detik atau 55 ms per huruf,
-// dan adegan menunggu sampai narasinya juga selesai
+// dan adegan menunggu sampai narasinya juga selesai. Putar ulang otomatis tanpa narasi suara.
 export async function say(
   p: Panggung,
   id: IdNaskah,
@@ -138,7 +138,7 @@ export async function say(
   const { teks, pose } = NASKAH[id]
   usePemutar.setState({ kalimat: teks, pose, pendamping: pendamping ?? null })
   await Promise.all([
-    ucapkan(id, teks, { signal: p.signal }),
+    kendali.otomatis ? undefined : ucapkan(id, teks, { signal: p.signal }),
     wait(p, Math.max(1600, teks.length * 55) + tambah, Infinity),
   ])
 }

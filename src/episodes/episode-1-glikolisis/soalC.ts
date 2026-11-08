@@ -24,6 +24,13 @@ import { usePemutar } from '../../stores/pemutar'
 import { carrier, countCarbons, relabel, type Glukosa, type Pembawa, type Separuh } from './molekul'
 import { say } from './naskah'
 
+// Juga dibaca Lembar Hasil untuk menampilkan alasan siswa
+export const ALASAN_C = [
+  'Satu ATP sudah cukup untuk memecah glukosa.',
+  'Glukosa perlu dua fosfat agar terbelah, dan tiap ATP memberi satu fosfat.',
+  'Makin banyak ATP, makin cepat dan makin banyak hasilnya.',
+]
+
 export async function soalC(
   p: Panggung,
   glu: Glukosa,
@@ -32,11 +39,7 @@ export async function soalC(
   usePemutar.setState({ bab: 2 })
   await say(p, 'e1-c-01')
 
-  const reasons = [
-    'Satu ATP sudah cukup untuk memecah glukosa.',
-    'Glukosa perlu dua fosfat agar terbelah, dan tiap ATP memberi satu fosfat.',
-    'Makin banyak ATP, makin cepat dan makin banyak hasilnya.',
-  ]
+  const reasons = ALASAN_C
 
   const P = await mintaTebak(p.signal, {
     judul: 'Berapa ATP yang dibutuhkan untuk memecah glukosa?',
@@ -59,6 +62,7 @@ export async function soalC(
   await Promise.all([camTo(p, 800, 450, 1, 700), to(glu, { x: 800, y: 535, s: 1.25 }, 700)])
 
   const atps = P.from.map(([x, y], i) => carrier(p, x, y, 'ATP', i ? -1 : 1))
+  bunyi('melesat')
   await Promise.all(atps.map((a, i) => arrive(p, a, i ? 1370 : 230, i > 1 ? 790 : 675)))
 
   await say(p, P.g === 1 ? 'e1-c-atp-1' : P.g === 2 ? 'e1-c-atp-2' : 'e1-c-atp-3')
@@ -113,6 +117,7 @@ export async function soalC(
     await shake(p, glu)
     await say(p, 'e1-c-04')
     const b = carrier(p, 1680, 750, 'ATP', -1)
+    bunyi('melesat')
     await arrive(p, b, 1370, 675)
     await give(b, 1)
   } else {
@@ -122,6 +127,7 @@ export async function soalC(
       tandaiAmati('salah', 'ATP ketiga tidak terpakai')
       bunyi('belum-tepat')
       await shake(p, atps[2])
+      bunyi('jatuh')
       await to(atps[2], { y: 860, o: 0.3 }, 600)
     } else {
       tandaiAmati('benar')
@@ -130,6 +136,7 @@ export async function soalC(
 
   await say(p, 'e1-c-06')
 
+  bunyi('getar')
   const rumble = comic(p, 'DRRRT', glu._x + 255, glu._y - 130, 'var(--color-hot)', p.world)
   for (const bond of Array.from(glu.cross.querySelectorAll('polygon:not([data-bayangan])'))) {
     bond.setAttribute('fill', 'var(--color-hot)')

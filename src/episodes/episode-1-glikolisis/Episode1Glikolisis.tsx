@@ -1,41 +1,47 @@
+import { useLocation, useNavigate } from 'react-router'
 import sel from '../../assets/images/sel-hewan.webp'
 import PemutarEpisode from '../../features/pemutar-episode/PemutarEpisode'
+import { BAB } from './bab'
 import { pembuka } from './pembuka'
 import { soalAB } from './soalAB'
 import { soalC } from './soalC'
 import { soalD } from './soalD'
 import { soalE } from './soalE'
+import { soalG } from './soalG'
+import { soalH } from './soalH'
 import { useJawaban } from '../../stores/jawaban'
+import { usePemutar } from '../../stores/pemutar'
 import type { Panggung } from '../../features/pemutar-episode/mesin'
 
-async function jalankan(p: Panggung) {
+async function episode(p: Panggung) {
   useJawaban.getState().mulai()
   await pembuka(p)
   const { glu, penanda } = await soalAB(p)
   const pgal = await soalC(p, glu, penanda)
   const piruvat = await soalD(p, pgal)
   await soalE(p, piruvat)
+  await soalG(p, piruvat)
+  await soalH(p, piruvat)
+  // Semua bab selesai; draf putaran ini menjadi hasil tersimpan (putar ulang otomatis tidak menulis)
+  usePemutar.setState({ bab: BAB.length, kalimat: '' })
+  useJawaban.getState().selesaikan()
 }
 
-const BAB = [
-  { k: 'a', t: 'Substrat' },
-  { k: 'b', t: 'Dua tahap' },
-  { k: 'c', t: 'Investasi energi', poe: true },
-  { k: 'd', t: 'Pembentukan energi' },
-  { k: 'e', t: 'ATP bersih', poe: true },
-  { k: 'g', t: 'Hasil' },
-  { k: 'h', t: 'Pengertian' },
-]
-
 function Episode1Glikolisis() {
+  const navigate = useNavigate()
+  const otomatis = (useLocation().state as { otomatis?: boolean } | null)?.otomatis === true
   return (
     <PemutarEpisode
       judul="Glikolisis"
       label="Aktivitas 1.7 · Episode 01"
       ringkasan="Tonton bagaimana sel memecah glukosa. Videonya berhenti di setiap soal Aktivitas 1.7: kamu menjawab langsung di adegan, lalu videonya berlanjut sesuai pilihanmu."
-      bab={BAB}
+      bab={[...BAB]}
       gambarSampul={sel}
-      jalankan={jalankan}
+      otomatis={otomatis}
+      jalankan={async (p) => {
+        await episode(p)
+        if (!p.signal.aborted) navigate('/episode/1/hasil')
+      }}
     />
   )
 }

@@ -61,15 +61,18 @@ async function bersihAnim(p: Panggung, g: number) {
   await say(p, 'e1-e-07')
 }
 
+// Juga dibaca Lembar Hasil untuk menampilkan alasan siswa
+export const ALASAN_E = [
+  'Glikolisis membentuk 4 ATP, jadi bersihnya 4.',
+  'Terbentuk 4 ATP, dikurangi 2 ATP yang dipakai di awal.',
+  'ATP yang dipakai di awal ikut dihitung, jadi 4 + 2 = 6.',
+]
+
 export async function soalE(p: Panggung, piruvat: Objek[]) {
   usePemutar.setState({ bab: 4 })
   await say(p, 'e1-e-01')
 
-  const reasons = [
-    'Glikolisis membentuk 4 ATP, jadi bersihnya 4.',
-    'Terbentuk 4 ATP, dikurangi 2 ATP yang dipakai di awal.',
-    'ATP yang dipakai di awal ikut dihitung, jadi 4 + 2 = 6.',
-  ]
+  const reasons = ALASAN_E
   const P = await mintaTebak(p.signal, {
     judul: 'Berapa ATP bersih yang dihasilkan glikolisis?',
     reasons,

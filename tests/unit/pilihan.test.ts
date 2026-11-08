@@ -1,10 +1,14 @@
-import { beforeEach, expect, test, vi } from 'vitest'
+import { afterEach, beforeEach, expect, test, vi } from 'vitest'
+import { kendali } from '../../src/features/pemutar-episode/mesin'
 import { mintaKetukSemua, mintaPilihan } from '../../src/features/pemutar-episode/pilihan'
 import { usePemutar } from '../../src/stores/pemutar'
 
 const isi = { judul: 'Pilih', opsi: [{ teks: 'salah' }, { teks: 'benar' }] }
 
 beforeEach(() => usePemutar.setState({ pilihan: null, dijeda: false }))
+afterEach(() => {
+  kendali.otomatis = false
+})
 
 test('pilihan menahan jawaban salah, indeks tidak valid, dan input selama jeda', async () => {
   const salah = vi.fn()
@@ -80,5 +84,46 @@ test('ketuk semua: tiap sasaran sekali, sasaran yang sudah diketuk hilang, seles
   await pilih(0)
   await janji
   expect(ketuk).toHaveBeenCalledTimes(2)
+  expect(usePemutar.getState().pilihan).toBeNull()
+})
+
+test('ketuk kumpulkan: pengecoh memberi umpan balik, tidak terkumpul, dan tidak dihitung', async () => {
+  const ketuk = vi.fn(async () => {})
+  const salah = vi.fn()
+  const selesai = vi.fn()
+  const sasaran = ['piruvat', 'CO₂', 'NADH'].map((teks) => ({
+    teks,
+    posisi: [100, 100] as [number, number],
+  }))
+  const janji = mintaKetukSemua(new AbortController().signal, 'Ketuk hasil', sasaran, ketuk, {
+    indeks: [1],
+    salah,
+  }).then(selesai)
+  const pilih = usePemutar.getState().pilihan!.pilih
+  await pilih(1)
+  await pilih(1)
+  expect(salah).toHaveBeenCalledTimes(2)
+  expect(salah).toHaveBeenCalledWith(1)
+  expect(ketuk).not.toHaveBeenCalled()
+  expect(usePemutar.getState().pilihan!.opsi[1].selesai).toBeUndefined()
+  await pilih(0)
+  await pilih(2)
+  await janji
+  expect(selesai).toHaveBeenCalledOnce()
+  expect(ketuk.mock.calls).toEqual([[0], [2]])
+})
+
+test('mode otomatis: pilihan langsung benar dan semua sasaran (tanpa pengecoh) diketuk sendiri', async () => {
+  kendali.otomatis = true
+  const salah = vi.fn()
+  await mintaPilihan(new AbortController().signal, isi, 1, salah)
+  expect(salah).not.toHaveBeenCalled()
+  const ketuk = vi.fn(async () => {})
+  const sasaran = ['a', 'b', 'c'].map((teks) => ({ teks }))
+  await mintaKetukSemua(new AbortController().signal, 'Ketuk', sasaran, ketuk, {
+    indeks: [1],
+    salah,
+  })
+  expect(ketuk.mock.calls).toEqual([[0], [2]])
   expect(usePemutar.getState().pilihan).toBeNull()
 })

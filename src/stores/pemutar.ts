@@ -18,6 +18,15 @@ export type SoalPilihan = {
   pilih: (index: number) => void
 }
 
+// Lengkapi kalimat: rumpang ke-terisi.length sedang aktif, opsi = pilihan rumpang itu
+export type SoalLengkapi = {
+  judul: string
+  potongan: string[]
+  terisi: string[]
+  opsi: string[]
+  pilih: (index: number) => void
+}
+
 export type PoeTahap = 'tebak' | 'amati' | 'jelaskan'
 
 export type PoeTebakState = {
@@ -72,6 +81,7 @@ type Pemutar = {
   bab: number
   dijeda: boolean
   pilihan: SoalPilihan | null
+  lengkapi: SoalLengkapi | null
   poe: PoeState | null
 }
 
@@ -83,5 +93,6 @@ export const usePemutar = create<Pemutar>()(() => ({
   bab: -1,
   dijeda: false,
   pilihan: null,
+  lengkapi: null,
   poe: null,
 }))
