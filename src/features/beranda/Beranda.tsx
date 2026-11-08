@@ -142,7 +142,7 @@ function Beranda() {
             to="/peta-materi"
             onClick={() => putar('mulai')}
             style={tunda(360)}
-            className="tempel mt-1 inline-flex min-h-12 items-center gap-3 rounded-xl bg-atp px-7 py-3 font-head text-[22px] font-extrabold text-paper shadow-kertas transition-transform duration-(--durasi-ui) ease-pose hover:-translate-y-1 active:translate-y-0.5 landscape:text-[clamp(16px,min(2.1vw,4.5dvh),40px)]"
+            className="tempel tombol-utama mt-1 inline-flex min-h-12 items-center gap-3 px-8 pt-3 pb-4 font-head text-[22px] font-extrabold transition-transform duration-(--durasi-ui) ease-pose hover:-translate-y-1 active:translate-y-0.5 landscape:text-[clamp(16px,min(2.1vw,4.5dvh),40px)]"
           >
             <Play aria-hidden="true" fill="currentColor" className="size-[0.8em]" />
             Mulai belajar

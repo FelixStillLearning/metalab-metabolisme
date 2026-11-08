@@ -20,3 +20,12 @@
     @apply outline-3 outline-offset-2 outline-accent;
   }
 }
+
+@layer components {
+  /* Tombol utama (aset I32): kertas biru. border-image menjaga kedua ujung bulat tetap utuh,
+     hanya bagian tengah yang memanjang mengikuti panjang teks; sisi kanan bawah berisi bayangan. */
+  .tombol-utama {
+    border-image: url('../assets/images/tombol-utama.webp') 0 66 0 60 fill / 0 1.2em 0 1.1em stretch;
+    color: var(--color-paper);
+  }
+}

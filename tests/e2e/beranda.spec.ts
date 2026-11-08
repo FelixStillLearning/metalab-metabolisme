@@ -213,3 +213,14 @@ test('tata letak mengikuti orientasi layar', async ({ page }, info) => {
   )
   expect(melebar).toBe(false)
 })
+
+test('tombol mulai belajar memakai gambar tombol utama', async ({ page }) => {
+  await page.goto('/')
+  const tombol = page.getByRole('link', { name: 'Mulai belajar' })
+  await expect(tombol).toHaveCSS('border-image-source', /tombol-utama.*\.webp/)
+  const ok = await page.evaluate(async () => {
+    const src = getComputedStyle(document.querySelector('.tombol-utama')!).borderImageSource
+    return (await fetch(src.slice(5, -2))).ok
+  })
+  expect(ok).toBe(true)
+})
