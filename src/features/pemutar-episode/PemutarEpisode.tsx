@@ -1,12 +1,16 @@
 import { gsap } from 'gsap'
 import { ArrowLeft, Pause, Play, Settings } from 'lucide-react'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { useReducedMotion } from 'motion/react'
 import { Link } from 'react-router'
+import logo from '../../assets/images/logo-metalab.webp'
+import organelMitokondria from '../../assets/images/organel-mitokondria.webp'
 import ikonPutarHp from '../../assets/svg/ui-putar-hp.svg?raw'
 import TombolSuara from '../../components/TombolSuara'
 import PengaturVolume from '../../components/PengaturVolume'
 import { musik } from '../../lib/suara'
 import { usePemutar } from '../../stores/pemutar'
+import { usePengaturan } from '../../stores/pengaturan'
 import Gelembung from './Gelembung'
 import PetunjukInteraksi from './PetunjukInteraksi'
 import { disc, el } from './kertas'
@@ -71,6 +75,9 @@ function PemutarEpisode({
   const [panelBuka, setPanelBuka] = useState(false)
   const babSekarang = usePemutar((s) => s.bab)
   const dijeda = usePemutar((s) => s.dijeda)
+  const tenang = usePengaturan((s) => s.tenang)
+  const gerakDikurangi = useReducedMotion()
+  const diam = tenang ?? gerakDikurangi
   const svg = useRef<SVGSVGElement>(null)
   const latar = useRef<SVGGElement>(null)
   const fx = useRef<SVGGElement>(null)
@@ -218,7 +225,7 @@ function PemutarEpisode({
   )
 
   return (
-    <div className="pemutar" data-dijeda={dijeda || undefined}>
+    <div className="pemutar" data-dijeda={dijeda || undefined} data-tenang={diam || undefined}>
       <div className="pemutar-panggung" data-panggung>
         <svg ref={svg} viewBox="0 0 1600 900" role="img" aria-label={`Animasi episode ${judul}`}>
           <g ref={latar} data-lapisan="latar" />
@@ -231,10 +238,23 @@ function PemutarEpisode({
         {children}
         {!mulai && (
           <div className="pemutar-sampul">
+            <img
+              src={organelMitokondria}
+              alt=""
+              aria-hidden="true"
+              className="pemutar-sampul-dekorasi-kanan"
+            />
             <div className="pemutar-sampul-gambar">
               <img src={gambarSampul} alt="" />
             </div>
             <div className="pemutar-sampul-isi">
+              <img
+                src={logo}
+                alt="MetaLab"
+                className="pemutar-sampul-logo"
+                width={280}
+                height={56}
+              />
               <span className="pemutar-label">{label}</span>
               <h1>{judul}</h1>
               <p>{ringkasan}</p>

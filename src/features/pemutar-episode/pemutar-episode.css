@@ -67,7 +67,31 @@
   grid-template-columns: 1fr 1fr;
   place-items: center;
   gap: 2%;
-  padding: 10% 7%;
+  padding: 8% 7%;
+  overflow: hidden;
+}
+
+.pemutar-sampul-dekorasi-kanan {
+  position: absolute;
+  top: -6%;
+  right: -5%;
+  width: 22%;
+  max-width: 320px;
+  transform: rotate(18deg);
+  opacity: 0.85;
+  pointer-events: none;
+  z-index: 0;
+  filter: drop-shadow(2px 5px 0 #0d252640);
+  animation: sampul-tempel 500ms var(--ease-letup) 50ms backwards;
+}
+
+.pemutar-sampul-logo {
+  display: block;
+  width: clamp(120px, 13cqw, 200px);
+  height: auto;
+  margin-bottom: 0.2cqw;
+  filter: drop-shadow(1px 2px 0 #0d252633);
+  animation: sampul-tempel 420ms var(--ease-letup) 0ms backwards;
 }
 
 .pemutar-sampul-gambar {
@@ -75,6 +99,7 @@
   width: 115%;
   margin-left: -5%;
   transform: rotate(-5deg);
+  animation: sampul-luncur-sel 600ms var(--ease-pose) 90ms backwards;
 }
 
 .pemutar-sampul-gambar img {
@@ -87,7 +112,8 @@
   grid-area: 1 / 1;
   display: grid;
   justify-items: start;
-  gap: 1.6cqw;
+  gap: 1.4cqw;
+  z-index: 1;
 }
 
 .pemutar-label {
@@ -98,23 +124,26 @@
   font-size: clamp(13px, 1.15cqw, 20px);
   font-weight: 700;
   transform: rotate(-2deg);
+  animation: sampul-tempel 420ms var(--ease-letup) 70ms backwards;
 }
 
 .pemutar-sampul h1 {
-  margin: 0.2em 0;
+  margin: 0.1em 0;
   padding: 0.22em 0.3em 0.12em;
   background: var(--color-paper);
   color: var(--color-ink);
-  font: 800 5.8cqw/1 var(--font-head);
+  font: 800 5.8cqw / 1 var(--font-head);
   letter-spacing: -0.04em;
   clip-path: polygon(0 2%, 99% 0, 100% 97%, 1% 100%);
   transform: rotate(-2deg);
+  animation: sampul-tempel 420ms var(--ease-letup) 140ms backwards;
 }
 
 .pemutar-sampul p {
   max-width: 35ch;
   font-size: clamp(16px, 1.55cqw, 26px);
   line-height: 1.5;
+  animation: sampul-tempel 420ms var(--ease-letup) 210ms backwards;
 }
 
 .pemutar-sampul-aksi {
@@ -123,6 +152,35 @@
   align-items: center;
   gap: 1.2cqw;
   margin-top: 0.6cqw;
+  animation: sampul-tempel 420ms var(--ease-letup) 280ms backwards;
+}
+
+/* Sama dengan beranda-tempel: hanya titik awal, jadi rotasi bawaan elemen tidak tertumpuk */
+@keyframes sampul-tempel {
+  from {
+    opacity: 0;
+    scale: 0.85;
+    rotate: -4deg;
+  }
+}
+
+@keyframes sampul-luncur-sel {
+  from {
+    opacity: 0;
+    translate: 10% -3%;
+    rotate: 7deg;
+  }
+}
+
+/* data-tenang sudah mencakup prefers-reduced-motion saat saklar tenang belum diatur */
+[data-tenang] .pemutar-sampul-logo,
+[data-tenang] .pemutar-label,
+[data-tenang] .pemutar-sampul h1,
+[data-tenang] .pemutar-sampul p,
+[data-tenang] .pemutar-sampul-aksi,
+[data-tenang] .pemutar-sampul-gambar,
+[data-tenang] .pemutar-sampul-dekorasi-kanan {
+  animation: none;
 }
 
 .pemutar-sampul .tombol-utama,
@@ -997,11 +1055,20 @@
   }
 
   .pemutar-sampul {
-    padding: 12% 6% 5%;
+    padding: 10% 6% 5%;
+  }
+
+  .pemutar-sampul-dekorasi-kanan {
+    display: none;
+  }
+
+  .pemutar-sampul-logo {
+    width: clamp(80px, 9cqw, 110px);
+    margin-bottom: 0;
   }
 
   .pemutar-sampul-isi {
-    gap: 8px;
+    gap: 6px;
   }
 
   .pemutar-sampul p {
