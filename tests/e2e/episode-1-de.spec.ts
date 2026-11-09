@@ -12,6 +12,9 @@ const ALASAN_C = 'Glukosa perlu dua fosfat agar terbelah, dan tiap ATP memberi s
 const ALASAN_E = 'Terbentuk 4 ATP, dikurangi 2 ATP yang dipakai di awal.'
 
 const tombol = (page: Page, nama: string) => page.getByRole('button', { name: nama, exact: true })
+type Kotak = { x: number; y: number; width: number; height: number }
+const bertumpuk = (a: Kotak, b: Kotak) =>
+  a.x < b.x + b.width && b.x < a.x + a.width && a.y < b.y + b.height && b.y < a.y + a.height
 
 test.beforeEach(async ({ page }, info) => {
   test.skip(info.project.name === 'hp-tegak', 'Soal dimainkan saat HP miring')
@@ -87,6 +90,25 @@ test('soal d: 2 NADH, 4 ATP, 2 H₂O, dan 2 asam piruvat 3 C', async ({ page }) 
     await expect(r.locator(KARBON)).toHaveCount(3)
     await expect(r.locator(FOSFAT)).toHaveCount(0)
   }
+  // Hasil soal d rapat di area kosong tengah-kanan: tidak di tepi, tidak saling tumpuk,
+  // tidak tertutup kartu tebakan e (desktop; di HP miring kartu tebakan memang di kanan)
+  const panggung = (await page.locator('[data-panggung]').boundingBox())!
+  const s = panggung.width / 1600
+  const hasil = page.locator(
+    '[data-molecule="h2o"], [data-molecule="piruvat"], [data-carrier="NADH"], [data-carrier="ATP"]',
+  )
+  await expect(hasil).toHaveCount(10)
+  const kotakHasil = await Promise.all(
+    (await hasil.all()).map(async (h) => (await h.boundingBox())!),
+  )
+  const kartuTebak = (await page.locator('.poe-card').boundingBox())!
+  const desktop = test.info().project.name === 'desktop'
+  kotakHasil.forEach((k, i) => {
+    expect((k.x - panggung.x) / s, `hasil ${i} kiri`).toBeGreaterThanOrEqual(950)
+    expect((k.x + k.width - panggung.x) / s, `hasil ${i} kanan`).toBeLessThanOrEqual(1430)
+    for (const l of kotakHasil.slice(i + 1)) expect(bertumpuk(k, l), `hasil ${i}`).toBe(false)
+    if (desktop) expect(bertumpuk(k, kartuTebak), `hasil ${i} dan kartu`).toBe(false)
+  })
   // Fosfat utuh: 4 ATP x 3 P. ADP soal c sudah keluar dari layar sebelum Jelaskan soal c.
   await expect(page.locator(`svg ${FOSFAT}`)).toHaveCount(12)
   await expect(page.locator('[data-carrier="ADP"]')).toHaveCount(0)

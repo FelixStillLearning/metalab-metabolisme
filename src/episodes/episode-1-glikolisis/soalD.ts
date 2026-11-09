@@ -92,7 +92,9 @@ export async function soalD(p: Panggung, [m1, m2]: [Separuh, Separuh]) {
   )
 
   await say(p, 'e1-d-02')
-  await Promise.all(nads.map((n, i) => to(n, { x: 1480, y: 160 + i * 70, s: 0.8 }, 700)))
+  // Hasil soal d rapat di area kosong tengah-kanan (kiri dipakai kartu dan nampan soal e);
+  // NADH sebelum hiasan mitokondria di pojok kanan atas latar
+  await Promise.all(nads.map((n, i) => to(n, { x: 1350, y: 150 + i * 75, s: 0.8 }, 700)))
   await say(p, 'e1-d-03')
 
   const targets = [m1.p1!, m1.p2!, m2.p1!, m2.p2!]
@@ -132,16 +134,15 @@ export async function soalD(p: Panggung, [m1, m2]: [Separuh, Separuh]) {
       void comic(p, 'KLIK', ox, oy - 100, 'var(--color-fosfat)', p.world)
       count++
       counter.teks.textContent = `ATP terbentuk: ${count}`
-      // Berjajar di kanan bawah tanpa saling menimpa (lencana + 3 P kira-kira 135 satuan),
-      // di luar label molekul bawah dan di bawah label piruvat
-      await to(adp, { x: 920 + count * 140, y: 710, s: 0.55 }, 600)
+      // Satu kolom di samping kedua piruvat (lencana + 3 P kira-kira 130 x 30 satuan)
+      await to(adp, { x: 1320, y: 300 + count * 60, s: 0.55 }, 600)
     },
   )
 
   await say(p, 'e1-d-04')
   const r1 = hide(piruvat(p, 800, 320))
   const r2 = hide(piruvat(p, 800, 590))
-  const w = [air(p, 1180, 140), air(p, 1300, 140)].map(hide)
+  const w = [air(p, 1060, 175), air(p, 1180, 175)].map(hide)
   await Promise.all([
     to(m1, { o: 0 }, 0),
     to(m2, { o: 0 }, 0),
@@ -152,8 +153,8 @@ export async function soalD(p: Panggung, [m1, m2]: [Separuh, Separuh]) {
   m1.remove()
   m2.remove()
   await Promise.all([
-    to(r1, { x: 1300, y: 320 }, 1200),
-    to(r2, { x: 1300, y: 590 }, 1200),
+    to(r1, { x: 1130, y: 360 }, 1200),
+    to(r2, { x: 1130, y: 560 }, 1200),
     camTo(p, 800, 450, 1, 1200),
   ])
 
