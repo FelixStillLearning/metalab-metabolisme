@@ -1215,7 +1215,8 @@
     left: 50%;
     top: 116px;
     bottom: auto;
-    width: 92%;
+    /* Sisi kiri dan kanan untuk molekul hasil Amati (PGAL soal c) */
+    width: 68%;
     max-height: calc(100% - 128px);
     padding: 12px 16px;
     gap: 8px;

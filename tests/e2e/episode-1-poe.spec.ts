@@ -332,6 +332,21 @@ for (const n of [1, 2, 3]) {
       await kartuMuat(page, '.poe-card-explain', pesan, width, height)
       const kartu = await kotak(page, '.poe-card-explain')
       expect(Math.abs(kartu.x + kartu.width / 2 - width / 2), pesan).toBeLessThan(2)
+      // Pendamping tidak tersisa setengah tertutup di belakang kartu
+      await expect(page.locator('.pemutar-pendamping'), pesan).toHaveCount(0)
+      // Ke-6 C dan kedua P PGAL tetap terlihat di samping kartu, tidak tertutup maskot
+      const panggung = await kotak(page, '[data-panggung]')
+      const penghalang = [kartu, await kotak(page, '.pemutar-panduan')]
+      for (const m of ['.pemutar-maskot', '.pemutar-pendamping'])
+        if (await page.locator(m).isVisible()) penghalang.push(await kotak(page, m))
+      const atom = page.locator(`[data-molecule="pgal"] :is(${KARBON}, ${FOSFAT})`)
+      await expect(atom).toHaveCount(8)
+      for (const a of await atom.all()) {
+        const k = (await a.boundingBox())!
+        expect(k.width, `${pesan} atom cukup besar`).toBeGreaterThanOrEqual(12)
+        expect(berisi(panggung, k), `${pesan} atom di panggung`).toBe(true)
+        for (const h of penghalang) expect(bertumpuk(h, k), `${pesan} atom tertutup`).toBe(false)
+      }
       await expect(page.locator('.pemutar-panduan')).toHaveCSS('transform', 'none')
       const petunjuk = await kotak(page, '.pemutar-panduan')
       expect(bertumpuk(kartu, petunjuk), pesan).toBe(false)
