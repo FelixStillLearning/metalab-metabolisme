@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test'
+import { latarMemenuhiLayar } from './bantu/latar.js'
 
 const gelembung = (page: Page) => page.locator('[data-gelembung]')
 const tombolMulai = (page: Page) => page.getByRole('button', { name: 'Mulai episode' })
@@ -63,6 +64,7 @@ test('pembuka: sel, penanda di mitokondria, lalu sitosol', async ({ page }) => {
   await expect(page.locator('[data-pose]')).toHaveAttribute('data-pose', '08-menunjuk')
   await expect(sitosol(page)).toHaveCSS('opacity', '1', { timeout: 15000 })
   await expect(page.getByText('SITOSOL · TANPA OKSIGEN')).toBeAttached()
+  await latarMemenuhiLayar(page, 'sitosol')
   // Pembanding untuk tes mode tenang: tanpa mode tenang garis gerak memang muncul
   expect(await efekTerlihat(page)).toContain('speed-lines')
   expect(galat).toEqual([])

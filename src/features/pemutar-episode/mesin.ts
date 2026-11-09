@@ -310,3 +310,22 @@ export function kinetik(p: Panggung, x: number, y: number, t: string, size: numb
 
 export const camTo = (p: Panggung, x: number, y: number, s: number, ms = 1400) =>
   to(p.cam, { x: 800 - x * s, y: 450 - y * s, s }, ms, 'kamera')
+
+// Latar lebar: sumber 1672x941 diperlebar 293 px di tiap sisi (2258x1527). Bagian tengahnya tepat
+// menutup adegan 1600x900; sisanya ditampilkan .pemutar-latar di bilah layar yang tidak 16:9.
+const LATAR = {
+  x: (-293 * 1600) / 1672,
+  y: (-293 * 900) / 941,
+  width: (2258 * 1600) / 1672,
+  height: (1527 * 900) / 941,
+  preserveAspectRatio: 'none',
+}
+
+export async function pasangLatar(p: Panggung, href: string, nama: string) {
+  const latar = obj(0, 0, p.latar)
+  latar.dataset.latar = nama
+  el('image', { href, ...LATAR }, latar)
+  hide(latar)
+  usePemutar.setState({ latar: href })
+  await to(latar, { o: 1 }, 600)
+}

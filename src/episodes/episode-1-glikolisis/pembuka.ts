@@ -1,7 +1,7 @@
 // Pembuka Episode 1: sel utuh, glukosa masuk, penanda menunjuk mitokondria lalu sitoplasma,
 // kemudian panel zoom membawa kamera ke panggung sitosol. Gerak sel, glukosa, dan kamera dari
 // intro() prototype; penanda dan panel zoom tambahan dari rancangan episode.
-import gambarLatar from '../../assets/images/latar-sitosol.webp'
+import gambarLatar from '../../assets/images/latar-sitosol-lebar.webp'
 import gambarPanel from '../../assets/images/organel-panel-zoom.webp'
 import gambarPenanda from '../../assets/images/organel-penanda-zoom.webp'
 import gambarSel from '../../assets/images/sel-hewan.webp'
@@ -11,6 +11,7 @@ import {
   camTo,
   hide,
   obj,
+  pasangLatar,
   teks,
   to,
   wait,
@@ -70,11 +71,7 @@ export async function pembuka(p: Panggung) {
   ])
 
   // Pindah ke panggung sitosol (labScene() di prototype)
-  const latar = obj(0, 0, p.latar)
-  latar.dataset.latar = 'sitosol'
-  el('image', { href: gambarLatar, width: 1600, height: 900 }, latar)
-  hide(latar)
-  await to(latar, { o: 1 }, 600)
+  await pasangLatar(p, gambarLatar, 'sitosol')
   p.world.replaceChildren()
   await to(p.cam, { x: 0, y: 0, s: 1 }, 0)
   const tempat = obj(800, 80, p.world)

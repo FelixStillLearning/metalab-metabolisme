@@ -75,6 +75,7 @@ function PemutarEpisode({
   const [panelBuka, setPanelBuka] = useState(false)
   const babSekarang = usePemutar((s) => s.bab)
   const dijeda = usePemutar((s) => s.dijeda)
+  const latarLebar = usePemutar((s) => s.latar)
   const tenang = usePengaturan((s) => s.tenang)
   const gerakDikurangi = useReducedMotion()
   const diam = tenang ?? gerakDikurangi
@@ -106,6 +107,7 @@ function PemutarEpisode({
       pilihan: null,
       lengkapi: null,
       poe: null,
+      latar: null,
     })
     const s = svg.current!
     const g = latar.current!
@@ -227,6 +229,9 @@ function PemutarEpisode({
 
   return (
     <div className="pemutar" data-dijeda={dijeda || undefined} data-tenang={diam || undefined}>
+      {latarLebar && (
+        <div className="pemutar-latar" style={{ backgroundImage: `url(${latarLebar})` }} />
+      )}
       <div className="pemutar-panggung" data-panggung>
         <svg ref={svg} viewBox="0 0 1600 900" role="img" aria-label={`Animasi episode ${judul}`}>
           <g ref={latar} data-lapisan="latar" />

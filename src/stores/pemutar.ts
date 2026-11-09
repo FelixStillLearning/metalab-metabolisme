@@ -83,6 +83,8 @@ type Pemutar = {
   pilihan: SoalPilihan | null
   lengkapi: SoalLengkapi | null
   poe: PoeState | null
+  // Latar lebar di belakang panggung, mengisi bilah layar yang tidak 16:9
+  latar: string | null
 }
 
 // Keadaan sesaat pemutar episode; sengaja tidak disimpan
@@ -95,4 +97,5 @@ export const usePemutar = create<Pemutar>()(() => ({
   pilihan: null,
   lengkapi: null,
   poe: null,
+  latar: null,
 }))

@@ -4,14 +4,21 @@
 import { useState } from 'react'
 import { Link } from 'react-router'
 import gambarBintang from '../../assets/images/efek-bintang-sorot.webp'
-import gambarLatar from '../../assets/images/latar-peta-penutup.webp'
+import gambarLatar from '../../assets/images/latar-peta-penutup-lebar.webp'
 import gambarMitokondria from '../../assets/images/organel-mitokondria.webp'
 import simpulBelum from '../../assets/images/ui-simpul-tahap.webp'
 import simpulMenyala from '../../assets/images/ui-simpul-tahap-menyala.webp'
 import simpulSelesai from '../../assets/images/ui-simpul-tahap-selesai.webp'
 import PemutarEpisode from '../../features/pemutar-episode/PemutarEpisode'
 import { el, label } from '../../features/pemutar-episode/kertas'
-import { hide, obj, to, wait, type Panggung } from '../../features/pemutar-episode/mesin'
+import {
+  hide,
+  obj,
+  pasangLatar,
+  to,
+  wait,
+  type Panggung,
+} from '../../features/pemutar-episode/mesin'
 import { bunyi } from '../../lib/suara'
 import { usePemutar } from '../../stores/pemutar'
 import { BAB } from './bab'
@@ -33,11 +40,7 @@ const MITOKONDRIA = [602, 222] as const
 
 async function penutup(p: Panggung) {
   usePemutar.setState({ bab: BAB.length })
-  const latar = obj(0, 0, p.latar)
-  latar.dataset.latar = 'peta-penutup'
-  el('image', { href: gambarLatar, width: 1600, height: 900 }, latar)
-  hide(latar)
-  await to(latar, { o: 1 }, 600)
+  await pasangLatar(p, gambarLatar, 'peta-penutup')
 
   // Bintang sorot dibuat lebih dulu agar berada di belakang simpul glikolisis
   const bintang = obj(TAHAP[0].x, Y, p.world)

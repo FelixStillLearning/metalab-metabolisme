@@ -3,6 +3,8 @@
    skala adegan. Kontrol selalu diam di tempat. */
 
 .pemutar {
+  /* Lebar panggung 16:9 yang muat di layar; juga dipakai .pemutar-latar */
+  --panggung: min(100vw, calc(100dvh * 16 / 9));
   position: fixed;
   inset: 0;
   display: grid;
@@ -11,9 +13,30 @@
   background: var(--color-screen);
 }
 
+/* Latar lebar (sumber 1672x941 + 293 px tiap sisi) di belakang panggung. Ukuran dan letaknya sama
+   dengan gambar latar di adegan, jadi bilah di luar 16:9 berisi lanjutan latar yang menyambung. */
+.pemutar-latar {
+  position: absolute;
+  inset: 0;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: calc(var(--panggung) * 2258 / 1672) calc(var(--panggung) * 9 / 16 * 1527 / 941);
+  animation: pemutar-latar-masuk 600ms both;
+}
+
+@keyframes pemutar-latar-masuk {
+  from {
+    opacity: 0;
+  }
+}
+
+[data-tenang] .pemutar-latar {
+  animation: none;
+}
+
 .pemutar-panggung {
   position: relative;
-  width: min(100vw, calc(100dvh * 16 / 9));
+  width: var(--panggung);
   aspect-ratio: 16 / 9;
   container-type: size;
   overflow: hidden;
