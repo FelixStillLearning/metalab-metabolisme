@@ -253,6 +253,9 @@ for (const n of [1, 2, 3]) {
     // Label muncul setelah kedua PGAL berhenti bergerak
     await expect(page.locator('svg text', { hasText: 'PGAL · 3 C' })).toHaveCount(2)
     const panggungAmati = await kotak(page, '[data-panggung]')
+    const posisiAmati = await page
+      .locator('[data-molecule="pgal"]')
+      .evaluateAll((gs) => gs.map((g) => getComputedStyle(g).transform))
 
     // Fosfat tidak hilang: 2 ADP masing-masing 2 P, ATP sisa tetap 3 P
     await expect(page.locator('[data-carrier="ADP"]')).toHaveCount(2)
@@ -303,6 +306,10 @@ for (const n of [1, 2, 3]) {
     else await expect(vonis).toContainText(`Tebakanmu ${n} ATP belum tepat. Yang terjadi`)
     const pgal = page.locator('[data-molecule="pgal"]')
     await expect(pgal).toHaveCount(2)
+    // PGAL tetap di posisi setelah terbelah, di belakang kartu Jelaskan.
+    expect(await pgal.evaluateAll((gs) => gs.map((g) => getComputedStyle(g).transform))).toEqual(
+      posisiAmati,
+    )
     for (const h of await pgal.all()) {
       await expect(h.locator(FOSFAT)).toHaveCount(1)
       await expect(h.locator(KARBON)).toHaveCount(3)
@@ -342,19 +349,6 @@ for (const n of [1, 2, 3]) {
       expect(Math.abs(kartu.x + kartu.width / 2 - width / 2), pesan).toBeLessThan(2)
       // Pendamping tidak tersisa setengah tertutup di belakang kartu
       await expect(page.locator('.pemutar-pendamping'), pesan).toHaveCount(0)
-      // Ke-6 C dan kedua P PGAL tetap terlihat di samping kartu, tidak tertutup maskot
-      const panggung = await kotak(page, '[data-panggung]')
-      const penghalang = [kartu, await kotak(page, '.pemutar-panduan')]
-      for (const m of ['.pemutar-maskot', '.pemutar-pendamping'])
-        if (await page.locator(m).isVisible()) penghalang.push(await kotak(page, m))
-      const atom = page.locator(`[data-molecule="pgal"] :is(${KARBON}, ${FOSFAT})`)
-      await expect(atom).toHaveCount(8)
-      for (const a of await atom.all()) {
-        const k = (await a.boundingBox())!
-        expect(k.width, `${pesan} atom cukup besar`).toBeGreaterThanOrEqual(12)
-        expect(berisi(panggung, k), `${pesan} atom di panggung`).toBe(true)
-        for (const h of penghalang) expect(bertumpuk(h, k), `${pesan} atom tertutup`).toBe(false)
-      }
       await expect(page.locator('.pemutar-panduan')).toHaveCSS('transform', 'none')
       const petunjuk = await kotak(page, '.pemutar-panduan')
       expect(bertumpuk(kartu, petunjuk), pesan).toBe(false)

@@ -188,13 +188,8 @@ export async function soalC(
   // ADP dan ATP sisa keluar ke samping: kartu Jelaskan akan menimpanya
   for (const a of sisa)
     void to(a, { x: a._x < 800 ? -250 : 1850, o: 0 }, 600, 'busur').then(() => a.remove())
-  // Kartu Jelaskan tetap di tengah; kedua PGAL menepi ke kiri dan kanannya agar 6 C tetap terhitung.
   // Pendamping dari kalimat hitung karbon pamit: di HP ia tertutup kartu.
   usePemutar.setState({ pendamping: null })
-  await Promise.all([
-    to(m1, { x: 175, y: 450, s: 0.8 }, 600),
-    to(m2, { x: 1425, y: 450, s: 0.8 }, 600),
-  ])
 
   // Tahap Jelaskan
   const x = await mintaJelaskan(p.signal, {

@@ -33,10 +33,10 @@ async function bersihAnim(p: Panggung, g: number) {
   for (let i = 0; i < 2; i++) {
     await to(made[i], { x: used[i]._x, y: 620 }, 700)
     bunyi('klik')
-    await Promise.all([to(made[i], { o: 0, s: 0.6 }, 300), to(used[i], { o: 0.15 }, 300)])
+    await Promise.all([to(made[i], { o: 0, s: 0.6 }, 300), to(used[i], { o: 0 }, 300)])
   }
   await Promise.all([
-    to(lu, { o: 0.25 }, 300),
+    to(lu, { o: 0 }, 300),
     to(lm, { o: 0 }, 300),
     to(made[2], { x: 340, y: 620, s: 1.2 }, 700),
     to(made[3], { x: 500, y: 620, s: 1.2 }, 700),

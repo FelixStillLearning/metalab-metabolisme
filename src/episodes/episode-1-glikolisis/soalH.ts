@@ -49,18 +49,14 @@ const RUMPANG: Rumpang[] = [
 export async function soalH(p: Panggung, piruvat: Objek[]) {
   usePemutar.setState({ bab: 6 })
   p.fx.replaceChildren()
-  await say(p, 'e1-h-01', { pendamping: '01-ramah' })
-  await say(p, 'e1-h-02', { pendamping: '08-menunjuk' })
-  const kalimat = await mintaLengkapi(
-    p.signal,
-    'Lengkapi kalimat pengertian glikolisis',
-    POTONGAN,
-    RUMPANG,
-  )
+  const [kalimat] = await Promise.all([
+    mintaLengkapi(p.signal, 'Lengkapi kalimat pengertian glikolisis', POTONGAN, RUMPANG),
+    say(p, 'e1-h-02', { pendamping: '08-menunjuk' }),
+  ])
   useJawaban.getState().catat('h', kalimat)
 
   p.fx.replaceChildren()
-  const k = hide(kinetik(p, 800, 200, 'GLIKOLISIS', 72, 'var(--color-paper)'))
+  const k = hide(kinetik(p, 800, 450, 'GLIKOLISIS', 72, 'var(--color-paper)'))
   await to(k, { o: 1 }, 600)
   await say(p, 'e1-h-03', { pendamping: '07-bangga' })
   // Kedua piruvat kembali hanya untuk perjalanan ke mitokondria, setelah kartu selesai.
