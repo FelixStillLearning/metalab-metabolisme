@@ -98,7 +98,8 @@ export async function soalC(
       {},
       { bayangan: true },
     )
-    half.insertBefore(bond, half.firstChild)
+    // Bayangan ikut dipindah ke belakang; bila tertinggal, ia menimpa atom C dan P
+    half.prepend(bond.bayangan!, bond)
     ph.bond = bond
     half.p1 = ph
 

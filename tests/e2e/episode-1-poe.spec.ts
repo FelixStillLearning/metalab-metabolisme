@@ -251,6 +251,16 @@ for (const n of [1, 2, 3]) {
       await expect(h.locator(FOSFAT)).toHaveCount(1)
       await expect(h.locator(KARBON)).toHaveCount(3)
     }
+    // Ikatan C-P beserta bayangannya tergambar di belakang atom C dan P
+    for (const h of await pgal.all()) {
+      const diDepanAtom = await h.evaluate((g) => {
+        const atom = g.querySelector(':scope > [data-carbon], :scope > [data-phosphate]')!
+        return Array.from(g.querySelectorAll(':scope > polygon')).filter(
+          (b) => atom.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING,
+        ).length
+      })
+      expect(diDepanAtom).toBe(0)
+    }
 
     // Setiap fosfat PGAL tergambar di dalam panggung
     const panggung = await kotak(page, '[data-panggung]')
