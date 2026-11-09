@@ -1061,11 +1061,16 @@
   display: none;
 }
 
-.pemutar-ikon-putar svg {
+.pemutar-ikon-putar {
   display: block;
-  width: 125px;
-  height: 100px;
-  color: var(--color-paper);
+  width: 200px;
+  height: auto;
+  /* I18 versi kertas komik: ditempel sekali seperti sampul, lalu diam */
+  animation: sampul-tempel 520ms var(--ease-letup) backwards;
+}
+
+[data-tenang] .pemutar-ikon-putar {
+  animation: none;
 }
 
 @media (orientation: portrait) and (max-width: 760px) {

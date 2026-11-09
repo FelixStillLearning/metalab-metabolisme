@@ -86,7 +86,12 @@ test('Escape menutup panel dan fokus kembali', async ({ page }, info) => {
 test('HP tegak menampilkan ajakan putar HP', async ({ page }, info) => {
   test.skip(info.project.name !== 'hp-tegak', 'khusus HP tegak')
   await expect(page.getByRole('heading', { name: 'Putar HP-mu' })).toBeVisible()
-  await expect(page.getByRole('img', { name: 'Putar HP' })).toBeVisible()
+  // Ikon I18 versi kertas komik, ditempel sekali lalu diam
+  const ikon = page.getByRole('img', { name: 'Putar HP' })
+  await expect(ikon).toBeVisible()
+  await expect(ikon).toHaveAttribute('src', /ui-putar-hp.*\.webp/)
+  await expect(ikon).toHaveCSS('animation-name', 'sampul-tempel')
+  await expect(ikon).toHaveCSS('animation-iteration-count', '1')
   // Jalan kembali tetap ada walau HP belum diputar
   await expect(page.getByRole('link', { name: 'Peta materi', exact: true })).toBeVisible()
 })

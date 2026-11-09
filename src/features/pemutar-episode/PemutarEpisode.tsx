@@ -5,7 +5,7 @@ import { useReducedMotion } from 'motion/react'
 import { Link } from 'react-router'
 import logo from '../../assets/images/logo-metalab.webp'
 import organelMitokondria from '../../assets/images/organel-mitokondria.webp'
-import ikonPutarHp from '../../assets/svg/ui-putar-hp.svg?raw'
+import ikonPutarHp from '../../assets/images/ui-putar-hp.webp'
 import TombolSuara from '../../components/TombolSuara'
 import PengaturVolume from '../../components/PengaturVolume'
 import { bunyi, musik } from '../../lib/suara'
@@ -335,7 +335,13 @@ function PemutarEpisode({
       />
 
       <div className="pemutar-putar-hp">
-        <span className="pemutar-ikon-putar" dangerouslySetInnerHTML={{ __html: ikonPutarHp }} />
+        <img
+          className="pemutar-ikon-putar"
+          src={ikonPutarHp}
+          alt="Putar HP"
+          width={400}
+          height={320}
+        />
         <h2>Putar HP-mu</h2>
         <p>Episode {judul.toLowerCase()} lebih nyaman dilihat dalam posisi miring.</p>
         {kembali}
