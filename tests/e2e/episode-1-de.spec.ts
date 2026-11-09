@@ -87,8 +87,9 @@ test('soal d: 2 NADH, 4 ATP, 2 H₂O, dan 2 asam piruvat 3 C', async ({ page }) 
     await expect(r.locator(KARBON)).toHaveCount(3)
     await expect(r.locator(FOSFAT)).toHaveCount(0)
   }
-  // Fosfat utuh: 4 ATP x 3 P ditambah 2 ADP dari soal c x 2 P
-  await expect(page.locator(`svg ${FOSFAT}`)).toHaveCount(12 + 4)
+  // Fosfat utuh: 4 ATP x 3 P. ADP soal c sudah keluar dari layar sebelum Jelaskan soal c.
+  await expect(page.locator(`svg ${FOSFAT}`)).toHaveCount(12)
+  await expect(page.locator('[data-carrier="ADP"]')).toHaveCount(0)
   expect((await draf(page)).d).toBe(
     'PGAL dioksidasi menjadi asam piruvat; terbentuk 2 NADH, 4 ATP, 2 H₂O',
   )

@@ -240,6 +240,54 @@ for (const n of [1, 2, 3]) {
       { polling: 'raf', timeout: 25000 },
     )
 
+    // Tahap Amati, setelah glukosa terbelah
+    await expect(page.locator('[data-molecule="pgal"]')).toHaveCount(2, { timeout: 25000 })
+    // Label muncul setelah kedua PGAL berhenti bergerak
+    await expect(page.locator('svg text', { hasText: 'PGAL · 3 C' })).toHaveCount(2)
+    const panggungAmati = await kotak(page, '[data-panggung]')
+
+    // Fosfat tidak hilang: 2 ADP masing-masing 2 P, ATP sisa tetap 3 P
+    await expect(page.locator('[data-carrier="ADP"]')).toHaveCount(2)
+    for (const adp of await page.locator('[data-carrier="ADP"]').all()) {
+      await expect(adp.locator(FOSFAT)).toHaveCount(2)
+    }
+    await expect(page.locator('[data-carrier="ATP"]')).toHaveCount(n > 2 ? 1 : 0)
+    if (n > 2) await expect(page.locator(`[data-carrier="ATP"] ${FOSFAT}`)).toHaveCount(3)
+
+    // ADP dan ATP sisa berhenti di tempat yang terlihat: di panggung, tidak di belakang maskot,
+    // tidak menimpa atom PGAL
+    await expect
+      .poll(async () => {
+        const penghalang: Kotak[] = []
+        for (const m of ['.pemutar-maskot', '.pemutar-pendamping'])
+          if (await page.locator(m).isVisible()) penghalang.push(await kotak(page, m))
+        for (const a of await page
+          .locator(`[data-molecule="pgal"] :is(${KARBON}, ${FOSFAT})`)
+          .all())
+          penghalang.push((await a.boundingBox())!)
+        const pembawa = await Promise.all(
+          (await page.locator('[data-carrier]').all()).map(async (c) => (await c.boundingBox())!),
+        )
+        // Jumlah ikut diperiksa: setelah pembawa keluar saat Jelaskan, daftar kosong selalu lolos
+        return (
+          pembawa.length === (n > 2 ? 3 : 2) &&
+          pembawa.every(
+            (k) => berisi(panggungAmati, k) && penghalang.every((h) => !bertumpuk(h, k)),
+          )
+        )
+      })
+      .toBe(true)
+
+    // Lencana pembawa memakai gambar E01/E02 (bayangannya di gambar), ikatan fosfatnya tanpa bayangan
+    await expect(page.locator('[data-carrier] > [data-bayangan]')).toHaveCount(0)
+    for (const c of await page.locator('[data-carrier]').all()) {
+      const jenis = await c.getAttribute('data-carrier')
+      await expect(c.locator('> image')).toHaveAttribute(
+        'href',
+        new RegExp(`pembawa-${jenis!.toLowerCase()}`),
+      )
+    }
+
     await expect(page.locator('#poe-explain-judul')).toBeVisible({ timeout: 25000 })
     // Vonis tebakan: hanya 2 ATP yang tepat
     const vonis = page.locator('.poe-card-explain .poe-verdict').first()
@@ -268,25 +316,9 @@ for (const n of [1, 2, 3]) {
       expect(berisi(panggung, (await f.boundingBox())!)).toBe(true)
     }
 
-    // Fosfat tidak hilang: 2 ADP masing-masing 2 P, ATP sisa tetap 3 P
-    await expect(page.locator('[data-carrier="ADP"]')).toHaveCount(2)
-    for (const adp of await page.locator('[data-carrier="ADP"]').all()) {
-      await expect(adp.locator(FOSFAT)).toHaveCount(2)
-    }
-    await expect(page.locator('[data-carrier="ATP"]')).toHaveCount(n > 2 ? 1 : 0)
-    if (n > 2) await expect(page.locator(`[data-carrier="ATP"] ${FOSFAT}`)).toHaveCount(3)
-
-    // Panah putus-putus soal b sudah dipudarkan; lencana pembawa memakai gambar E01/E02
-    // (bayangannya di gambar), ikatan fosfatnya tanpa bayangan
+    // Pembawa soal c sudah keluar: kartu Jelaskan akan menimpanya
+    await expect(page.locator('[data-carrier]')).toHaveCount(0)
     await expect(page.locator('svg path[stroke-dasharray]')).toHaveCount(0)
-    await expect(page.locator('[data-carrier] > [data-bayangan]')).toHaveCount(0)
-    for (const c of await page.locator('[data-carrier]').all()) {
-      const jenis = await c.getAttribute('data-carrier')
-      await expect(c.locator('> image')).toHaveAttribute(
-        'href',
-        new RegExp(`pembawa-${jenis!.toLowerCase()}`),
-      )
-    }
 
     if (n !== 2) return
     // Chip tahap G07 memakai gambar tahap yang aktif

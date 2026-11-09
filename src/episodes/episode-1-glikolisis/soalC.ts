@@ -70,6 +70,8 @@ export async function soalC(
 
   await say(p, P.g === 1 ? 'e1-c-atp-1' : P.g === 2 ? 'e1-c-atp-2' : 'e1-c-atp-3')
 
+  // Pembawa yang sudah dipakai (dan ATP sisa) tetap terlihat selama Amati
+  const sisa: Pembawa[] = []
   const give = async (a: Pembawa, side: number) => {
     await to(a, { y: 660 }, 300)
     const ph = a.ps.pop()!
@@ -107,7 +109,9 @@ export async function soalC(
     await comic(p, 'KLIK', targetX + side * 25, glu._y - 130, 'var(--color-fosfat)', p.world)
 
     speedLines(p, a, side)
-    void to(a, { x: side < 0 ? 170 : 1430, y: 800, o: 0.8 }, 700, 'busur')
+    // Prototype: ke (170 | 1430, 800), kini tertutup maskot yang diperbesar; berhenti di atasnya
+    sisa.push(a)
+    void to(a, { x: side < 0 ? 250 : 1350, y: 420, o: 0.8 }, 700, 'busur')
   }
 
   await give(atps[0], -1)
@@ -132,7 +136,8 @@ export async function soalC(
       bunyi('belum-tepat')
       await shake(p, atps[2])
       bunyi('jatuh')
-      await to(atps[2], { y: 860, o: 0.3 }, 600)
+      sisa.push(atps[2])
+      await to(atps[2], { x: 1350, y: 310, o: 0.4 }, 600)
     } else {
       tandaiAmati('benar')
     }
@@ -178,6 +183,10 @@ export async function soalC(
 
   await say(p, 'e1-c-07', { pendamping: '08-menunjuk' })
   await countCarbons(p, [m1, m2])
+
+  // ADP dan ATP sisa keluar ke samping: kartu Jelaskan akan menimpanya
+  for (const a of sisa)
+    void to(a, { x: a._x < 800 ? -250 : 1850, o: 0 }, 600, 'busur').then(() => a.remove())
 
   // Tahap Jelaskan
   const x = await mintaJelaskan(p.signal, {
