@@ -68,9 +68,28 @@ export const ALASAN_E = [
   'ATP yang dipakai di awal ikut dihitung, jadi 4 + 2 = 6.',
 ]
 
+// Sama dengan media query HP miring di pemutar-episode.css (kartu tebakan di kanan)
+const HP_MIRING = '(max-height: 500px) and (orientation: landscape)'
+
+// Di HP miring kartu tebakan menutupi hasil soal d di tengah-kanan. Hasilnya disusun ulang
+// tiga baris di ruang kosong kiri atas (di bawah petunjuk, di atas nampan, di kiri token ATP):
+// H₂O dan NADH, kedua piruvat, lalu 4 ATP.
+function rapatkanHasilHp(p: Panggung, piruvat: Objek[]) {
+  if (!matchMedia(HP_MIRING).matches) return
+  const k = 0.75
+  const ambil = (pemilih: string) => [...p.world.querySelectorAll<Objek>(`:scope > ${pemilih}`)]
+  const pindah = (o: Objek, x: number, y: number) => to(o, { x, y, s: o._s * k }, 700)
+  return Promise.all([
+    ...ambil('[data-molecule="h2o"]').map((o, i) => pindah(o, 100 + i * 95, 280)),
+    ...ambil('[data-carrier="NADH"]').map((o, i) => pindah(o, 340 + i * 135, 290)),
+    ...piruvat.map((o, i) => pindah(o, 160 + i * 200, 395)),
+    ...ambil('[data-carrier="ATP"]').map((o, i) => pindah(o, 120 + i * 110, 490)),
+  ])
+}
+
 export async function soalE(p: Panggung, piruvat: Objek[]) {
   usePemutar.setState({ bab: 4 })
-  await say(p, 'e1-e-01')
+  await Promise.all([say(p, 'e1-e-01'), rapatkanHasilHp(p, piruvat)])
 
   const reasons = ALASAN_E
   const P = await mintaTebak(p.signal, {

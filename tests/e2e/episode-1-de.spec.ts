@@ -90,8 +90,9 @@ test('soal d: 2 NADH, 4 ATP, 2 H₂O, dan 2 asam piruvat 3 C', async ({ page }) 
     await expect(r.locator(KARBON)).toHaveCount(3)
     await expect(r.locator(FOSFAT)).toHaveCount(0)
   }
-  // Hasil soal d rapat di area kosong tengah-kanan: tidak di tepi, tidak saling tumpuk,
-  // tidak tertutup kartu tebakan e (desktop; di HP miring kartu tebakan memang di kanan)
+  // Hasil soal d rapat di ruang kosong: desktop di tengah-kanan, HP miring (kartu tebakan
+  // di kanan) dikecilkan ke kiri atas. Tidak saling tumpuk, tidak tertutup kartu, token,
+  // nampan, atau petunjuk.
   const panggung = (await page.locator('[data-panggung]').boundingBox())!
   const s = panggung.width / 1600
   const hasil = page.locator(
@@ -101,13 +102,20 @@ test('soal d: 2 NADH, 4 ATP, 2 H₂O, dan 2 asam piruvat 3 C', async ({ page }) 
   const kotakHasil = await Promise.all(
     (await hasil.all()).map(async (h) => (await h.boundingBox())!),
   )
-  const kartuTebak = (await page.locator('.poe-card').boundingBox())!
+  const penghalang = await Promise.all(
+    (await page.locator('.poe-card, .tok, .poe-zone, .pemutar-panduan').all()).map(
+      async (h) => (await h.boundingBox())!,
+    ),
+  )
   const desktop = test.info().project.name === 'desktop'
   kotakHasil.forEach((k, i) => {
-    expect((k.x - panggung.x) / s, `hasil ${i} kiri`).toBeGreaterThanOrEqual(950)
-    expect((k.x + k.width - panggung.x) / s, `hasil ${i} kanan`).toBeLessThanOrEqual(1430)
+    if (desktop) {
+      expect((k.x - panggung.x) / s, `hasil ${i} kiri`).toBeGreaterThanOrEqual(950)
+      expect((k.x + k.width - panggung.x) / s, `hasil ${i} kanan`).toBeLessThanOrEqual(1430)
+    }
+    expect(k.x, `hasil ${i} di panggung`).toBeGreaterThanOrEqual(panggung.x)
     for (const l of kotakHasil.slice(i + 1)) expect(bertumpuk(k, l), `hasil ${i}`).toBe(false)
-    if (desktop) expect(bertumpuk(k, kartuTebak), `hasil ${i} dan kartu`).toBe(false)
+    for (const h of penghalang) expect(bertumpuk(k, h), `hasil ${i} tertutup`).toBe(false)
   })
   // Fosfat utuh: 4 ATP x 3 P. ADP soal c sudah keluar dari layar sebelum Jelaskan soal c.
   await expect(page.locator(`svg ${FOSFAT}`)).toHaveCount(12)

@@ -86,7 +86,8 @@ function chip(p: Panggung, x: number, y: number, id: string, label: string, isi:
 export async function soalG(p: Panggung, piruvat: Objek[]) {
   usePemutar.setState({ bab: 5 })
   p.fx.replaceChildren()
-  await Promise.all(piruvat.map((r, i) => to(r, { x: 1380, y: 290 + i * 140 }, 500)))
+  // s: 1 memulihkan piruvat yang dikecilkan soal e di HP miring
+  await Promise.all(piruvat.map((r, i) => to(r, { x: 1380, y: 290 + i * 140, s: 1 }, 500)))
   await say(p, 'e1-g-01')
 
   const chips = ITEM.map(([id, label, , isi], i) => {
