@@ -18,6 +18,7 @@ async function bersihAnim(p: Panggung, g: number) {
   // Jarak lencana 140 (prototype 120): lencana gambar lebih lebar dari lencana kode
   const used = [0, 1].map((i) => hide(badge(p, 170 + i * 140, 620, 'ATP', p.fx)))
   const lu = hide(kinetik(p, 240, 560, '−2 DIPAKAI', 36, 'var(--color-hot)'))
+  bunyi('muncul')
   await Promise.all([...used.map((u) => to(u, { o: 1 }, 500)), to(lu, { o: 1 }, 500)])
   await say(p, 'e1-e-02', { tambah: -600 })
 
@@ -31,10 +32,12 @@ async function bersihAnim(p: Panggung, g: number) {
   await say(p, 'e1-e-06', { tambah: -1200 })
 
   for (let i = 0; i < 2; i++) {
+    bunyi('geser')
     await to(made[i], { x: used[i]._x, y: 620 }, 700)
-    bunyi('klik')
+    bunyi('tempel')
     await Promise.all([to(made[i], { o: 0, s: 0.6 }, 300), to(used[i], { o: 0 }, 300)])
   }
+  bunyi('geser')
   await Promise.all([
     to(lu, { o: 0 }, 300),
     to(lm, { o: 0 }, 300),
@@ -65,6 +68,7 @@ async function bersihAnim(p: Panggung, g: number) {
   const hp = matchMedia(HP_MIRING).matches
   const skala = p.svg.getBoundingClientRect().width / 1600
   // Di HP, persamaan tetap 18 px pada baris 108 px, antara popup dan kartu Jelaskan.
+  bunyi('geser')
   await Promise.all([
     to(net, { x: 800, y: hp ? 108 / skala : 210, s: hp ? 0.4 / skala : 1 }, 600),
     ...made.slice(2).map((m, i) => to(m, { x: 1490, y: 420 + i * 140 }, 600)),
@@ -89,6 +93,7 @@ function rapatkanHasilHp(p: Panggung, piruvat: Objek[]) {
   const k = 0.75
   const ambil = (pemilih: string) => [...p.world.querySelectorAll<Objek>(`:scope > ${pemilih}`)]
   const pindah = (o: Objek, x: number, y: number) => to(o, { x, y, s: o._s * k }, 700)
+  bunyi('geser')
   return Promise.all([
     ...ambil('[data-molecule="h2o"]').map((o, i) => pindah(o, 100 + i * 95, 280)),
     ...ambil('[data-carrier="NADH"]').map((o, i) => pindah(o, 340 + i * 135, 290)),
@@ -128,6 +133,7 @@ export async function soalE(p: Panggung, piruvat: Objek[]) {
   tampilkanAmati(P.g, 'ATP bersih')
 
   // Piruvat disimpan untuk perjalanan akhir, tetapi tidak mengganggu perhitungan ATP.
+  bunyi('geser')
   for (const c of Array.from(p.world.children) as Objek[]) {
     if (!c.dataset.objek)
       void to(c, { o: 0 }, 400).then(() => {

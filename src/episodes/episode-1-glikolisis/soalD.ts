@@ -42,6 +42,7 @@ export async function soalD(p: Panggung, [m1, m2]: [Separuh, Separuh]) {
   tempat.style.display = 'inline'
   // Desktop lebih ke kiri; di HP atom C tetap di luar popup petunjuk.
   const geser = matchMedia('(max-height: 500px) and (orientation: landscape)').matches ? 0 : 160
+  bunyi('geser')
   await Promise.all([
     camTo(p, 1000, 460, 1.15, 1100),
     to(tempat, { x: 1270, y: 125 }, 1100),
@@ -51,6 +52,7 @@ export async function soalD(p: Panggung, [m1, m2]: [Separuh, Separuh]) {
   await say(p, 'e1-d-01')
 
   // Dua elektron per PGAL, di samping PGAL atas (y 270) dan bawah (y 540)
+  bunyi('muncul')
   const pasangan = [270, 540].map((y) =>
     [-18, 18].map((dy) => {
       const e = hide(elektron(p.world, 860 - geser, y + dy))
@@ -74,9 +76,10 @@ export async function soalD(p: Panggung, [m1, m2]: [Separuh, Separuh]) {
       const n = nads[i]
       const es = pasangan[i]
       const y = es[0]._y + 18
+      bunyi('geser')
       await arc(n, 1300 - geser, y, 80, 600)
       void comic(p, 'KLIK', 1300 - geser, y - 85, 'var(--color-nad)', p.world)
-      bunyi('klik')
+      bunyi('tempel')
       // Kedua elektron ditangkap dan ikut menempel di NADH
       await Promise.all(
         es.map((e, k) => {
@@ -108,6 +111,7 @@ export async function soalD(p: Panggung, [m1, m2]: [Separuh, Separuh]) {
   await say(p, 'e1-d-02')
   // Hasil soal d rapat di area kosong tengah-kanan (kiri dipakai kartu dan nampan soal e);
   // NADH sebelum hiasan mitokondria di pojok kanan atas latar
+  bunyi('geser')
   await Promise.all(nads.map((n, i) => to(n, { x: 1350, y: 200 + i * 75, s: 0.8 }, 700)))
   await say(p, 'e1-d-03')
 
@@ -134,6 +138,7 @@ export async function soalD(p: Panggung, [m1, m2]: [Separuh, Separuh]) {
       const adp = carrier(p, ox - 100, 860, 'ADP')
       adp._s = 0.65
       hide(adp)
+      bunyi('geser')
       await to(adp, { o: 1, y: oy + 60 }, 500)
 
       // Fosfat pindah dari molekul ke ADP: jumlah P tetap
@@ -149,6 +154,7 @@ export async function soalD(p: Panggung, [m1, m2]: [Separuh, Separuh]) {
       count++
       counter.teks.textContent = `ATP terbentuk: ${count}`
       // Satu kolom di samping kedua piruvat (lencana + 3 P kira-kira 130 x 30 satuan)
+      bunyi('geser')
       await to(adp, { x: 1320, y: 300 + count * 60, s: 0.55 }, 600)
     },
   )
@@ -157,6 +163,7 @@ export async function soalD(p: Panggung, [m1, m2]: [Separuh, Separuh]) {
   const r1 = hide(piruvat(p, 800, 320))
   const r2 = hide(piruvat(p, 800, 590))
   const w = [air(p, 1060, 175), air(p, 1180, 175)].map(hide)
+  bunyi('muncul')
   await Promise.all([
     to(m1, { o: 0 }, 0),
     to(m2, { o: 0 }, 0),
@@ -166,6 +173,7 @@ export async function soalD(p: Panggung, [m1, m2]: [Separuh, Separuh]) {
   ])
   m1.remove()
   m2.remove()
+  bunyi('geser')
   await Promise.all([
     to(r1, { x: 1130, y: 360 }, 1200),
     to(r2, { x: 1130, y: 560 }, 1200),

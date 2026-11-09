@@ -3,6 +3,8 @@ import { usePengaturan } from '../stores/pengaturan'
 
 export type NamaSuara =
   | 'melesat'
+  | 'geser'
+  | 'tempel'
   | 'mendarat'
   | 'muncul'
   | 'maskot'
@@ -52,7 +54,10 @@ export function siapkan(...nama: NamaSuara[]) {
 
 export function putar(nama: NamaSuara) {
   if (!usePengaturan.getState().suaraAktif) return
-  ambil(nama).play()
+  const suara = ambil(nama)
+  // Gerak serentak berbagi satu suara agar swish dan tempel tidak menumpuk.
+  if (nama === 'geser' || nama === 'tempel') suara.stop()
+  suara.play()
 }
 
 // Browser menolak suara sebelum halaman pernah disentuh, jadi suara otomatis hanya diputar sesudahnya
@@ -66,6 +71,8 @@ export type SlotSuara =
   | 'belum-tepat'
   | 'muncul'
   | 'melesat'
+  | 'geser'
+  | 'tempel'
   | 'klik'
   | 'getar'
   | 'belah'
@@ -84,6 +91,8 @@ const BERKAS_SLOT: Record<SlotSuara, NamaSuara> = {
   // Pop episode sendiri; 'mendarat' tetap milik animasi sel Beranda
   muncul: 'muncul',
   melesat: 'melesat',
+  geser: 'geser',
+  tempel: 'tempel',
   klik: 'klik',
   getar: 'getar',
   belah: 'belah',

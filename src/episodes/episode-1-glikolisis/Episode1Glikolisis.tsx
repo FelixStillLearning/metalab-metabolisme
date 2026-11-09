@@ -9,11 +9,13 @@ import { soalD } from './soalD'
 import { soalE } from './soalE'
 import { soalG } from './soalG'
 import { soalH } from './soalH'
+import { bunyi, siapkan } from '../../lib/suara'
 import { useJawaban } from '../../stores/jawaban'
 import { usePemutar } from '../../stores/pemutar'
 import type { Panggung } from '../../features/pemutar-episode/mesin'
 
 async function episode(p: Panggung) {
+  siapkan('geser', 'tempel', 'muncul', 'atp', 'getar', 'belah', 'selesai')
   useJawaban.getState().mulai()
   await pembuka(p)
   const { glu, penanda } = await soalAB(p)
@@ -22,6 +24,7 @@ async function episode(p: Panggung) {
   await soalE(p, piruvat)
   await soalG(p, piruvat)
   await soalH(p, piruvat)
+  bunyi('selesai')
   // Semua bab selesai; draf putaran ini menjadi hasil tersimpan (putar ulang otomatis tidak menulis)
   usePemutar.setState({ bab: BAB.length, kalimat: '' })
   useJawaban.getState().selesaikan()

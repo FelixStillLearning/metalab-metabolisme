@@ -87,6 +87,7 @@ export async function soalG(p: Panggung, piruvat: Objek[]) {
   for (const r of piruvat) r.remove()
   await say(p, 'e1-g-01')
 
+  bunyi('muncul')
   const chips = ITEM.map(([id, label, , isi], i) => {
     const c = chip(p, 325 + i * 190, 550, id, label, isi)
     void to(hide(c), { o: 1 }, 400)
@@ -102,8 +103,9 @@ export async function soalG(p: Panggung, piruvat: Objek[]) {
     async (i) => {
       const c = chips[i]
       c.dataset.terkumpul = ''
-      bunyi('muncul')
+      bunyi('geser')
       await to(c, { x: 440 + got++ * 240, y: 370 }, 600)
+      bunyi('tempel')
     },
     {
       indeks: [4, 5],
@@ -119,6 +121,7 @@ export async function soalG(p: Panggung, piruvat: Objek[]) {
     },
   )
 
+  bunyi('geser')
   await Promise.all(chips.slice(4).map((c) => to(c, { o: 0 }, 400).then(() => c.remove())))
   useJawaban.getState().catat('g', '2 asam piruvat, 2 NADH, 2 ATP (bersih), 2 H₂O')
   await say(p, 'e1-g-02', { pendamping: '07-bangga' })

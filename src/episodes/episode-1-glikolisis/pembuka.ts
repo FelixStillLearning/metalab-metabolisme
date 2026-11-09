@@ -37,13 +37,14 @@ export async function pembuka(p: Panggung) {
   sel.dataset.objek = 'sel'
   el('image', { href: gambarSel, x: -550, y: -367, width: 1100, height: 733 }, sel)
   teks(sel, 0, -385, 'SEL', 34, 'var(--color-paper)')
+  bunyi('muncul')
   await wait(p, 500)
   await say(p, 'e1-pembuka-01')
 
   const g = glukosa(p, 1650, 700)
   g.label.style.opacity = '0'
   await to(g, { s: 0.45 }, 0)
-  bunyi('melesat')
+  bunyi('geser')
   await arrive(p, g, ...SITOPLASMA)
 
   const penanda = obj(...TITIK_MITOKONDRIA, p.world)
@@ -51,9 +52,11 @@ export async function pembuka(p: Panggung) {
   gambar(penanda, gambarPenanda)
   hide(penanda)
   penanda._s = 0.85
+  bunyi('muncul')
   await to(penanda, { o: 1, s: 1 }, 600)
   await say(p, 'e1-pembuka-02', { pendamping: '01-ramah' })
 
+  bunyi('geser')
   await to(penanda, { x: SITOPLASMA[0], y: SITOPLASMA[1] })
   await say(p, 'e1-pembuka-03')
 
@@ -62,7 +65,9 @@ export async function pembuka(p: Panggung) {
   panel.dataset.objek = 'panel-zoom'
   gambar(panel, gambarPanel)
   hide(panel)
+  bunyi('muncul')
   await Promise.all([to(panel, { o: 1 }, 300), to(penanda, { o: 0 }, 300)])
+  bunyi('geser')
   // Kurva dan durasi sama dengan kamera, jadi titik sitoplasma tetap di tengah panel
   await Promise.all([
     to(panel, { x: 800, y: 450, s: 4.9 }, 1800, 'kamera'),

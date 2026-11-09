@@ -105,6 +105,28 @@ test('musik tidak dimulai saat musik mati atau semua suara bisu', () => {
   expect(play).not.toHaveBeenCalled()
 })
 
+test('efek gerak dan tempel memakai berkas episode, tidak menumpuk, dan mengikuti efek/bisu', () => {
+  for (const nama of ['geser', 'tempel'] as const) {
+    bunyi(nama)
+    expect(Howl).toHaveBeenLastCalledWith({ src: [`/audio/${nama}.ogg`, `/audio/${nama}.mp3`] })
+  }
+  expect(stop).toHaveBeenCalledTimes(2)
+  expect(play).toHaveBeenCalledTimes(2)
+  bunyi('geser')
+  expect(stop).toHaveBeenCalledTimes(3)
+  expect(play).toHaveBeenCalledTimes(3)
+  vi.clearAllMocks()
+  usePengaturan.getState().atur('efek', false)
+  bunyi('geser')
+  bunyi('tempel')
+  expect(play).not.toHaveBeenCalled()
+  usePengaturan.getState().atur('efek', true)
+  usePengaturan.getState().aturSuara(false)
+  bunyi('geser')
+  bunyi('tempel')
+  expect(play).not.toHaveBeenCalled()
+})
+
 test('volume utama mengubah audio aktif tanpa memulai ulang musik atau melepas bisu', () => {
   musik(true)
   vi.clearAllMocks()

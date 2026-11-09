@@ -94,6 +94,7 @@ export function mintaTebak(
       },
     }
 
+    bunyi('muncul')
     // Pose maskot per tahap seperti poeStep() di prototype
     usePemutar.setState({ pose: '04-penasaran', poe: pasangState })
   })
@@ -158,6 +159,7 @@ export function mintaJelaskan(
       ? `Tebakanmu tepat: ${opsi.hasil}.`
       : `Tebakanmu ${opsi.g} ${opsi.unit} belum tepat. Yang terjadi: ${opsi.hasil}.`
 
+    bunyi('muncul')
     usePemutar.setState({
       pose: '05-menjelaskan',
       poe: {

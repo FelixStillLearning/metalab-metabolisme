@@ -20,6 +20,7 @@ export async function soalAB(p: Panggung) {
   const g = glukosa(p, 800, 380)
   const pir = piruvat(p, 420, 560)
   const o2 = oksigen(p, 1180, 560)
+  bunyi('muncul')
   await Promise.all([g, pir, o2].map((m) => to(hide(m), { o: 1 }, 600)))
   await say(p, 'e1-a-01')
   await mintaPilihan(
@@ -45,6 +46,7 @@ export async function soalAB(p: Panggung) {
     },
   )
   useJawaban.getState().catat('a', 'Glukosa (6 atom C)')
+  bunyi('geser')
   await Promise.all([to(pir, { o: 0, x: 200 }, 700), to(o2, { o: 0, x: 1400 }, 700)])
   pir.remove()
   o2.remove()
@@ -52,6 +54,7 @@ export async function soalAB(p: Panggung) {
   await to(g, { s: 1.25 }, 400)
   await to(g, { s: 1 }, 300)
   await say(p, 'e1-a-02')
+  bunyi('geser')
   await to(g, { x: 300, y: 440 }, 1100)
 
   usePemutar.setState({ bab: 1 })
@@ -72,7 +75,9 @@ export async function soalAB(p: Panggung) {
       penanda[0],
     )
   }
+  bunyi('muncul')
   await say(p, 'e1-b-01')
+  bunyi('muncul')
   await mintaPilihan(
     p.signal,
     {
@@ -96,7 +101,7 @@ export async function soalAB(p: Panggung) {
     const k = obj(x, 430, p.world)
     penanda.push(k)
     teks(k, 0, 0, judul, 26, 'var(--color-paper)')
-    bunyi('melesat')
+    bunyi('geser')
     await to(hide(k), { o: 1, y: 400 }, 700)
   }
   await say(p, 'e1-b-02')

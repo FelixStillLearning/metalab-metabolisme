@@ -82,6 +82,7 @@ async function penutup(p: Panggung) {
     r._s = 0.2
     return Object.assign(r, { sisi })
   })
+  bunyi('muncul')
   await Promise.all([
     to(mito, { o: 1, s: 1 }, 600),
     ...pir.map((r) => to(r, { o: 1, s: 0.55, x: TAHAP[0].x + r.sisi * 70, y: 190 }, 600)),
@@ -90,12 +91,13 @@ async function penutup(p: Panggung) {
     say(p, 'e1-penutup-02'),
     (async () => {
       await wait(p, 400)
-      bunyi('melesat')
+      bunyi('geser')
       await Promise.all(
         pir.map((r) =>
           to(r, { x: MITOKONDRIA[0] + r.sisi * 62, y: MITOKONDRIA[1] + 8, s: 0.5 }, 1600, 'busur'),
         ),
       )
+      bunyi('tempel')
     })(),
   ])
   await say(p, 'e1-penutup-03', { pendamping: '09-melambaikan' })
@@ -115,7 +117,7 @@ function PenutupEpisode1() {
     >
       {selesai && (
         <div className="pemutar-akhir">
-          <Link to="/peta-materi" className="tombol-utama">
+          <Link to="/peta-materi" className="tombol-utama" onClick={() => bunyi('kembali')}>
             Ke peta materi
           </Link>
         </div>

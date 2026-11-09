@@ -30,3 +30,12 @@ Status belum terverifikasi bukan pernyataan bahwa penggunaan pasti dilarang. Cat
 | `getar`              | Luckius, `paper_crushed_-_2.mp3`, [Various Paper Sound Effects](https://opengameart.org/content/various-paper-sound-effects) | CC0-1.0 |
 | `belah`              | Independent.nu, `impactcrunch03`, [5 break, crunch impacts](https://opengameart.org/content/5-break-crunch-impacts)          | CC0-1.0 |
 | `muncul`             | cogitollc, [pop sounds](https://opengameart.org/content/pop-sounds)                                                          | CC0-1.0 |
+
+## Gerak dan tempel Episode 1, 9 November 2026
+
+| Berkas (OGG dan MP3) | Pemakaian                                                          | Sumber asli                                                                                                   | Lisensi |
+| -------------------- | ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------- | ------- |
+| `geser`              | Perpindahan molekul, kamera, pengumpulan hasil, pergantian susunan | artisticdude, `whoosh-swish-12.wav`, [Swishes Sound Pack](https://opengameart.org/content/swishes-sound-pack) | CC0-1.0 |
+| `tempel`             | Fosfat/elektron menempel dan hasil mendarat                        | Kenney, `pluck_001.wav`, [Interface Sounds](https://kenney.nl/assets/interface-sounds)                        | CC0-1.0 |
+
+Sumber memakai salinan lokal beserta catatan lisensi yang sudah tersedia. Versi episode: durasi maksimal 320 ms (geser) / 160 ms (tempel), mono 44,1 kHz, high-pass 90 Hz, low-pass 6.500 Hz, target −23 LUFS dan −3 dBTP, fade akhir 35 ms. MP3 dikonversi dari OGG dengan libmp3lame kualitas 4. Berkas melesat/klik lama tetap tersedia untuk pemakaian lainnya. Gerakan serentak memakai satu cue; swish dan tempel yang sedang aktif dimulai ulang agar tidak menumpuk. Semua cue mengikuti saklar efek, bisu, dan volume utama.
