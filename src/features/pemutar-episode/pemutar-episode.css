@@ -721,7 +721,14 @@
 
 /* Lengkapi kalimat: lebih lebar dari kartu soal biasa; rumpang aktif disorot oker */
 .pemutar-lengkapi {
+  top: 50%;
+  bottom: auto;
+  transform: translate(-50%, -50%);
   width: min(66%, 900px);
+}
+
+.pemutar-panggung:has(.pemutar-lengkapi) .pemutar-narator {
+  --pendamping: clamp(128px, 12cqw, 200px);
 }
 
 .pemutar-kalimat {
@@ -1038,8 +1045,17 @@
   }
 
   .pemutar-lengkapi {
-    bottom: 21%;
-    width: 92%;
+    top: 100px;
+    transform: translateX(-50%);
+    /* Kedua sisi untuk maskot, bagian bawah untuk subtitle. */
+    width: 62%;
+    max-height: calc(100% - 174px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .pemutar-panggung:has(.pemutar-lengkapi) .pemutar-narator {
+    --pendamping: 104px;
   }
 
   .pemutar-kalimat {

@@ -40,25 +40,26 @@ export async function soalD(p: Panggung, [m1, m2]: [Separuh, Separuh]) {
   // Label tetap di ruang kanan atas selama kamera mendekat, termasuk di HP miring.
   const tempat = p.world.querySelector<Objek>('[data-objek="label-sitosol"]')!
   tempat.style.display = 'inline'
+  // Desktop lebih ke kiri; di HP atom C tetap di luar popup petunjuk.
+  const geser = matchMedia('(max-height: 500px) and (orientation: landscape)').matches ? 0 : 160
   await Promise.all([
     camTo(p, 1000, 460, 1.15, 1100),
     to(tempat, { x: 1270, y: 125 }, 1100),
-    // Atom C teratas harus di kanan popup petunjuk pada HP miring.
-    to(m1, { x: 1155 }, 1100),
-    to(m2, { x: 1005 }, 1100),
+    to(m1, { x: 1155 - geser }, 1100),
+    to(m2, { x: 1005 - geser }, 1100),
   ])
   await say(p, 'e1-d-01')
 
   // Dua elektron per PGAL, di samping PGAL atas (y 270) dan bawah (y 540)
   const pasangan = [270, 540].map((y) =>
     [-18, 18].map((dy) => {
-      const e = hide(elektron(p.world, 860, y + dy))
-      void to(e, { o: 1, x: 1200 }, 600)
+      const e = hide(elektron(p.world, 860 - geser, y + dy))
+      void to(e, { o: 1, x: 1200 - geser }, 600)
       return e
     }),
   )
   // NAD⁺ atas mulai di y 330 (prototype 250) agar tidak tertutup petunjuk ketuk di HP miring
-  const nads = [badge(p, 1250, 330, 'NAD⁺'), badge(p, 1250, 610, 'NAD⁺')]
+  const nads = [badge(p, 1250 - geser, 330, 'NAD⁺'), badge(p, 1250 - geser, 610, 'NAD⁺')]
   for (const n of nads) void to(hide(n), { o: 1 }, 500)
 
   await mintaKetukSemua(
@@ -73,8 +74,8 @@ export async function soalD(p: Panggung, [m1, m2]: [Separuh, Separuh]) {
       const n = nads[i]
       const es = pasangan[i]
       const y = es[0]._y + 18
-      await arc(n, 1300, y, 80, 600)
-      void comic(p, 'KLIK', 1300, y - 85, 'var(--color-nad)', p.world)
+      await arc(n, 1300 - geser, y, 80, 600)
+      void comic(p, 'KLIK', 1300 - geser, y - 85, 'var(--color-nad)', p.world)
       bunyi('klik')
       // Kedua elektron ditangkap dan ikut menempel di NADH
       await Promise.all(

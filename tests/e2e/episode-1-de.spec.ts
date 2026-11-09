@@ -168,8 +168,20 @@ test('soal d: 2 NADH, 4 ATP, 2 H₂O, dan 2 asam piruvat 3 C', async ({ page }) 
 
 async function tebakE(page: Page, n: number) {
   await expect(page.locator('#poe-tebak-judul')).toBeVisible({ timeout: 20000 })
+  await expect(page.locator('svg text', { hasText: 'ATP terbentuk:' })).toHaveCount(0)
+  const nampan = (await page.locator('.poe-zone').boundingBox())!
+  expect(bertumpuk(nampan, (await page.locator('.poe-card').boundingBox())!)).toBe(false)
   for (let i = 1; i <= n; i++) await tombol(page, `ATP ${i}`).click()
   await expect(page.locator('#cnt')).toHaveText(`${n} ATP`)
+  await expect(async () => {
+    for (const t of await page.locator('.tok.placed').all()) {
+      const k = (await t.boundingBox())!
+      expect(k.x).toBeGreaterThanOrEqual(nampan.x)
+      expect(k.x + k.width).toBeLessThanOrEqual(nampan.x + nampan.width)
+      expect(k.y).toBeGreaterThanOrEqual(nampan.y)
+      expect(k.y + k.height).toBeLessThanOrEqual(nampan.y + nampan.height)
+    }
+  }).toPass()
   await page.getByRole('button', { name: ALASAN_E }).click()
   await page.getByRole('button', { name: 'Kunci tebakan, lanjutkan video' }).click()
 }
@@ -195,6 +207,27 @@ test('POE e tebakan 2: tepat, 4 terbentuk dikurangi 2 dipakai, jawaban tersimpan
   expect(hasilTebakan.width).toBeLessThanOrEqual(360)
   const vonis = page.locator('.poe-card-explain .poe-verdict').first()
   await expect(vonis).toContainText('Tebakanmu tepat', { timeout: 20000 })
+  const kartu = (await page.locator('.poe-card-explain').boundingBox())!
+  const persamaan = (await page
+    .locator('svg text', { hasText: 'ATP BERSIH = 4 − 2 = 2' })
+    .boundingBox())!
+  expect(
+    bertumpuk(kartu, persamaan),
+    `persamaan dan kartu: ${JSON.stringify([persamaan, kartu])}`,
+  ).toBe(false)
+  const petunjuk = (await page.locator('.pemutar-panduan').boundingBox())!
+  expect(
+    bertumpuk(persamaan, petunjuk),
+    `persamaan dan petunjuk: ${JSON.stringify([persamaan, petunjuk])}`,
+  ).toBe(false)
+  const bersih = page.locator('[data-carrier="ATP"]')
+  await expect(bersih).toHaveCount(2)
+  for (const atp of await bersih.all())
+    expect(bertumpuk(kartu, (await atp.boundingBox())!), 'dua ATP bersih tetap terlihat').toBe(
+      false,
+    )
+  for (const r of await page.locator('[data-molecule="piruvat"]').all())
+    await expect(r).toHaveCSS('opacity', '0')
   await page.getByRole('button', { name: ALASAN_E }).click()
   await page.getByRole('button', { name: 'Lanjutkan video' }).click()
   expect((await draf(page)).e).toBe('2 ATP bersih (4 terbentuk − 2 dipakai)')
@@ -211,4 +244,19 @@ test('POE e tebakan 4: narasi pembanding muncul dan vonis belum tepat', async ({
   await expect(page.locator('.gtag.no')).toBeVisible({ timeout: 20000 })
   const vonis = page.locator('.poe-card-explain .poe-verdict').first()
   await expect(vonis).toContainText('Tebakanmu 4 ATP belum tepat', { timeout: 20000 })
+})
+
+test('POE e tebakan 6: seluruh token muat di nampan dan narasi mengoreksi penjumlahan', async ({
+  page,
+}) => {
+  await soalD(page)
+  await tebakE(page, 6)
+  await expect(page.locator('[data-gelembung]')).toHaveText(
+    'Tebakanmu 6 menjumlahkan keduanya. Tapi ATP yang dipakai di awal bukan hasil; ATP itu habis terpakai.',
+    { timeout: 20000 },
+  )
+  await expect(page.locator('.poe-card-explain .poe-verdict').first()).toContainText(
+    'Tebakanmu 6 ATP belum tepat',
+    { timeout: 20000 },
+  )
 })

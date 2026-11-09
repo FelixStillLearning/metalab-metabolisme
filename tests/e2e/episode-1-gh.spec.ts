@@ -7,6 +7,9 @@ const ALASAN_C = 'Glukosa perlu dua fosfat agar terbelah, dan tiap ATP memberi s
 const ALASAN_E = 'Terbentuk 4 ATP, dikurangi 2 ATP yang dipakai di awal.'
 const tombol = (page: Page, nama: string) => page.getByRole('button', { name: nama, exact: true })
 const gelembung = (page: Page) => page.locator('[data-gelembung]')
+type Kotak = { x: number; y: number; width: number; height: number }
+const bertumpuk = (a: Kotak, b: Kotak) =>
+  a.x < b.x + b.width && b.x < a.x + a.width && a.y < b.y + b.height && b.y < a.y + a.height
 
 test.beforeEach(async ({ page }, info) => {
   test.skip(info.project.name === 'hp-tegak', 'Soal dimainkan saat HP miring')
@@ -44,6 +47,19 @@ test('soal g dan h, lalu Lembar Hasil dari jawaban putaran ini', async ({ page }
   // g: pengecoh ditolak dengan umpan balik, tetap di tempat
   const co2 = page.locator('[data-chip="co2"]')
   await expect(co2).toHaveCount(1, { timeout: 20000 })
+  await expect(page.locator('[data-molecule="piruvat"]')).toHaveCount(0)
+  const panggung = (await page.locator('[data-panggung]').boundingBox())!
+  const periksaTengah = async (pemilih: string) => {
+    await expect(async () => {
+      const kotak = await Promise.all(
+        (await page.locator(pemilih).all()).map(async (c) => (await c.boundingBox())!),
+      )
+      const kiri = Math.min(...kotak.map((k) => k.x))
+      const kanan = Math.max(...kotak.map((k) => k.x + k.width))
+      expect(Math.abs((kiri + kanan) / 2 - (panggung.x + panggung.width / 2))).toBeLessThan(6)
+    }).toPass()
+  }
+  await periksaTengah('[data-chip]')
   await expect(co2.locator('[data-molecule="co2"]')).toHaveAttribute('data-karbon', '1')
   await expect(co2.locator('[data-molecule="co2"]')).toHaveAttribute('data-oksigen', '2')
   await expect(page.locator('[data-chip="o2"] [data-molecule="o2"]')).toHaveAttribute(
@@ -66,6 +82,7 @@ test('soal g dan h, lalu Lembar Hasil dari jawaban putaran ini', async ({ page }
   for (const nama of ['2 asam piruvat', '2 NADH', '2 ATP bersih', '2 H₂O'])
     await tombol(page, nama).click()
   await expect(page.locator('[data-terkumpul]')).toHaveCount(4)
+  await periksaTengah('[data-terkumpul]')
   await expect(gelembung(page)).toHaveText(
     'Hasil glikolisis: 2 asam piruvat, 2 NADH, 2 ATP bersih, dan 2 molekul air.',
     { timeout: 15000 },
@@ -76,6 +93,18 @@ test('soal g dan h, lalu Lembar Hasil dari jawaban putaran ini', async ({ page }
   // h: rumpang diisi berurutan, pilihan salah menahan
   const terisi = page.locator('[data-rumpang="terisi"]')
   await tombol(page, '6 CO₂').click({ timeout: 20000 })
+  await expect(page.locator('[data-chip], [data-molecule="piruvat"]')).toHaveCount(0)
+  const kartu = (await page.locator('.pemutar-lengkapi').boundingBox())!
+  expect(Math.abs(kartu.x + kartu.width / 2 - (panggung.x + panggung.width / 2))).toBeLessThan(2)
+  const pendamping = page.locator('.pemutar-pendamping')
+  await expect(pendamping).toBeInViewport({ ratio: 1 })
+  expect((await pendamping.boundingBox())!.width).toBeGreaterThanOrEqual(
+    test.info().project.name === 'desktop' ? 160 : 100,
+  )
+  expect(bertumpuk(kartu, (await pendamping.boundingBox())!), 'maskot kanan di luar kartu').toBe(
+    false,
+  )
+  expect(bertumpuk(kartu, (await page.locator('.pemutar-panduan').boundingBox())!)).toBe(false)
   await expect(tombol(page, '6 CO₂')).toHaveAttribute('aria-pressed', 'true')
   await expect
     .poll(() => tombol(page, '6 CO₂').evaluate((el) => getComputedStyle(el, '::before').filter))
@@ -104,6 +133,17 @@ test('soal g dan h, lalu Lembar Hasil dari jawaban putaran ini', async ({ page }
     '4 ATP terbentuk, tetapi 2 dipakai di awal; bersihnya 2.',
   )
   await expect(terisi).toHaveCount(3)
+  await expect(page.locator('.pemutar-lengkapi h2')).toBeInViewport({ ratio: 1 })
+  expect(
+    await page.locator('.pemutar-lengkapi').evaluate((e) => e.scrollWidth - e.clientWidth),
+  ).toBe(0)
+  expect(
+    bertumpuk(
+      (await page.locator('.pemutar-lengkapi').boundingBox())!,
+      (await pendamping.boundingBox())!,
+    ),
+    'maskot tetap terlihat setelah kalimat terisi',
+  ).toBe(false)
   await tombol(page, '2 NADH dan 2 ATP').click()
   await expect(page.locator('svg text', { hasText: 'GLIKOLISIS' })).toHaveCount(1, {
     timeout: 15000,
@@ -111,6 +151,9 @@ test('soal g dan h, lalu Lembar Hasil dari jawaban putaran ini', async ({ page }
   expect((await jawaban(page)).draf.h).toBe(
     'Glikolisis adalah pemecahan satu glukosa (6 C) menjadi 2 asam piruvat (3 C) di sitosol dalam kondisi anaerob (tanpa oksigen), dengan hasil sampingan 2 NADH dan 2 ATP.',
   )
+  const piruvatAkhir = page.locator('[data-molecule="piruvat"]')
+  await expect(piruvatAkhir).toHaveCount(2, { timeout: 15000 })
+  await expect(piruvatAkhir.locator('[data-carbon]:not([data-bayangan])')).toHaveCount(6)
 
   // Akhir episode: draf menjadi hasil, lalu Lembar Hasil
   await page.waitForURL(/#\/episode\/1\/hasil/, { timeout: 30000 })

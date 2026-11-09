@@ -80,22 +80,19 @@ function chip(p: Panggung, x: number, y: number, id: string, label: string, isi:
 }
 
 // Soal g, Senyawa yang dihasilkan: ketuk kumpulkan keempat hasil, pengecoh CO₂ dan O₂ ditolak.
-// Hasil terkumpul naik ke deretan "HASIL GLIKOLISIS" di atas (prototype: di bawah, tetapi chip
-// bergambar lebih tinggi dari lencana dan bawah adegan dipakai narator). Asam piruvat sedikit
-// lebih rendah dari prototype agar tidak tertutup petunjuk ketuk di HP miring.
+// Hasil terkumpul di tengah, di atas deretan pilihan dan di luar ruang narator.
 export async function soalG(p: Panggung, piruvat: Objek[]) {
   usePemutar.setState({ bab: 5 })
   p.fx.replaceChildren()
-  // s: 1 memulihkan piruvat yang dikecilkan soal e di HP miring
-  await Promise.all(piruvat.map((r, i) => to(r, { x: 1380, y: 290 + i * 140, s: 1 }, 500)))
+  for (const r of piruvat) r.remove()
   await say(p, 'e1-g-01')
 
   const chips = ITEM.map(([id, label, , isi], i) => {
-    const c = chip(p, 300 + i * 190, 592, id, label, isi)
+    const c = chip(p, 325 + i * 190, 550, id, label, isi)
     void to(hide(c), { o: 1 }, 400)
     return c
   })
-  const tray = kinetik(p, 740, 225, 'HASIL GLIKOLISIS', 34, 'var(--color-paper)')
+  const tray = kinetik(p, 800, 260, 'HASIL GLIKOLISIS', 34, 'var(--color-paper)')
   let got = 0
 
   await mintaKetukSemua(
@@ -106,7 +103,7 @@ export async function soalG(p: Panggung, piruvat: Objek[]) {
       const c = chips[i]
       c.dataset.terkumpul = ''
       bunyi('muncul')
-      await to(c, { x: 380 + got++ * 240, y: 330 }, 600)
+      await to(c, { x: 440 + got++ * 240, y: 370 }, 600)
     },
     {
       indeks: [4, 5],

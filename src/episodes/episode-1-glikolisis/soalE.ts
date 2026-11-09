@@ -59,6 +59,16 @@ async function bersihAnim(p: Panggung, g: number) {
   await to(net, { o: 1, s: 1.08 }, 500)
   await to(net, { s: 1 }, 300)
   await say(p, 'e1-e-07')
+
+  // Kartu Jelaskan tetap di tengah; persamaan di atasnya, dua ATP bersih di sisi kanan.
+  for (const o of [...used, lu, lm, ...made.slice(0, 2)]) o.remove()
+  const hp = matchMedia(HP_MIRING).matches
+  const skala = p.svg.getBoundingClientRect().width / 1600
+  // Di HP, persamaan tetap 18 px pada baris 108 px, antara popup dan kartu Jelaskan.
+  await Promise.all([
+    to(net, { x: 800, y: hp ? 108 / skala : 210, s: hp ? 0.4 / skala : 1 }, 600),
+    ...made.slice(2).map((m, i) => to(m, { x: 1490, y: 420 + i * 140 }, 600)),
+  ])
 }
 
 // Juga dibaca Lembar Hasil untuk menampilkan alasan siswa
@@ -89,34 +99,40 @@ function rapatkanHasilHp(p: Panggung, piruvat: Objek[]) {
 
 export async function soalE(p: Panggung, piruvat: Objek[]) {
   usePemutar.setState({ bab: 4 })
+  p.fx.replaceChildren()
   await Promise.all([say(p, 'e1-e-01'), rapatkanHasilHp(p, piruvat)])
 
   const reasons = ALASAN_E
+  const hp = matchMedia(HP_MIRING).matches
+  const nampanX = hp ? 580 : 800
+  const nampanY = hp ? 600 : 770
   const P = await mintaTebak(p.signal, {
     judul: 'Berapa ATP bersih yang dihasilkan glikolisis?',
     reasons,
     right: 2,
-    // Kartu kiri atas seperti prototype; nampan digeser ke kanan dan naik agar tidak menutupi
-    // maskot, token 3 x 2 di antara kartu kiri (desktop) dan kartu kanan (HP miring)
+    // Nampan di bawah kartu pada desktop; di kiri kartu pada HP miring.
     kartu: [3, 7],
     zone: {
-      x: 580,
-      y: 600,
+      x: nampanX,
+      y: nampanY,
       w: 680,
-      h: 170,
+      h: hp ? 170 : 130,
       name: 'nampan ATP bersih',
       cap: 'ATP bersih untuk sel',
       nampan: true,
     },
     supply: [0, 1, 2, 3, 4, 5].map((i) => [640 + (i % 3) * 100, i < 3 ? 330 : 430]),
-    slot: (i, n) => [580 + (i - (n - 1) / 2) * 100, 600],
+    slot: (i, n) => [nampanX + (i - (n - 1) / 2) * 100, nampanY],
   })
   useJawaban.getState().catatPoe('e', { tebakan: P.g, alasan: P.r })
   tampilkanAmati(P.g, 'ATP bersih')
 
-  // Sisa bab sebelumnya dipudarkan; yang tersisa hanya asam piruvat dan label sitosol
+  // Piruvat disimpan untuk perjalanan akhir, tetapi tidak mengganggu perhitungan ATP.
   for (const c of Array.from(p.world.children) as Objek[]) {
-    if (!piruvat.includes(c) && !c.dataset.objek) void to(c, { o: 0 }, 400).then(() => c.remove())
+    if (!c.dataset.objek)
+      void to(c, { o: 0 }, 400).then(() => {
+        if (!piruvat.includes(c)) c.remove()
+      })
   }
   await bersihAnim(p, P.g)
 
