@@ -860,14 +860,13 @@
   color: var(--color-paper);
 }
 
-.poe-zone-label {
-  /* Di bawah bingkai atas G02 (8,2% tinggi gambar) */
+/* Token sedang diseret di atas zona, seperti .zone.over prototype */
+.poe-zone[data-over]::after {
+  content: '';
   position: absolute;
-  top: 8.6%;
-  font: 700 clamp(9px, 1cqw, 14px) var(--font-head);
-  color: var(--color-accent);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  inset: 8.2%;
+  border-radius: 1.5cqw;
+  background: rgb(245 241 232 / 0.18);
 }
 
 .poe-tokens {
@@ -889,10 +888,19 @@
   border: 0;
   cursor: pointer;
   pointer-events: auto;
+  /* Seret dengan jari tidak menggulir halaman */
+  touch-action: none;
   transition:
     transform 200ms var(--ease-keluar),
     left 300ms var(--ease-keluar),
     top 300ms var(--ease-keluar);
+}
+
+/* Mengikuti penunjuk tanpa jeda, di atas token lain */
+.tok[data-seret] {
+  z-index: 1;
+  cursor: grabbing;
+  transition: transform 200ms var(--ease-keluar);
 }
 
 .tok:hover {

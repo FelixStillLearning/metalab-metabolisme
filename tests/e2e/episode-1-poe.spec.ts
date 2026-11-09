@@ -398,8 +398,8 @@ test('POE c: chip tahap, label, zona glukosa, token, dan kartu tebakan tidak ber
       expect(bertumpuk(kartu, k), nama).toBe(false)
       if (bertumpuk(zona, k)) expect(berisi(dalam, k), `${nama} di bingkai zona`).toBe(true)
     }
-    const judulZona = await kotak(page, '.poe-zone-label')
-    expect(berisi(dalam, judulZona), `${pesan} judul zona`).toBe(true)
+    // Tanpa tulisan nama zona di bingkai; label molekul sudah menyebut glukosa
+    await expect(page.locator('.poe-zone-label')).toHaveCount(0)
 
     // Kartu muat di layar: semua alasan dan tombol Kunci terlihat tanpa gulir
     await kartuMuat(page, '.poe-card', pesan, width, height)
@@ -425,13 +425,53 @@ test('POE c: chip tahap, label, zona glukosa, token, dan kartu tebakan tidak ber
   await page.waitForTimeout(400)
   await tiapUkuran(page, info.project.name, async (pesan) => {
     await tokenAman(page, `${pesan} di zona`)
-    // Token tertaruh utuh di dalam bingkai zona, di bawah judul zona
+    // Token tertaruh utuh di dalam bingkai zona
     const dalam = dalamZona(await kotak(page, '.poe-zone'))
-    const judulZona = await kotak(page, '.poe-zone-label')
     for (const t of await page.locator('.tok.placed').all()) {
       const k = (await t.boundingBox())!
       expect(berisi(dalam, k), `${pesan} token di zona`).toBe(true)
-      expect(bertumpuk(judulZona, k), `${pesan} token dan judul zona`).toBe(false)
     }
   })
+})
+
+// Seret seperti dragPredict() prototype: lepas di zona = masuk, di luar zona = keluar atau kembali
+async function seret(page: Page, dari: Kotak, ke: { x: number; y: number }) {
+  await page.mouse.move(dari.x + dari.width / 2, dari.y + dari.height / 2)
+  await page.mouse.down()
+  await page.mouse.move(ke.x, ke.y, { steps: 8 })
+}
+
+test('POE c: ATP bisa diseret ke zona glukosa dan keluar lagi', async ({ page }) => {
+  await expect(page.locator('#poe-tebak-judul')).toBeVisible({ timeout: 15000 })
+  const zona = await kotak(page, '.poe-zone')
+  const tengahZona = { x: zona.x + zona.width / 2, y: zona.y + zona.height / 2 }
+  const atp1 = page.getByRole('button', { name: /^ATP 1/ })
+  const asal = (await atp1.boundingBox())!
+
+  // Diseret di atas zona: zona disorot dan token mengikuti penunjuk
+  await seret(page, asal, tengahZona)
+  await expect(page.locator('.poe-zone')).toHaveAttribute('data-over')
+  const ikut = (await atp1.boundingBox())!
+  expect(Math.abs(ikut.x + ikut.width / 2 - tengahZona.x)).toBeLessThan(4)
+  await page.mouse.up()
+  await expect(page.locator('#cnt')).toHaveText('1 ATP')
+  await expect(atp1).toHaveAccessibleName('ATP 1 di glukosa')
+  await expect(page.locator('.poe-zone')).not.toHaveAttribute('data-over')
+
+  // Dilepas di luar zona: keluar lagi dan kembali ke tempat asal (setelah token selesai
+  // meluncur ke slotnya, transisi 300 ms)
+  await page.waitForTimeout(400)
+  await seret(page, (await atp1.boundingBox())!, { x: asal.x + asal.width / 2, y: asal.y - 60 })
+  await page.mouse.up()
+  await expect(page.locator('#cnt')).toHaveText('0 ATP')
+  await expect(atp1).toHaveAccessibleName('ATP 1')
+  await expect.poll(async () => Math.round((await atp1.boundingBox())!.y)).toBe(Math.round(asal.y))
+
+  // ATP di luar zona yang dilepas di luar zona tetap di luar; ketuk tetap berfungsi
+  await page.waitForTimeout(400)
+  await seret(page, asal, { x: asal.x + asal.width / 2, y: asal.y - 60 })
+  await page.mouse.up()
+  await expect(page.locator('#cnt')).toHaveText('0 ATP')
+  await atp1.click()
+  await expect(page.locator('#cnt')).toHaveText('1 ATP')
 })

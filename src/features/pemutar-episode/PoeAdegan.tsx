@@ -1,4 +1,4 @@
-import { useEffect, useRef, type CSSProperties } from 'react'
+import { useEffect, useRef, useState, type CSSProperties, type PointerEvent } from 'react'
 import silang from '../../assets/images/efek-belum-tepat.webp'
 import centang from '../../assets/images/efek-benar.webp'
 import penandaBenar from '../../assets/images/interaksi-penanda-tebakan-benar.webp'
@@ -41,6 +41,13 @@ export function PoeAdegan() {
   const { poe, dijeda } = usePemutar()
   const pertama = useRef<HTMLButtonElement>(null)
   const tanggapan = useRef<HTMLDivElement>(null)
+  // Seret token seperti dragPredict() prototype; posisi dalam satuan adegan 1600x900
+  const wadahToken = useRef<HTMLDivElement>(null)
+  const tarik = useRef<{ i: number; x0: number; y0: number; geser: boolean } | null>(null)
+  const abaikanKlik = useRef(false)
+  const [seret, setSeret] = useState<{ i: number; x: number; y: number; over: boolean } | null>(
+    null,
+  )
   const alasanTerpilih = poe?.tahap === 'jelaskan' ? poe.selectedExplain : null
 
   useEffect(() => {
@@ -58,6 +65,15 @@ export function PoeAdegan() {
   }, [poe?.tahap])
 
   if (!poe) return null
+
+  const keAdegan = (e: PointerEvent) => {
+    const r = wadahToken.current!.getBoundingClientRect()
+    return [((e.clientX - r.left) / r.width) * 1600, ((e.clientY - r.top) / r.height) * 900]
+  }
+  const diZona = (x: number, y: number) =>
+    poe.tahap === 'tebak' &&
+    Math.abs(x - poe.zone.x) < poe.zone.w / 2 &&
+    Math.abs(y - poe.zone.y) < poe.zone.h / 2
 
   const langkah = ['Tebak', 'Amati', 'Jelaskan']
   const langkahAktif =
@@ -80,6 +96,7 @@ export function PoeAdegan() {
           <div
             className="poe-zone"
             data-nampan={poe.zone.nampan || undefined}
+            data-over={seret?.over || undefined}
             style={{
               left: `${poe.zone.x / 16}%`,
               top: `${poe.zone.y / 9}%`,
@@ -88,30 +105,67 @@ export function PoeAdegan() {
             }}
             data-name={poe.zone.name}
           >
-            {poe.zone.cap ? (
-              <span className="poe-zone-cap">{poe.zone.cap}</span>
-            ) : (
-              <span className="poe-zone-label">{poe.zone.name}</span>
-            )}
+            {poe.zone.cap && <span className="poe-zone-cap">{poe.zone.cap}</span>}
           </div>
 
-          <div className="poe-tokens">
+          <div className="poe-tokens" ref={wadahToken}>
             {poe.supply.map((xy, i) => {
               const placedIdx = poe.placed.indexOf(i)
               const isPlaced = placedIdx >= 0
-              const [x, y] = isPlaced ? poe.slot(placedIdx, poe.placed.length) : xy
+              const diseret = seret?.i === i
+              const [x, y] = diseret
+                ? [seret.x, seret.y]
+                : isPlaced
+                  ? poe.slot(placedIdx, poe.placed.length)
+                  : xy
               return (
                 <button
                   key={i}
                   type="button"
                   className={`tok${isPlaced ? ' placed' : ''}`}
                   style={{ left: `${x / 16}%`, top: `${y / 9}%` }}
+                  data-seret={diseret || undefined}
                   disabled={dijeda}
                   aria-label={`ATP ${i + 1}${isPlaced ? ` di ${poe.zone.name}` : ''}`}
-                  title={isPlaced ? 'Ketuk untuk mengambil ATP kembali' : 'Ketuk untuk menaruh ATP'}
-                  onClick={() => poe.taruhToken(i)}
+                  title={
+                    isPlaced
+                      ? 'Ketuk atau seret keluar untuk mengambil ATP kembali'
+                      : `Ketuk atau seret ke ${poe.zone.name} untuk menaruh ATP`
+                  }
+                  onPointerDown={(e) => {
+                    abaikanKlik.current = false
+                    e.currentTarget.setPointerCapture(e.pointerId)
+                    tarik.current = { i, x0: e.clientX, y0: e.clientY, geser: false }
+                  }}
+                  onPointerMove={(e) => {
+                    const t = tarik.current
+                    if (t?.i !== i) return
+                    // Gerak kecil tetap dihitung ketukan
+                    if (!t.geser && Math.hypot(e.clientX - t.x0, e.clientY - t.y0) < 6) return
+                    t.geser = true
+                    const [sx, sy] = keAdegan(e)
+                    setSeret({ i, x: sx, y: sy, over: diZona(sx, sy) })
+                  }}
+                  onPointerUp={(e) => {
+                    const t = tarik.current
+                    tarik.current = null
+                    if (!t?.geser) return
+                    // Klik sesudah seret tidak dihitung ketukan
+                    abaikanKlik.current = true
+                    setSeret(null)
+                    if (diZona(...(keAdegan(e) as [number, number])) !== isPlaced) poe.taruhToken(i)
+                  }}
+                  onPointerCancel={() => {
+                    tarik.current = null
+                    setSeret(null)
+                  }}
+                  onClick={() => {
+                    if (abaikanKlik.current) abaikanKlik.current = false
+                    else poe.taruhToken(i)
+                  }}
                 >
-                  <img src={gambarAtp} alt="" width={128} height={52} />
+                  {/* Gambar tidak diseret sendiri oleh browser; yang diseret tokennya */}
+                  <img src={gambarAtp} alt="" width={128} height={52} draggable={false} />
                 </button>
               )
             })}
