@@ -62,6 +62,11 @@ test('slot memutar berkasnya sendiri', () => {
   expect(Howl).toHaveBeenLastCalledWith({ src: ['/audio/getar.ogg', '/audio/getar.mp3'] })
 })
 
+test('POP episode memakai berkasnya sendiri, bukan pop Beranda', () => {
+  bunyi('muncul')
+  expect(Howl).toHaveBeenLastCalledWith({ src: ['/audio/muncul.ogg', '/audio/muncul.mp3'] })
+})
+
 test('efek suara mati: slot diam', () => {
   usePengaturan.getState().atur('efek', false)
   bunyi('tepat')

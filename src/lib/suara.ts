@@ -4,6 +4,7 @@ import { usePengaturan } from '../stores/pengaturan'
 export type NamaSuara =
   | 'melesat'
   | 'mendarat'
+  | 'muncul'
   | 'maskot'
   | 'mulai'
   | 'buka-peta'
@@ -80,7 +81,8 @@ const BERKAS_SLOT: Record<SlotSuara, NamaSuara> = {
   ketuk: 'ketuk',
   tepat: 'tepat',
   'belum-tepat': 'belum-tepat',
-  muncul: 'mendarat',
+  // Pop episode sendiri; 'mendarat' tetap milik animasi sel Beranda
+  muncul: 'muncul',
   melesat: 'melesat',
   klik: 'klik',
   getar: 'getar',
