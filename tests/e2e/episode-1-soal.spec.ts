@@ -109,6 +109,17 @@ test('soal a dan b memberi umpan balik dan menyimpan jawaban tanpa skor', async 
   await expect(page.locator('[data-gelembung]')).toContainText('Dua tahap: fase investasi energi')
   await expect(page.locator('svg').getByText('Investasi energi', { exact: true })).toBeVisible()
   await expect(page.locator('svg').getByText('Pembentukan energi', { exact: true })).toBeVisible()
+  // Judul tahap tepat di atas panahnya: sela kecil dan sejajar titik tengah panah
+  const satuan = (await page.locator('[data-panggung]').boundingBox())!.width / 1600
+  const panahTahap = page.locator('svg path[stroke-dasharray]')
+  for (const [i, judul] of ['Investasi energi', 'Pembentukan energi'].entries()) {
+    const t = (await page.locator('svg').getByText(judul, { exact: true }).boundingBox())!
+    const a = (await panahTahap.nth(i).boundingBox())!
+    const sela = (a.y - (t.y + t.height)) / satuan
+    expect(sela, judul).toBeGreaterThan(10)
+    expect(sela, judul).toBeLessThan(60)
+    expect(Math.abs(t.x + t.width / 2 - (a.x + a.width / 2)) / satuan, judul).toBeLessThan(10)
+  }
   expect((await draf(page)).b).toBe('2 tahap: investasi energi dan pembentukan energi')
   await page.reload()
   await expect(page.getByRole('button', { name: 'Mulai episode' })).toBeVisible()

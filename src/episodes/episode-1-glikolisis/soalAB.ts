@@ -88,15 +88,16 @@ export async function soalAB(p: Panggung) {
     },
   )
   useJawaban.getState().catat('b', '2 tahap: investasi energi dan pembentukan energi')
+  // Judul tepat di atas titik tengah panahnya (prototype: y 260, jauh dari panah di y 440)
   for (const [x, judul] of [
-    [540, 'Investasi energi'],
+    [555, 'Investasi energi'],
     [1060, 'Pembentukan energi'],
   ] as const) {
-    const k = obj(x, 290, p.world)
+    const k = obj(x, 430, p.world)
     penanda.push(k)
     teks(k, 0, 0, judul, 26, 'var(--color-paper)')
     bunyi('melesat')
-    await to(hide(k), { o: 1, y: 260 }, 700)
+    await to(hide(k), { o: 1, y: 400 }, 700)
   }
   await say(p, 'e1-b-02')
   return { glu: g, penanda }
