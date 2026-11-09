@@ -40,9 +40,33 @@ test.beforeEach(async ({ page }, info) => {
 
 async function soalD(page: Page) {
   // Tiap NAD⁺ menangkap tepat 2 elektron dari satu PGAL
-  await expect(page.locator('[data-petunjuk]')).toHaveText('Ketuk NAD⁺ untuk menangkap elektron', {
-    timeout: 15000,
-  })
+  await expect(page.locator('[data-petunjuk]')).toHaveText(
+    'Ketuk kedua NAD⁺ untuk menangkap elektron.',
+    {
+      timeout: 15000,
+    },
+  )
+  const tempat = page.locator('[data-objek="label-sitosol"] text')
+  await expect(tempat).toBeVisible()
+  const k = (await tempat.boundingBox())!
+  const panggung = (await page.locator('[data-panggung]').boundingBox())!
+  expect(k.x).toBeGreaterThanOrEqual(panggung.x)
+  expect(k.x + k.width).toBeLessThanOrEqual(panggung.x + panggung.width)
+  expect(k.y).toBeGreaterThanOrEqual(panggung.y)
+  for (const h of await page.locator('.pemutar-bilah, .pemutar-panduan').all()) {
+    expect(bertumpuk(k, (await h.boundingBox())!), 'label sitosol utuh').toBe(false)
+    for (const n of await page.locator('[data-carrier="NAD⁺"]').all()) {
+      expect(
+        bertumpuk((await n.boundingBox())!, (await h.boundingBox())!),
+        'NAD⁺ bisa diketuk',
+      ).toBe(false)
+    }
+    for (const c of await page.locator(`[data-molecule="pgal"] ${KARBON}`).all()) {
+      expect(bertumpuk((await c.boundingBox())!, (await h.boundingBox())!), 'karbon terlihat').toBe(
+        false,
+      )
+    }
+  }
   await tombol(page, 'NAD⁺ 1').click({ timeout: 15000 })
   await tombol(page, 'NAD⁺ 2').click()
   await expect(page.locator('[data-carrier="NADH"]')).toHaveCount(2, { timeout: 15000 })
@@ -62,6 +86,23 @@ async function soalD(page: Page) {
 
   // Panen fosfat: 4 fosfat, 4 ADP menjadi 4 ATP
   await expect(page.locator('[data-petunjuk]')).toHaveText('Ketuk tiap fosfat', { timeout: 15000 })
+  const penghitung = (await page
+    .locator('svg text', { hasText: 'ATP terbentuk: 0' })
+    .boundingBox())!
+  for (const h of await page.locator('.pemutar-bilah, .pemutar-panduan').all()) {
+    expect(bertumpuk(penghitung, (await h.boundingBox())!), 'penghitung ATP terbaca').toBe(false)
+  }
+  for (const l of await bpg
+    .locator('text', { hasText: '1,3-bifosfogliserat' })
+    .locator('..')
+    .all()) {
+    for (const c of await bpg.locator(KARBON).all()) {
+      expect(
+        bertumpuk((await l.boundingBox())!, (await c.boundingBox())!),
+        `label tidak menimpa karbon: ${JSON.stringify([await l.boundingBox(), await c.boundingBox()])}`,
+      ).toBe(false)
+    }
+  }
   for (let i = 1; i <= 4; i++) await tombol(page, `Fosfat ${i}`).click({ timeout: 15000 })
   await expect(page.locator('svg text', { hasText: 'ATP terbentuk: 4' })).toHaveCount(1, {
     timeout: 15000,

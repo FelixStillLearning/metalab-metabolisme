@@ -33,14 +33,27 @@ import { say } from './naskah'
 // lalu keempat fosfat dipanen menjadi 4 ATP dan molekulnya menjadi asam piruvat + H₂O.
 export async function soalD(p: Panggung, [m1, m2]: [Separuh, Separuh]) {
   usePemutar.setState({ bab: 3 })
-  await camTo(p, 1000, 460, 1.15, 1100)
+  for (const ph of [m1, m2]) {
+    ph.label?.remove()
+    ph.label = label(ph, ph.side * 75, 138, 'PGAL · 3 C', 20)
+  }
+  // Label tetap di ruang kanan atas selama kamera mendekat, termasuk di HP miring.
+  const tempat = p.world.querySelector<Objek>('[data-objek="label-sitosol"]')!
+  tempat.style.display = 'inline'
+  await Promise.all([
+    camTo(p, 1000, 460, 1.15, 1100),
+    to(tempat, { x: 1270, y: 125 }, 1100),
+    // Atom C teratas harus di kanan popup petunjuk pada HP miring.
+    to(m1, { x: 1155 }, 1100),
+    to(m2, { x: 1005 }, 1100),
+  ])
   await say(p, 'e1-d-01')
 
   // Dua elektron per PGAL, di samping PGAL atas (y 270) dan bawah (y 540)
   const pasangan = [270, 540].map((y) =>
     [-18, 18].map((dy) => {
       const e = hide(elektron(p.world, 860, y + dy))
-      void to(e, { o: 1, x: 940 }, 600)
+      void to(e, { o: 1, x: 1200 }, 600)
       return e
     }),
   )
@@ -50,7 +63,7 @@ export async function soalD(p: Panggung, [m1, m2]: [Separuh, Separuh]) {
 
   await mintaKetukSemua(
     p.signal,
-    'Ketuk NAD⁺ untuk menangkap elektron',
+    'Ketuk kedua NAD⁺ untuk menangkap elektron.',
     nads.map((n, i) => ({
       teks: `NAD⁺ ${i + 1}`,
       posisi: keLayar(p, n._x, n._y),
@@ -60,8 +73,8 @@ export async function soalD(p: Panggung, [m1, m2]: [Separuh, Separuh]) {
       const n = nads[i]
       const es = pasangan[i]
       const y = es[0]._y + 18
-      await arc(n, 1020, y, 80, 600)
-      void comic(p, 'KLIK', 1020, y - 85, 'var(--color-nad)', p.world)
+      await arc(n, 1300, y, 80, 600)
+      void comic(p, 'KLIK', 1300, y - 85, 'var(--color-nad)', p.world)
       bunyi('klik')
       // Kedua elektron ditangkap dan ikut menempel di NADH
       await Promise.all(
@@ -84,7 +97,7 @@ export async function soalD(p: Panggung, [m1, m2]: [Separuh, Separuh]) {
       ph.p2 = f
       ph.dataset.molecule = 'bifosfogliserat'
       ph.label?.remove()
-      ph.label = label(ph, ph.side * 75, 155, '1,3-bifosfogliserat · 3 C', 18)
+      ph.label = label(ph, ph.side * 75, 138, '1,3-bifosfogliserat · 3 C', 18)
       await wait(p, 120)
       await to(f, { o: 1 }, 0)
       bunyi('muncul')
@@ -94,13 +107,13 @@ export async function soalD(p: Panggung, [m1, m2]: [Separuh, Separuh]) {
   await say(p, 'e1-d-02')
   // Hasil soal d rapat di area kosong tengah-kanan (kiri dipakai kartu dan nampan soal e);
   // NADH sebelum hiasan mitokondria di pojok kanan atas latar
-  await Promise.all(nads.map((n, i) => to(n, { x: 1350, y: 150 + i * 75, s: 0.8 }, 700)))
+  await Promise.all(nads.map((n, i) => to(n, { x: 1350, y: 200 + i * 75, s: 0.8 }, 700)))
   await say(p, 'e1-d-03')
 
   const targets = [m1.p1!, m1.p2!, m2.p1!, m2.p2!]
   let count = 0
-  // Di bawah bilah kontrol (prototype y 150 tertutup bilah di HP miring)
-  const counter = kinetik(p, 260, 210, 'ATP terbentuk: 0', 34, 'var(--color-paper)')
+  // Di bawah popup petunjuk, termasuk di HP miring.
+  const counter = kinetik(p, 260, 300, 'ATP terbentuk: 0', 34, 'var(--color-paper)')
   const dunia = (t: Fosfat, i: number): [number, number] => {
     const m = i < 2 ? m1 : m2
     return [m._x + t._x, m._y + t._y]
@@ -156,7 +169,9 @@ export async function soalD(p: Panggung, [m1, m2]: [Separuh, Separuh]) {
     to(r1, { x: 1130, y: 360 }, 1200),
     to(r2, { x: 1130, y: 560 }, 1200),
     camTo(p, 800, 450, 1, 1200),
+    to(tempat, { x: 800, y: 80 }, 1200),
   ])
+  tempat.style.removeProperty('display')
 
   useJawaban
     .getState()
