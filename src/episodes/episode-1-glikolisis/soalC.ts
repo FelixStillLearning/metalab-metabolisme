@@ -37,28 +37,31 @@ export async function soalC(
   penanda: Objek[],
 ): Promise<[Separuh, Separuh]> {
   usePemutar.setState({ bab: 2 })
-  await say(p, 'e1-c-01')
+  // Panah dan judul tahap soal b dipudarkan sebelum tebakan (prototype: saat Amati) karena
+  // bingkai zona dan kartu menimpanya. Glukosa bergeser ke kanan bawah: di atasnya ada
+  // petunjuk, di kirinya maskot.
+  for (const m of penanda) void to(m, { o: 0 }, 180).then(() => m.remove())
+  await Promise.all([to(glu, { x: 480, y: 500 }, 700), say(p, 'e1-c-01')])
 
   const reasons = ALASAN_C
-
   const P = await mintaTebak(p.signal, {
     judul: 'Berapa ATP yang dibutuhkan untuk memecah glukosa?',
     reasons,
     right: 2,
-    zone: { x: 300, y: 430, w: 380, h: 390, name: 'glukosa' },
+    // Bagian dalam bingkai G02 (8,2% tiap sisi) memuat judul zona, baris ATP, cincin, dan label
+    zone: { x: 480, y: 475, w: 380, h: 490, name: 'glukosa' },
     supply: [
-      [620, 580],
-      [740, 580],
-      [860, 580],
+      [820, 370],
+      [820, 480],
+      [820, 590],
     ],
-    slot: (i, n) => [300 + (i - (n - 1) / 2) * 120, 285],
+    slot: (i, n) => [480 + (i - (n - 1) / 2) * 100, 335],
   })
 
   useJawaban.getState().catatPoe('c', { tebakan: P.g, alasan: P.r })
   tampilkanAmati(P.g, 'ATP')
 
-  // Animasi Amati: Investasi energi. Panah dan judul tahap soal b dipudarkan seperti prototype.
-  for (const m of penanda) void to(m, { o: 0 }, 180).then(() => m.remove())
+  // Animasi Amati: Investasi energi
   await Promise.all([camTo(p, 800, 450, 1, 700), to(glu, { x: 800, y: 535, s: 1.25 }, 700)])
 
   const atps = P.from.map(([x, y], i) => carrier(p, x, y, 'ATP', i ? -1 : 1))

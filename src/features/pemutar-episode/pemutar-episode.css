@@ -785,9 +785,11 @@
 .gtag.ok,
 .gtag.no {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  width: max-content;
+  max-width: min(360px, 45vw);
 }
 
 .gtag img {
@@ -802,6 +804,7 @@
 }
 
 .gtag-catatan {
+  flex-basis: 100%;
   margin: 0;
   font-size: 16px;
 }
@@ -834,7 +837,10 @@
 }
 
 .poe-zone-label {
-  font: 700 14px var(--font-head);
+  /* Di bawah bingkai atas G02 (8,2% tinggi gambar) */
+  position: absolute;
+  top: 8.6%;
+  font: 700 clamp(9px, 1cqw, 14px) var(--font-head);
   color: var(--color-accent);
   text-transform: uppercase;
   letter-spacing: 0.05em;
