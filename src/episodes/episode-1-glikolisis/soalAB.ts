@@ -26,10 +26,11 @@ export async function soalAB(p: Panggung) {
     p.signal,
     {
       judul: 'Ketuk bahan awal glikolisis.',
+      // Kotak sorotan memuat atom dan label tiap molekul, dengan sela 25 satuan
       opsi: [
-        { teks: 'Glukosa (6 atom C)', posisi: [800, 420] },
-        { teks: 'Asam piruvat (3 atom C)', posisi: [420, 580] },
-        { teks: 'O₂ (2 atom O)', posisi: [1180, 580] },
+        { teks: 'Glukosa (6 atom C)', posisi: [800, 413], ukuran: [292, 332] },
+        { teks: 'Asam piruvat (3 atom C)', posisi: [420, 588], ukuran: [280, 184] },
+        { teks: 'O₂ (2 atom O)', posisi: [1180, 586], ukuran: [230, 192] },
       ],
     },
     0,

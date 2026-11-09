@@ -49,6 +49,19 @@ test('soal a dan b memberi umpan balik dan menyimpan jawaban tanpa skor', async 
   await expect(page.locator('[data-molecule="glukosa"] [data-carbon]')).toHaveCount(6)
   await expect(page.locator('[data-molecule="piruvat"] [data-carbon]')).toHaveCount(3)
   await expect(page.locator('[data-molecule="o2"]')).toHaveAttribute('data-oksigen', '2')
+  // Kotak sorotan tiap sasaran memuat seluruh molekul beserta labelnya
+  for (const [nama, molekul] of [
+    ['Glukosa (6 atom C)', 'glukosa'],
+    ['Asam piruvat (3 atom C)', 'piruvat'],
+    ['O₂ (2 atom O)', 'o2'],
+  ]) {
+    const kotak = (await page.getByRole('button', { name: nama, exact: true }).boundingBox())!
+    const isi = (await page.locator(`[data-molecule="${molekul}"]`).boundingBox())!
+    expect(isi.x, nama).toBeGreaterThanOrEqual(kotak.x)
+    expect(isi.y, nama).toBeGreaterThanOrEqual(kotak.y)
+    expect(isi.x + isi.width, nama).toBeLessThanOrEqual(kotak.x + kotak.width)
+    expect(isi.y + isi.height, nama).toBeLessThanOrEqual(kotak.y + kotak.height)
+  }
   await page.getByRole('button', { name: 'O₂ (2 atom O)', exact: true }).click()
   await expect(page.locator('[data-gelembung]')).toHaveText('Glikolisis berlangsung tanpa oksigen.')
   expect(await draf(page)).toEqual({})
