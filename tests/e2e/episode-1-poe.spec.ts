@@ -40,7 +40,7 @@ test('POE c: tebak, amati investasi energi, pembelahan 6C jadi 2 PGAL, dan jelas
   const tombolKunci = page.getByRole('button', { name: 'Kunci tebakan, lanjutkan video' })
   await expect(tombolKunci).toBeDisabled()
 
-  await expect(page.locator('[data-petunjuk]')).toHaveText('Ketuk ATP ke glukosa.')
+  await expect(page.locator('[data-petunjuk]')).toHaveText('Ketuk atau seret ATP ke glukosa.')
   await expect(page.locator('.pemutar-ajakan')).toHaveCount(0)
   // Taruh 2 ATP
   await page.getByRole('button', { name: 'ATP 1', exact: true }).click()

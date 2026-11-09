@@ -75,7 +75,7 @@ test('petunjuk terpisah dari bubble tanpa menghapus umpan balik, juga saat subti
 
 test('petunjuk POE mengikuti penempatan ATP, alasan, kunci, dan lanjut', () => {
   usePemutar.setState({ poe: tebak })
-  expect(petunjukInteraksi(usePemutar.getState())).toBe('Ketuk ATP ke glukosa.')
+  expect(petunjukInteraksi(usePemutar.getState())).toBe('Ketuk atau seret ATP ke glukosa.')
   act(() => usePemutar.setState({ poe: { ...tebak, placed: [0] } }))
   expect(petunjukInteraksi(usePemutar.getState())).toBe('Pilih alasan tebakanmu.')
   act(() => usePemutar.setState({ poe: { ...tebak, placed: [0], alasan: 1 } }))
