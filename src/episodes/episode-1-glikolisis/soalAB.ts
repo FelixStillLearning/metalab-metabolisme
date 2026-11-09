@@ -25,7 +25,7 @@ export async function soalAB(p: Panggung) {
   await mintaPilihan(
     p.signal,
     {
-      judul: 'Ketuk molekul yang menjadi bahan awal glikolisis.',
+      judul: 'Ketuk bahan awal glikolisis.',
       opsi: [
         { teks: 'Glukosa (6 atom C)', posisi: [800, 420] },
         { teks: 'Asam piruvat (3 atom C)', posisi: [420, 580] },
@@ -56,7 +56,8 @@ export async function soalAB(p: Panggung) {
   usePemutar.setState({ bab: 1 })
   // Panah dan judul tahap dipudarkan di awal adegan c agar tidak menimpa molekul
   const penanda: Objek[] = [obj(0, 0, p.world)]
-  for (const d of ['M420 440 L660 440', 'M940 440 L1180 440']) {
+  // Prototype mulai di x 420, menempel atom C glukosa (x 400, jari-jari 21); diberi celah
+  for (const d of ['M450 440 L660 440', 'M940 440 L1180 440']) {
     el(
       'path',
       {

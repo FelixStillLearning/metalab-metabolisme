@@ -19,12 +19,27 @@ test.beforeEach(async ({ page }, info) => {
 })
 
 test('soal a dan b memberi umpan balik dan menyimpan jawaban tanpa skor', async ({ page }) => {
-  await expect(page.locator('[data-petunjuk]')).toHaveText(
-    'Ketuk molekul yang menjadi bahan awal glikolisis.',
-  )
+  await expect(page.locator('[data-petunjuk]')).toHaveText('Ketuk bahan awal glikolisis.')
+  // Pemberitahuan cukup satu baris
+  const baris = await page
+    .locator('[data-petunjuk]')
+    .evaluate(
+      (el) => el.getBoundingClientRect().height / parseFloat(getComputedStyle(el).lineHeight),
+    )
+  expect(baris).toBeLessThan(1.5)
+  // Sorotan sasaran molekul: garis putus-putus krem yang cukup tebal
+  if (await page.evaluate(() => matchMedia('(hover: hover)').matches)) {
+    await glukosa(page).hover()
+    await expect(glukosa(page)).toHaveCSS('outline-style', 'dashed')
+    await expect(glukosa(page)).toHaveCSS('outline-color', 'rgb(245, 241, 232)')
+    expect(
+      parseFloat(await glukosa(page).evaluate((el) => getComputedStyle(el).outlineWidth)),
+    ).toBeGreaterThanOrEqual(5)
+    await page.mouse.move(0, 0)
+  }
   await expect(page.locator('.pemutar-gelembung [data-petunjuk]')).toHaveCount(0)
   await expect(page.getByRole('status', { name: 'Petunjuk interaksi' })).toContainText(
-    'Ketuk molekul',
+    'Ketuk bahan awal',
   )
   await expect(page.locator('.pemutar-panduan')).toHaveCSS('opacity', '1')
   await expect(page.locator('.pemutar-panduan')).toHaveCSS('pointer-events', 'none')
@@ -45,6 +60,18 @@ test('soal a dan b memberi umpan balik dan menyimpan jawaban tanpa skor', async 
   expect((await draf(page)).a).toBe('Glukosa (6 atom C)')
   await expect(page.locator('[data-petunjuk]')).toHaveText('Pilih salah satu jawaban di kartu.')
   await expect(page.locator('.pemutar-sasaran .pemutar-ajakan')).toHaveCount(0)
+  // Panah tahap pertama tidak menempel pada atom C glukosa (celah minimal 15 satuan adegan)
+  const skala = (await page.locator('[data-panggung]').boundingBox())!.width / 1600
+  const ujungGlukosa = Math.max(
+    ...(await Promise.all(
+      (await page.locator('[data-molecule="glukosa"] [data-carbon]').all()).map(async (c) => {
+        const k = (await c.boundingBox())!
+        return k.x + k.width
+      }),
+    )),
+  )
+  const panah = (await page.locator('svg path[stroke-dasharray]').first().boundingBox())!
+  expect((panah.x - ujungGlukosa) / skala).toBeGreaterThanOrEqual(15)
   const satu = page.getByRole('button', { name: '1 tahap', exact: true })
   await expect(satu).toHaveCSS('font-family', /Atkinson Hyperlegible/)
   if (await page.evaluate(() => matchMedia('(hover: hover)').matches)) {

@@ -615,8 +615,9 @@
 
 .pemutar-sasaran:hover,
 .pemutar-sasaran:focus-visible {
-  outline: 3px solid var(--color-accent);
-  outline-offset: 3px;
+  /* Krem putus-putus, sejenis panah tahap soal b dan zona taruh */
+  outline: 5px dashed var(--color-paper);
+  outline-offset: 4px;
 }
 
 .pemutar-soal {
