@@ -155,7 +155,8 @@ export async function soalC(
 
   bunyi('belah')
   burstBehind(p, glu)
-  await comic(p, 'KRAAK!', glu._x, 310, 'var(--color-hot)', p.world)
+  // Tidak ditunggu, seperti prototype: glukosa terbelah bersamaan dengan letupan dan KRAAK!
+  void comic(p, 'KRAAK!', glu._x, 310, 'var(--color-hot)', p.world)
 
   glu.cross.remove()
   glu.label.remove()

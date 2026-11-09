@@ -239,6 +239,14 @@ for (const n of [1, 2, 3]) {
       FOSFAT,
       { polling: 'raf', timeout: 25000 },
     )
+    // Seperti prototype, glukosa terbelah saat KRAAK! masih tampil, bukan sesudahnya
+    await page.waitForFunction(
+      () =>
+        !!document.querySelector('[data-word="KRAAK!"]') &&
+        document.querySelectorAll('[data-molecule="pgal"]').length === 2,
+      null,
+      { polling: 'raf', timeout: 15000 },
+    )
 
     // Tahap Amati, setelah glukosa terbelah
     await expect(page.locator('[data-molecule="pgal"]')).toHaveCount(2, { timeout: 25000 })
