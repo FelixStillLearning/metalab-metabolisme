@@ -23,7 +23,8 @@ const POSE_MITOKONDRIA = perPose(
 )
 const gambarPose = (pose: PoseMaskot) => POSE[pose] ?? POSE['05-menjelaskan']
 
-// Narator di kiri gelembung kalimat; pendamping mitokondria di kanan (disembunyikan di HP miring).
+// Narator di kiri gelembung kalimat; pendamping mitokondria di kanan.
+// Saat siswa diberi tugas keduanya mengecil agar tidak menutupi pilihan di adegan.
 // Wadah aria-live selalu ada agar kalimat pertama juga dibacakan pembaca layar.
 function Gelembung() {
   const state = usePemutar()
@@ -39,7 +40,12 @@ function Gelembung() {
     : ({ animationDuration: `${durasi(280)}ms` } as CSSProperties)
 
   return (
-    <div className="pemutar-narator" aria-live="polite" hidden={!petunjuk && !tampilSubtitle}>
+    <div
+      className="pemutar-narator"
+      aria-live="polite"
+      hidden={!petunjuk && !tampilSubtitle}
+      data-tugas={!!petunjuk || undefined}
+    >
       <img
         src={gambarPose(poseAktif)}
         alt=""

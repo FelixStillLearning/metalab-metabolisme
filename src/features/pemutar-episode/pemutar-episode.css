@@ -252,21 +252,50 @@
 
 /* ---------- narator dan gelembung ---------- */
 
+/* Didaftarkan sebagai panjang agar perubahan ukuran maskot bisa ditransisikan */
+@property --maskot {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: 200px;
+}
+
+@property --pendamping {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: 128px;
+}
+
 .pemutar-narator {
+  /* Ikut lebar panggung: 1440 px ≈ 260 px dan 175 px */
+  --maskot: clamp(200px, 18cqw, 300px);
+  --pendamping: clamp(128px, 12cqw, 200px);
   position: absolute;
   left: 50%;
   bottom: 3%;
   display: grid;
-  grid-template-columns: 200px minmax(0, 1fr);
+  grid-template-columns: var(--maskot) minmax(0, 1fr);
   align-items: end;
   gap: 12px;
   width: 90%;
   transform: translateX(-50%);
   pointer-events: none;
+  transition:
+    --maskot 300ms var(--ease-pose),
+    --pendamping 300ms var(--ease-pose);
+}
+
+/* Ukuran lama (prototype) selama siswa diberi tugas, supaya pilihan di kiri bawah tidak tertutup */
+.pemutar-narator[data-tugas] {
+  --maskot: 200px;
+  --pendamping: 128px;
+}
+
+[data-tenang] .pemutar-narator {
+  transition: none;
 }
 
 .pemutar-narator:has(.pemutar-pendamping) {
-  grid-template-columns: 200px minmax(0, 1fr) 128px;
+  grid-template-columns: var(--maskot) minmax(0, 1fr) var(--pendamping);
 }
 
 .pemutar-maskot,
@@ -276,13 +305,13 @@
 }
 
 .pemutar-maskot {
-  width: 200px;
-  height: 200px;
+  width: var(--maskot);
+  height: var(--maskot);
 }
 
 .pemutar-pendamping {
-  width: 128px;
-  height: 128px;
+  width: var(--pendamping);
+  height: var(--pendamping);
 }
 
 /* Gelembung G05: kedua ujung bulat tetap utuh, bagian tengah memanjang mengikuti kalimat */
@@ -1095,23 +1124,19 @@
     font-size: 13px;
   }
 
-  .pemutar-narator,
-  .pemutar-narator:has(.pemutar-pendamping) {
+  .pemutar-narator {
+    --maskot: 136px;
+    --pendamping: 88px;
     left: 0;
     bottom: 2%;
-    grid-template-columns: 112px minmax(0, 1fr);
     gap: 6px;
     width: 98%;
     transform: none;
   }
 
-  .pemutar-maskot {
-    width: 112px;
-    height: 112px;
-  }
-
-  .pemutar-pendamping {
-    display: none;
+  .pemutar-narator[data-tugas] {
+    --maskot: 112px;
+    --pendamping: 72px;
   }
 
   .pemutar-gelembung {

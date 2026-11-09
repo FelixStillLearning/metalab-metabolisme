@@ -101,10 +101,35 @@ test('HP miring: panggung dan kontrol muat di layar', async ({ page }, info) => 
   expect(kotak.y + kotak.height).toBeLessThanOrEqual(360)
   await expect(page.getByRole('button', { name: 'Jeda (spasi)' })).toBeInViewport()
   await expect(page.getByRole('button', { name: 'Pengaturan', exact: true })).toBeInViewport()
-  // Kalimat tentang mitokondria memanggil pendamping; di HP miring ia tidak ditampilkan
+  // Kalimat tentang mitokondria memanggil pendamping; di HP miring ia tetap tampil dan muat
   await expect(gelembung(page)).toHaveText(KALIMAT_2)
-  await expect(page.locator('[data-pendamping]')).toBeAttached()
-  await expect(page.locator('[data-pendamping]')).toBeHidden()
+  await expect(page.locator('[data-pendamping]')).toBeVisible()
+  await expect(page.locator('[data-pendamping]')).toBeInViewport({ ratio: 1 })
+  expect((await page.locator('.pemutar-maskot').boundingBox())!.width).toBeGreaterThanOrEqual(130)
+})
+
+test('desktop: kedua maskot cukup besar dan muat di layar', async ({ page }, info) => {
+  test.skip(info.project.name !== 'desktop', 'khusus desktop')
+  await mulai(page)
+  await expect(gelembung(page)).toHaveText(KALIMAT_2)
+  const maskot = page.locator('.pemutar-maskot')
+  const pendamping = page.locator('[data-pendamping]')
+  await expect(maskot).toBeInViewport({ ratio: 1 })
+  await expect(pendamping).toBeInViewport({ ratio: 1 })
+  expect((await maskot.boundingBox())!.width).toBeGreaterThanOrEqual(240)
+  expect((await pendamping.boundingBox())!.width).toBeGreaterThanOrEqual(160)
+})
+
+test('saat siswa diberi tugas, maskot kembali ke ukuran kecil', async ({ page }, info) => {
+  test.skip(info.project.name !== 'desktop', 'khusus desktop')
+  await mulai(page)
+  await expect(page.getByRole('button', { name: 'Glukosa (6 atom C)', exact: true })).toBeVisible({
+    timeout: 20000,
+  })
+  await expect(page.locator('[data-petunjuk]')).toBeVisible()
+  await expect
+    .poll(async () => (await page.locator('.pemutar-maskot').boundingBox())!.width)
+    .toBeLessThanOrEqual(205)
 })
 
 test('diputar ke tegak di tengah episode menjeda', async ({ page }, info) => {
