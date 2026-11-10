@@ -8,9 +8,9 @@ Judul kegiatan: Rancang Bangun Media Pembelajaran Interaktif Berbasis Web pada M
 
 ## Status
 
-Tahap Assembly (MDLC). Beranda, peta materi, serta Episode 0 (pengantar), Episode 1 (glikolisis), dan Episode 2 (dekarboksilasi oksidatif) sudah diimplementasikan. Episode 2 mencakup perpindahan dua piruvat, pelepasan CO₂, pembentukan NADH, pengikatan KoA, perhitungan enam karbon, dan Lembar Hasil. Animasi komik dan efek suara mengikuti tiap reaksi. Jawaban siswa tersimpan secara lokal per episode.
+Tahap Assembly (MDLC). Beranda, peta materi, dan Episode 0–4 sudah diimplementasikan, termasuk animasi, aktivitas POE, Lembar Hasil, refleksi, dan cetak. Episode 2 mencakup gerak dua piruvat, pelepasan CO₂, pembentukan NADH, pengikatan KoA, dan perhitungan enam karbon. Semua episode respirasi aerob dapat dibuka dari peta; jawaban siswa tersimpan secara lokal per episode.
 
-Episode 3 dan 4 dikerjakan pada branch terpisah. Penilaian materi oleh guru, kenyamanan audio pada perangkat fisik, dan pemeriksaan Safari masih terbuka.
+Episode 4 mencakup transpor elektron dan perbandingan empat tahap (Aktivitas 1.10–1.11). Perhitungan mengikuti buku: 34 ATP dari transpor elektron dan 38 ATP total respirasi aerob. Tabel perbandingan masih memerlukan validasi guru. Pengujian perangkat fisik, kenyamanan audio, Safari, serta validasi siswa masih diperlukan sebelum rilis.
 
 ## Isi media
 

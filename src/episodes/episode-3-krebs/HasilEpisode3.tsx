@@ -108,12 +108,13 @@ export default function HasilEpisode3() {
         poe: poe.map(({ k, isi, p }) => ({
           k,
           tebakan: isi.zat[p.tebakan],
+          nyata: isi.zat[1],
           awal: isi.alasan[p.alasan],
           akhir: isi.alasan[p.penjelasan!],
         })),
         tabel: <Tabel />,
       }}
-      rute={{ episode: '/episode/3', lanjut: '/peta-materi' }}
+      rute={{ episode: '/episode/3', lanjut: '/episode/4' }}
       narasi={{
         id: 'e3-hasil',
         teks: 'Ini roda siklus Krebsmu. Bandingkan tebakan dengan pengamatan. Jelaskan mengapa dua asetil KoA menghasilkan dua putaran, dengan oksaloasetat terbentuk kembali.',

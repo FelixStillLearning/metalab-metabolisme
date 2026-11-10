@@ -164,18 +164,14 @@ function PetaMateri() {
                     <img src={ikon} alt="" width={240} height={240} className="peta-ikon" />
                     <h3 className="peta-nama">{judul}</h3>
                     <p className="text-muted">{tempat}</p>
-                    {i < 3 ? (
-                      <Link
-                        to={`/episode/${i + 1}`}
-                        aria-label={`Buka ${judul}`}
-                        onClick={() => bunyi('melesat')}
-                        className="tombol-utama mt-auto inline-flex min-h-12 items-center gap-2 px-5 pt-2 pb-3 font-head font-extrabold transition-transform duration-(--durasi-ui) ease-pose hover:-translate-y-0.5 active:translate-y-0.5"
-                      >
-                        Buka <ArrowRight aria-hidden="true" className="size-4" />
-                      </Link>
-                    ) : (
-                      <p className="mt-auto font-bold text-muted">Belum tersedia</p>
-                    )}
+                    <Link
+                      to={`/episode/${i + 1}`}
+                      aria-label={`Buka ${judul}`}
+                      onClick={() => bunyi('melesat')}
+                      className="tombol-utama mt-auto inline-flex min-h-12 items-center gap-2 px-5 pt-2 pb-3 font-head font-extrabold transition-transform duration-(--durasi-ui) ease-pose hover:-translate-y-0.5 active:translate-y-0.5"
+                    >
+                      Buka <ArrowRight aria-hidden="true" className="size-4" />
+                    </Link>
                   </li>
                 ))}
               </ol>
