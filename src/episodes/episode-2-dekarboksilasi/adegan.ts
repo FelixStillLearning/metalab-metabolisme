@@ -371,7 +371,7 @@ async function lepas(p: Panggung, molekul: Piruvat[]) {
   panduan.remove()
   p.fx.replaceChildren()
   bunyi('geser')
-  await Promise.all(molekul.map((m, i) => arc(m.karboksil, 1180, 310 + i * 160, 65, 800)))
+  await Promise.all(molekul.map((m, i) => arc(m.karboksil, 1180, 400 + i * 190, 65, 800)))
 }
 
 async function oksidasi(p: Panggung, molekul: Piruvat[]) {
@@ -383,7 +383,12 @@ async function oksidasi(p: Panggung, molekul: Piruvat[]) {
   await poe(p, 'b·2', async (pilihan) => {
     p.fx.replaceChildren()
     await to(panduan, { o: 1 }, 300)
-    await Promise.all(molekul.map((m, i) => to(m.asetil, { x: 430, y: 330 + i * 200 }, 600)))
+    await Promise.all(
+      molekul.flatMap((m, i) => [
+        to(m.asetil, { x: 430, y: 330 + i * 200 }, 600),
+        to(m.karboksil, { y: 330 + i * 200 }, 600),
+      ]),
+    )
     await camTo(p, 700, 420, 1.2, 850)
     const elektronKeluar = molekul.map((m) =>
       [-1, 1].map((sisi) => elektron(p.world, m.asetil._x + 100, m.asetil._y + sisi * 18)),
@@ -425,7 +430,10 @@ async function oksidasi(p: Panggung, molekul: Piruvat[]) {
     bunyi('geser')
     await Promise.all([
       ...nadh.map((n, i) => arc(n, 1420, 340 + i * 160, 70, 850)),
-      ...molekul.map((m, i) => to(m.asetil, { x: 400, y: 400 + i * 190 }, 650)),
+      ...molekul.flatMap((m, i) => [
+        to(m.asetil, { x: 400, y: 400 + i * 190 }, 650),
+        to(m.karboksil, { y: 400 + i * 190 }, 650),
+      ]),
     ])
     await to(panduan, { o: 0 }, 300)
   })
