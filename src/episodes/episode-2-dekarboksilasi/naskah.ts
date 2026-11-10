@@ -6,6 +6,10 @@ export const NASKAH = {
   pembuka:
     'Dari satu glukosa, glikolisis menghasilkan dua asam piruvat. Keduanya menuju matriks mitokondria untuk diubah sebelum masuk siklus Krebs.',
   bahan: 'Pilih bahan awal dekarboksilasi oksidatif. Tiap asam piruvat memiliki tiga atom karbon.',
+  'substrat-terpilih':
+    'Benar. Asam piruvat adalah bahan awalnya. Ada dua asam piruvat dari satu glukosa, masing-masing memiliki tiga karbon. Totalnya enam karbon.',
+  'jumlah-tahap':
+    'Dua asam piruvat ini akan diubah menjadi asetil KoA. Ada berapa tahap utama dalam perubahan tersebut?',
   aerob:
     'Tahap ini berlangsung dalam suasana aerob. Oksigen mendukung kelanjutan respirasi melalui transpor elektron, tetapi tidak dikonsumsi langsung dalam reaksi ini.',
   tahap:

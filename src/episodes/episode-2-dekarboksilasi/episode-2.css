@@ -51,3 +51,14 @@
     top: 3%;
   }
 }
+
+.episode-2 .pemutar-panggung:has([data-objek='jumlah-piruvat']) .pemutar-soal {
+  left: auto;
+  right: 2%;
+  transform: none;
+}
+@media (max-height: 500px) and (orientation: landscape) {
+  .episode-2 .e2-konteks-isi {
+    transform: translateY(-190px);
+  }
+}

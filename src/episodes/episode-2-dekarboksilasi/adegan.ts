@@ -2,6 +2,7 @@ import matriks from '../../assets/images/latar-matriks-lebar.webp'
 import mitokondria from '../../assets/images/mitokondria-zoom.webp'
 import gambarCo2 from '../../assets/images/molekul-co2.webp'
 import gambarO2 from '../../assets/images/molekul-o2.webp'
+import gambarKoenzimA from '../../assets/images/molekul-koa.webp'
 import gambarKoa from '../../assets/images/molekul-asetil-koa.webp'
 import gambarAtp from '../../assets/images/pembawa-atp.webp'
 import gambarNad from '../../assets/images/pembawa-nad.webp'
@@ -9,12 +10,13 @@ import gambarNadh from '../../assets/images/pembawa-nadh.webp'
 import gambarFad from '../../assets/images/pembawa-fad.webp'
 import gambarFadh from '../../assets/images/pembawa-fadh2.webp'
 import gambarAdp from '../../assets/images/pembawa-adp.webp'
-import { el, hapusBentuk, label, strip } from '../../features/pemutar-episode/kertas'
+import { cut, el, hapusBentuk, label, strip } from '../../features/pemutar-episode/kertas'
 import {
   camTo,
   hide,
   obj,
   pasangLatar,
+  teks,
   to,
   type Objek,
   type Panggung,
@@ -58,6 +60,68 @@ async function pembuka(p: Panggung) {
   tempat.dataset.objek = 'label-matriks'
 }
 
+async function tempatkan(m: Piruvat, x: number, y: number, s = 1, ms = 700) {
+  await Promise.all([
+    to(m.asetil, { x, y, s }, ms),
+    to(m.karboksil, { x: x + 75 * s, y: y + 12 * s, s }, ms),
+  ])
+}
+
+function konteksAerob(p: Panggung) {
+  const g = obj(1180, 410, p.fx)
+  g.dataset.objek = 'konteks-aerob'
+  const isi = el('g', { class: 'e2-konteks-isi' }, g)
+  cut(
+    isi,
+    [
+      [-270, -120],
+      [270, -120],
+      [270, 120],
+      [-270, 120],
+    ],
+    'var(--color-paper)',
+    {},
+    1,
+    { bayangan: true },
+  )
+  gambar(isi, gambarO2, -170, -30, 130, 65)
+  teks(isi, 60, -55, 'Respirasi aerob', 28, 'var(--color-ink)')
+  teks(isi, 60, -10, 'O₂ dipakai pada', 24, 'var(--color-ink)')
+  teks(isi, 60, 25, 'transpor elektron', 24, 'var(--color-ink)')
+  teks(isi, 0, 85, 'Tidak dikonsumsi langsung di sini.', 24, 'var(--color-ink)')
+  return g
+}
+
+async function tampilkanTahap(p: Panggung) {
+  label(p.fx, 1100, 240, 'Urutan perubahan piruvat', 26)
+  const tahap = [
+    { gambar: gambarCo2, nama: '1 · Lepas CO₂' },
+    { gambar: gambarNadh, nama: '2 · Bentuk NADH' },
+    { gambar: gambarKoenzimA, nama: '3 · Ikat KoA' },
+  ]
+  for (const [i, isi] of tahap.entries()) {
+    const g = obj(820 + i * 280, 445, p.fx)
+    g.dataset.ikhtisarTahap = String(i + 1)
+    cut(
+      g,
+      [
+        [-120, -105],
+        [120, -105],
+        [120, 105],
+        [-120, 105],
+      ],
+      'var(--color-paper)',
+      {},
+      1,
+      { bayangan: true },
+    )
+    gambar(g, isi.gambar, 0, -25, 160, 80)
+    teks(g, 0, 75, isi.nama, 24, 'var(--color-ink)')
+    bunyi('muncul')
+    await to(hide(g), { o: 1, y: 415 }, 500, 'pose')
+  }
+}
+
 async function bahan(p: Panggung) {
   usePemutar.setState({ bab: 0 })
   const pir = piruvat(p, 800, 350)
@@ -85,7 +149,22 @@ async function bahan(p: Panggung) {
       })
     },
   )
-  for (const g of [glu, co2, pir.asetil, pir.karboksil]) g.remove()
+  await Promise.all([to(glu, { o: 0, x: 150 }, 500), to(co2, { o: 0, x: 1450 }, 500)])
+  glu.remove()
+  co2.remove()
+  bunyi('muncul')
+  await tempatkan(pir, 800, 350, 1.3, 400)
+  const kedua = piruvat(p, 1700, 530)
+  const molekul = [pir, kedua]
+  bunyi('geser')
+  await Promise.all(molekul.map((m, i) => tempatkan(m, 430, 330 + i * 200, 1.15, 900)))
+  const jumlah = obj(430, 270, p.fx)
+  jumlah.dataset.objek = 'jumlah-piruvat'
+  label(jumlah, 0, 0, '2 piruvat · 6 C', 26)
+  await say(p, 'substrat-terpilih', '08-menunjuk')
+  const aerob = konteksAerob(p)
+  bunyi('muncul')
+  await to(hide(aerob), { o: 1 }, 500)
   await say(p, 'aerob')
   await mintaPilihan(
     p.signal,
@@ -102,7 +181,10 @@ async function bahan(p: Panggung) {
     },
   )
   useJawabanE2.getState().catat('a')
+  await to(aerob, { o: 0 }, 350)
+  aerob.remove()
   usePemutar.setState({ bab: 1 })
+  await say(p, 'jumlah-tahap')
   await mintaPilihan(
     p.signal,
     {
@@ -120,7 +202,10 @@ async function bahan(p: Panggung) {
     },
   )
   useJawabanE2.getState().catat('b')
-  await say(p, 'tahap')
+  await Promise.all([say(p, 'tahap'), tampilkanTahap(p)])
+  await Promise.all(molekul.map((m, i) => tempatkan(m, 400, 400 + i * 190)))
+  p.fx.replaceChildren()
+  return molekul
 }
 
 async function poe(p: Panggung, k: PoeE2, amati: (pilihan: number) => Promise<void>) {
@@ -334,8 +419,7 @@ export async function episode(p: Panggung) {
   siapkan('geser', 'tempel', 'muncul', 'belah', 'selesai')
   useJawabanE2.getState().mulai()
   await pembuka(p)
-  await bahan(p)
-  const molekul = [piruvat(p, 400, 400), piruvat(p, 400, 590)]
+  const molekul = await bahan(p)
   await lepas(p, molekul)
   const nadh = await oksidasi(p, molekul)
   const koas = await ikat(p, molekul)

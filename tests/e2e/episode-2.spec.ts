@@ -267,3 +267,111 @@ test('E2 jeda menahan pemisahan karbon, keluar membatalkan, efek mematuhi saklar
   expect(data.hasil).toBeNull()
   expect(data.draf.poe.c).toBeUndefined()
 })
+
+test('awal E2 tetap berilustrasi: enam karbon, konteks aerob, narasi baru dan tiga tahap', async ({
+  page,
+}, info) => {
+  test.skip(info.project.name === 'hp-tegak', 'Adegan dimainkan miring')
+  test.setTimeout(60000)
+  const gagal: string[] = []
+  page.on('response', (r) => {
+    if (r.status() >= 400) gagal.push(r.url())
+  })
+  await page.addInitScript(() => {
+    const w = window as unknown as { jumlahBunyi: number }
+    w.jumlahBunyi = 0
+    const start = AudioBufferSourceNode.prototype.start
+    AudioBufferSourceNode.prototype.start = function (...args) {
+      if (this.buffer && this.buffer.length > 1) w.jumlahBunyi++
+      return start.apply(this, args)
+    }
+  })
+  await siapkan(page)
+  await page.goto('/#/episode/2?cepat')
+  await page.getByRole('button', { name: 'Mulai episode' }).click()
+  await page.getByRole('button', { name: 'Asam piruvat (3 C)', exact: true }).click()
+  await expect(page.getByRole('button', { name: 'Ada oksigen (aerob)', exact: true })).toBeVisible({
+    timeout: 20000,
+  })
+  await expect(page.locator('[data-carbon]')).toHaveCount(6)
+  await expect(page.locator('[data-oxygen]')).toHaveCount(4)
+  await expect(page.locator('[data-objek="konteks-aerob"]')).toContainText(
+    'Tidak dikonsumsi langsung',
+  )
+  await expect(page.locator('[data-objek="jumlah-piruvat"]')).toContainText('2 piruvat · 6 C')
+  const ukur = async (nama: string) => {
+    await page.screenshot({ path: info.outputPath(`${nama}-aerob.png`) })
+    const bagian = [
+      '[data-objek="konteks-aerob"]',
+      '[data-objek="jumlah-piruvat"]',
+      '[data-molecule="asetil"]',
+      '[data-molecule="karboksil"]',
+    ]
+    const viewport = page.viewportSize()!
+    const penghalang = await Promise.all(
+      (
+        await page
+          .locator('.pemutar-soal, .pemutar-panduan, .pemutar-gelembung:not([hidden])')
+          .all()
+      ).map((e) => e.boundingBox()),
+    )
+    for (const selector of bagian)
+      for (const e of await page.locator(selector).all()) {
+        const a = (await e.boundingBox())!
+        expect(a.x, nama).toBeGreaterThanOrEqual(0)
+        expect(a.y, nama).toBeGreaterThanOrEqual(0)
+        expect(a.x + a.width, nama).toBeLessThanOrEqual(viewport.width + 1)
+        expect(a.y + a.height, nama).toBeLessThanOrEqual(viewport.height + 1)
+        for (const b of penghalang)
+          if (b)
+            expect(
+              a.x + a.width <= b.x ||
+                b.x + b.width <= a.x ||
+                a.y + a.height <= b.y ||
+                b.y + b.height <= a.y,
+              `${nama}: ${selector} ${JSON.stringify(a)} bertemu ${JSON.stringify(b)}`,
+            ).toBe(true)
+      }
+    await page.screenshot({ path: info.outputPath(`${nama}-aerob.png`) })
+  }
+  await ukur(info.project.name)
+  if (info.project.name === 'desktop') {
+    await page.setViewportSize({ width: 667, height: 375 })
+    await ukur('667')
+    await page.setViewportSize({ width: 1440, height: 900 })
+  }
+  await page.getByRole('button', { name: 'Ada oksigen (aerob)', exact: true }).click()
+  await expect(page.getByRole('button', { name: '3 tahap', exact: true })).toBeVisible({
+    timeout: 15000,
+  })
+  await expect(page.locator('[data-gelembung]')).toContainText('Ada berapa tahap utama')
+  await expect(page.locator('[data-carbon]')).toHaveCount(6)
+  await page.getByRole('button', { name: 'Jeda (spasi)' }).click()
+  await page.screenshot({ path: info.outputPath('pertanyaan-tahap.png') })
+  await page.getByRole('button', { name: 'Lanjut (spasi)' }).click()
+  if (info.project.name === 'desktop')
+    await page.evaluate(async () => {
+      const { usePengaturan } = await import('/src/' + 'stores/pengaturan.ts')
+      usePengaturan.setState({ suaraAktif: true, efek: true, musik: false, narasi: false })
+    })
+  await page.getByRole('button', { name: '3 tahap', exact: true }).click()
+  await expect(page.locator('[data-ikhtisar-tahap]')).toHaveCount(3)
+  await expect(page.locator('[data-ikhtisar-tahap="3"]')).toHaveCSS('opacity', '1')
+  await expect(page.locator('[data-carbon]')).toHaveCount(6)
+  await page.getByRole('button', { name: 'Jeda (spasi)' }).click()
+  await expect(page.locator('[data-gelembung]')).toContainText('Tiga tahap utama')
+  if (info.project.name === 'desktop') {
+    await expect
+      .poll(() => page.evaluate(() => (window as unknown as { jumlahBunyi: number }).jumlahBunyi))
+      .toBe(4)
+    await page.setViewportSize({ width: 667, height: 375 })
+    await page.screenshot({ path: info.outputPath('667-tiga-tahap.png') })
+    await page.setViewportSize({ width: 1440, height: 900 })
+  }
+  await page.screenshot({ path: info.outputPath('ikhtisar-tiga-tahap.png') })
+  await page.getByRole('button', { name: 'Lanjut (spasi)' }).click()
+  await expect(page.locator('#poe-tebak-judul')).toHaveText(POE.c.judul, { timeout: 15000 })
+  await expect(page.locator('[data-ikhtisar-tahap]')).toHaveCount(0)
+  expect(gagal).toEqual([])
+  await expect(page.locator('[data-carbon]')).toHaveCount(6)
+})
