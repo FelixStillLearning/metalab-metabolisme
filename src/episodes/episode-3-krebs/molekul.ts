@@ -6,15 +6,15 @@ import { obj, to, type Panggung } from '../../features/pemutar-episode/mesin'
 
 export const posisi = (i: number): [number, number] => {
   const a = -Math.PI / 2 + (i * Math.PI) / 4
-  return [500 + Math.cos(a) * 210, 480 + Math.sin(a) * 210]
+  return [500 + Math.cos(a) * 189, 480 + Math.sin(a) * 189]
 }
 export function rodaKrebs(p: Panggung) {
   const g = obj(500, 480, p.world)
   g.dataset.objek = 'roda-krebs'
-  el('image', { href: roda, x: -280, y: -280, width: 560, height: 560 }, g)
+  el('image', { href: roda, x: -252, y: -252, width: 504, height: 504 }, g)
   const sorot = el(
     'circle',
-    { cx: 0, cy: -210, r: 50, fill: 'none', stroke: 'var(--color-accent)', 'stroke-width': 9 },
+    { cx: 0, cy: -189, r: 50, fill: 'none', stroke: 'var(--color-accent)', 'stroke-width': 9 },
     g,
   )
   return {
@@ -186,12 +186,12 @@ export function rangka(p: Panggung, n: number, nama: string, x = 500, y = 485) {
   }
   namaBaru(nama, 0)
   sambung(atom.slice(1).map((_, i) => [i, i + 1]))
-  return { g, atom, ikatan, susun }
+  return { g, atom, ikatan, susun, judul, hitung }
 }
 export async function lepasCo2(p: Panggung, m: ReturnType<typeof rangka>, tahap: number) {
   const c = m.atom.pop()!
   p.world.append(c)
-  await to(c, { x: m.g._x + c._x, y: m.g._y + c._y }, 0)
+  await to(c, { x: m.g._x + c._x * m.g._s, y: m.g._y + c._y * m.g._s, s: m.g._s }, 0)
   c.dataset.molecule = 'co2'
   c.dataset.tahap = String(tahap)
   for (const y of [-32, 32])
@@ -201,3 +201,13 @@ export async function lepasCo2(p: Panggung, m: ReturnType<typeof rangka>, tahap:
 }
 export type Rangka = ReturnType<typeof rangka>
 export type Roda = ReturnType<typeof rodaKrebs>
+
+export function asetilKertas(p: Panggung, x: number, y: number) {
+  const m = rangka(p, 2, 'Asetil KoA', x, y)
+  strip(m.ikatan, 25, 12, 90, 12, 8)
+  gambar(m.g, koa, 130, 12, 110, 55)
+  m.judul.remove()
+  m.hitung.remove()
+  const judul = label(m.g, 0, 130, 'Asetil KoA · 2 C', 24)
+  return { ...m, judul }
+}

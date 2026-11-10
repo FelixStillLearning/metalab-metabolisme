@@ -12,7 +12,7 @@ export default function Episode3Krebs() {
     <div className="episode-3">
       <PemutarEpisode
         judul="Siklus Krebs"
-        label="Episode 3 · Aktivitas 1.9"
+        label="Episode 3"
         ringkasan="Putar roda delapan tahap di matriks mitokondria. Hitung karbon, tempatkan zat pada tahapnya, dan bandingkan hasil per putaran dengan hasil per glukosa."
         gambarSampul={mitokondria}
         bab={[...BAB]}
