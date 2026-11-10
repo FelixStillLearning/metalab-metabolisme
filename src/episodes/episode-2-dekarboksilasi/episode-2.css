@@ -9,8 +9,11 @@
   font: 700 max(14px, 1.3cqw) / 1 var(--font-body);
 }
 .episode-2 .tok-zat[aria-pressed='true'] {
-  border-style: solid;
-  background: var(--color-accent);
+  width: max(52px, 7cqw);
+  height: max(30px, 2.7cqw);
+  padding: 0;
+  border: 0;
+  background: none;
 }
 .episode-2 .tok-zat span {
   display: block;
