@@ -8,6 +8,12 @@
   color: var(--color-ink);
   font: 700 max(14px, 1.3cqw) / 1 var(--font-body);
 }
+.episode-2 .pemutar-sampul-dekorasi-kanan {
+  top: 3%;
+  right: 3%;
+  width: 15%;
+  transform: rotate(10deg);
+}
 .episode-2 .tok-zat[aria-pressed='true'] {
   width: max(52px, 7cqw);
   height: max(30px, 2.7cqw);
