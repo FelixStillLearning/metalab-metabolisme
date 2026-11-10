@@ -10,7 +10,7 @@ import { useSiswa } from '../../stores/siswa'
 import { tenangAktif } from '../../stores/pengaturan'
 import './lembar-hasil.css'
 
-// Tebakan POE sebelum menonton lawan yang terjadi; tidak dinilai
+// Tebakan POE sebelum menonton dibandingkan dengan yang terjadi.
 export type PasanganPoe = {
   k: string
   q: string
@@ -32,7 +32,13 @@ type Props = {
   cetak: {
     judul: string
     jawaban: { k: string; bagian: string; isi: string }[]
-    poe: { k: string; tebakan: number | string; awal: string; akhir: string }[]
+    poe: {
+      k: string
+      tebakan: number | string
+      nyata: number | string
+      awal: string
+      akhir: string
+    }[]
     tabel?: ReactNode
   }
   rute: { episode: string; lanjut: string }
@@ -105,7 +111,7 @@ function LembarHasil({
         <div className="hasil-sisi">
           {poe.length > 0 && (
             <section>
-              <h2>Tebakanmu sebelum menonton (tidak dinilai)</h2>
+              <h2>Tebakanmu sebelum menonton</h2>
               {poe.map(({ k, q, tebakan, nyata, alasan }) => {
                 const sama = tebakan === nyata
                 return (
@@ -114,8 +120,9 @@ function LembarHasil({
                       Soal {k} · {q}
                     </span>
                     <span className={`n guess${sama ? ' same' : ''}`}>
+                      <span aria-label={sama ? 'Benar' : 'Belum tepat'}>{sama ? '✓ ' : '× '}</span>
                       {sama ? tebakan : <s>{tebakan}</s>}
-                      <small>tebakanmu</small>
+                      <small>{sama ? 'tebakanmu · benar' : 'tebakanmu · belum tepat'}</small>
                     </span>
                     {!sama && (
                       <>
@@ -123,8 +130,9 @@ function LembarHasil({
                           →
                         </span>
                         <span className="n real">
+                          <span aria-label="Benar">✓ </span>
                           {nyata}
-                          <small>yang terjadi</small>
+                          <small>jawaban benar</small>
                         </span>
                       </>
                     )}
@@ -215,27 +223,27 @@ function LembarHasil({
         {cetak.tabel}
         {cetak.poe.length > 0 && (
           <>
-            <h3>Catatan POE (tidak dinilai)</h3>
+            <h3>Catatan POE</h3>
             <table>
               <colgroup>
                 <col style={{ width: '8%' }} />
-                <col style={{ width: '12%' }} />
-                <col style={{ width: '40%' }} />
+                <col style={{ width: '28%' }} />
+                <col style={{ width: '32%' }} />
                 <col />
               </colgroup>
               <thead>
                 <tr>
                   <th>Soal</th>
-                  <th>Tebakan</th>
+                  <th>Tebakan → jawaban benar</th>
                   <th>Alasan awal</th>
                   <th>Alasan setelah menonton</th>
                 </tr>
               </thead>
               <tbody>
-                {cetak.poe.map(({ k, tebakan, awal, akhir }) => (
+                {cetak.poe.map(({ k, tebakan, nyata, awal, akhir }) => (
                   <tr key={k}>
                     <td>{k}</td>
-                    <td>{tebakan}</td>
+                    <td>{tebakan === nyata ? `✓ ${tebakan}` : `× ${tebakan} → ✓ ${nyata}`}</td>
                     <td>{awal}</td>
                     <td>{akhir}</td>
                   </tr>

@@ -137,6 +137,7 @@ export default function HasilEpisode2() {
         poe: poe.map(({ k, isi, p }) => ({
           k,
           tebakan: isi.zat[p.tebakan],
+          nyata: isi.zat[0],
           awal: isi.alasan[p.alasan],
           akhir: isi.alasan[p.penjelasan!],
         })),

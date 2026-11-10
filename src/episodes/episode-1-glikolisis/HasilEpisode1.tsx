@@ -251,6 +251,7 @@ function HasilEpisode1() {
         poe: daftarPoe.map(({ k, alasan, p }) => ({
           k,
           tebakan: p!.tebakan,
+          nyata: 2,
           awal: alasan[p!.alasan],
           akhir: alasan[p!.penjelasan ?? 1],
         })),
