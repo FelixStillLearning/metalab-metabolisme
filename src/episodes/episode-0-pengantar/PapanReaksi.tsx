@@ -1,3 +1,8 @@
+import { useRef } from 'react'
+import { useGSAP } from '@gsap/react'
+import { gsap } from 'gsap'
+import { durasi } from '../../features/pemutar-episode/mesin'
+import { tenangAktif, usePengaturan } from '../../stores/pengaturan'
 import foto from '../../assets/images/molekul-reaksi-fotosintesis.webp'
 import respirasi from '../../assets/images/molekul-reaksi-respirasi.webp'
 import cahaya from '../../assets/images/energi-cahaya.webp'
@@ -25,7 +30,54 @@ const POTONGAN = {
 
 export default function PapanReaksi() {
   const { soal, terjawab } = useAdeganE0()
-  if (soal < 0 || soal >= 6) return null
+  const papan = useRef<HTMLElement>(null)
+  const tenang = usePengaturan((s) => s.tenang)
+  const reaksiAktif = soal < 0 || soal >= 6 ? null : soal < 3 ? 'a' : 'b'
+  useGSAP(
+    () => {
+      if (!papan.current || tenangAktif()) return
+      const molekul = papan.current.querySelectorAll('.e0-molekul')
+      const gerak = gsap.from(molekul, {
+        y: 18,
+        rotation: -4,
+        opacity: 0,
+        stagger: durasi(100) / 1000,
+        duration: durasi(550) / 1000,
+        ease: 'back.out(1.3)',
+      })
+      return () => {
+        gerak.revert()
+      }
+    },
+    { scope: papan, dependencies: [reaksiAktif, tenang], revertOnUpdate: true },
+  )
+  useGSAP(
+    () => {
+      if (!papan.current || !terjawab || tenangAktif()) return
+      const isian = ['nama', 'energi', 'perubahan'][soal % 3]
+      const teks = gsap.from(papan.current.querySelectorAll(`[data-isian="${isian}"] b`), {
+        opacity: 0.3,
+        duration: durasi(420) / 1000,
+        ease: 'power2.out',
+      })
+      const energi =
+        isian === 'energi'
+          ? gsap.from(papan.current.querySelectorAll('.e0-isian-energi img'), {
+              y: reaksiAktif === 'a' ? -18 : 18,
+              scale: 0.7,
+              rotation: -12,
+              duration: durasi(550) / 1000,
+              ease: 'back.out(1.5)',
+            })
+          : null
+      return () => {
+        teks.revert()
+        energi?.revert()
+      }
+    },
+    { scope: papan, dependencies: [soal, terjawab, tenang], revertOnUpdate: true },
+  )
+  if (reaksiAktif === null) return null
   const a = soal < 3,
     k = a ? 'a' : 'b',
     r = reaksi[k],
@@ -78,6 +130,7 @@ export default function PapanReaksi() {
   )
   return (
     <section
+      ref={papan}
       className="e0-reaksi"
       aria-label={`Reaksi (${k})`}
       data-reaksi={k}
