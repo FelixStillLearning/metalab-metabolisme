@@ -181,8 +181,19 @@ test('menutup pengaturan setelah HP diputar tetap menjeda episode', async ({ pag
   await mulai(page)
   await expect(gelembung(page)).toHaveText(KALIMAT_1)
   await page.getByRole('button', { name: 'Pengaturan', exact: true }).click()
+  // Overlay CSS dapat terlihat sebelum event orientasi diproses pemutar.
+  await page.evaluate(() => {
+    matchMedia('(orientation: portrait) and (max-width: 760px)').addEventListener(
+      'change',
+      () => {
+        document.documentElement.dataset.tegakDiproses = 'true'
+      },
+      { once: true },
+    )
+  })
   await page.setViewportSize({ width: 360, height: 800 })
   await expect(page.getByRole('heading', { name: 'Putar HP-mu' })).toBeVisible()
+  await expect(page.locator('html')).toHaveAttribute('data-tegak-diproses', 'true')
   await page.setViewportSize({ width: 800, height: 360 })
   await page.getByRole('button', { name: 'Tutup pengaturan' }).click()
   await expect(page.getByRole('button', { name: 'Lanjut (spasi)' })).toBeVisible()

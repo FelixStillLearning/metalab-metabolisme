@@ -147,7 +147,7 @@ test('suara episode dimuat tanpa berkas yang hilang', async ({ page }) => {
   await tombolMulai(page).click()
   await expect(sitosol(page)).toHaveCSS('opacity', '1', { timeout: 15000 })
   expect(audio.some((u) => /audio\/musik-latar\.(ogg|mp3)$/.test(u))).toBe(true)
-  expect(audio.some((u) => /audio\/melesat\.(ogg|mp3)$/.test(u))).toBe(true)
+  expect(audio.some((u) => /audio\/geser\.(ogg|mp3)$/.test(u))).toBe(true)
   // Glukosa yang dipilih di soal a membesar dengan POP episode
   await page
     .getByRole('button', { name: 'Glukosa (6 atom C)', exact: true })
