@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from 'react-router'
-import ikon from '../../assets/images/episode-0.webp'
+import ikon from '../../assets/images/sampul-pengantar.webp'
 import PemutarEpisode from '../../features/pemutar-episode/PemutarEpisode'
 import { useAdeganE0, jalankanEpisode0 } from './adegan'
 import { usePilah } from './pilah'

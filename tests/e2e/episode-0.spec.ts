@@ -227,3 +227,26 @@ test('HP 667×375: atom bebas overlap, drag luar zona, jeda dan tombol keyboard'
   await page.getByRole('link', { name: 'Buka Glikolisis' }).click()
   await expect(page.locator('[data-petunjuk]')).toHaveCount(0)
 })
+
+test('sampul memakai ilustrasi tajam dan dekorasi utuh di dalam panggung', async ({
+  page,
+}, info) => {
+  test.skip(info.project.name === 'hp-tegak', 'HP tegak menampilkan ajakan putar')
+  await siapkan(page)
+  await page.goto('/#/episode/0')
+  const gambar = page.locator('.pemutar-sampul-gambar img')
+  await expect(gambar).toBeVisible()
+  await expect
+    .poll(() => gambar.evaluate((n) => (n as HTMLImageElement).naturalWidth))
+    .toBeGreaterThanOrEqual(1200)
+  if (info.project.name === 'desktop') {
+    await page.evaluate(() => Promise.all(document.getAnimations().map((a) => a.finished)))
+    const panggung = (await page.locator('[data-panggung]').boundingBox())!
+    const dekorasi = (await page.locator('.pemutar-sampul-dekorasi-kanan').boundingBox())!
+    expect(dekorasi.x).toBeGreaterThanOrEqual(panggung.x)
+    expect(dekorasi.y).toBeGreaterThanOrEqual(panggung.y)
+    expect(dekorasi.x + dekorasi.width).toBeLessThanOrEqual(panggung.x + panggung.width)
+    expect(dekorasi.y + dekorasi.height).toBeLessThanOrEqual(panggung.y + panggung.height)
+  }
+  await page.screenshot({ path: info.outputPath('sampul-tajam.png') })
+})
