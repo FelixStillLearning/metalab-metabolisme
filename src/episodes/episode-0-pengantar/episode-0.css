@@ -843,10 +843,6 @@
     min-height: 44px;
     padding: 8px 18px;
   }
-  .episode-0 .pemutar-panggung:has(.e0-pilah) .pemutar-narator {
-    --maskot: 100px;
-    width: 28%;
-  }
 }
 @media (max-height: 500px) and (orientation: landscape) {
   .e0-kartu-ciri:not([data-aktif]),
