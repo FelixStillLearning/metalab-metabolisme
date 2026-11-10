@@ -1,5 +1,6 @@
 import matriks from '../../assets/images/latar-matriks-lebar.webp'
 import mitokondria from '../../assets/images/mitokondria-zoom.webp'
+import panelZoom from '../../assets/images/organel-panel-zoom.webp'
 import gambarCo2 from '../../assets/images/molekul-co2.webp'
 import gambarO2 from '../../assets/images/molekul-o2.webp'
 import gambarKoenzimA from '../../assets/images/molekul-koa.webp'
@@ -86,7 +87,7 @@ function jalur(p: Panggung, dari: string, tujuan: string, x1: number, x2: number
 async function pembuka(p: Panggung) {
   const mito = gambar(p.world, mitokondria, 800, 450, 1200, 600)
   mito.dataset.objek = 'mitokondria-zoom'
-  label(mito, -32, -56, 'Matriks mitokondria', 24)
+  label(mito, 0, -320, 'Matriks mitokondria', 24)
   bunyi('muncul')
   await to(hide(mito), { o: 1 }, 600)
   const masuk = [piruvat(p, -180, 360), piruvat(p, -180, 540)]
@@ -105,12 +106,24 @@ async function pembuka(p: Panggung) {
     m.karboksil.remove()
   })
   p.fx.replaceChildren()
+  const matriksX = 800 + ((840 - 887) * 1200) / 1774
+  const matriksY = 450 + ((360 - 443.5) * 600) / 887
+  const panel = hide(gambar(p.fx, panelZoom, matriksX, matriksY, 440, 440))
+  panel.dataset.objek = 'panel-zoom'
+  bunyi('muncul')
+  await to(panel, { o: 1 }, 300)
   bunyi('geser')
   // Jangkar matriks sumber C04: (840, 360) pada gambar bersih 1774 × 887.
-  await camTo(p, 800 + ((840 - 887) * 1200) / 1774, 450 + ((360 - 443.5) * 600) / 887, 4.2, 1800)
+  await Promise.all([
+    to(panel, { x: 800, y: 450, s: 4.9 }, 1800, 'kamera'),
+    camTo(p, matriksX, matriksY, 4.2, 1800),
+    to(mito, { o: 0.25 }, 1800),
+  ])
   await pasangLatar(p, matriks, 'matriks')
   mito.remove()
   await to(p.cam, { x: 0, y: 0, s: 1 }, 0)
+  await to(panel, { o: 0 }, 600)
+  panel.remove()
   const tempat = label(p.latar, 800, 160, 'MATRIKS MITOKONDRIA · AEROB', 24)
   tempat.dataset.objek = 'label-matriks'
 }
