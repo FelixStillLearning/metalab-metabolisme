@@ -324,16 +324,16 @@ async function lepas(p: Panggung, molekul: Piruvat[]) {
     await Promise.all(molekul.map((m, i) => tempatkan(m, 430, 330 + i * 200)))
     await camTo(p, 650, 420, 1.25, 900)
     bunyi('kertas-getar')
+    molekul.forEach((m) => m.ikatan.setAttribute('fill', 'var(--color-hot)'))
     await Promise.all([
-      comic(p, 'DRRRT', 640, 300, 'var(--color-hot)', p.world),
-      ...molekul.map((m) => shake(p, m.karboksil, 2, 480)),
+      comic(p, 'DRRRT', 650, 300, 'var(--color-hot)', p.world),
+      ...molekul.map((m) => shake(p, m.karboksil, 3.4, 720)),
     ])
     bunyi('kertas-lepas')
-    const retak = comic(p, 'LEPAS!', 800, 220, 'var(--color-hot)', p.fx)
     panduan.querySelector('[data-judul-jalur="asal"]')?.remove()
     label(panduan, 430, 270, 'Gugus asetil · 2 C', 22)
     for (const m of molekul) {
-      burstBehind(p, m.karboksil, 200)
+      burstBehind(p, m.karboksil, 300)
       hapusBentuk(m.ikatan)
       m.karboksil.dataset.molecule = 'co2'
       m.nama.remove()
@@ -342,9 +342,12 @@ async function lepas(p: Panggung, molekul: Piruvat[]) {
     }
     p.world.prepend(...p.world.querySelectorAll<SVGGElement>('[data-effect="split-burst"]'))
     await Promise.all([
-      retak,
+      comic(p, 'KRAAK!', 650, 200, 'var(--color-hot)', p.fx),
       say(p, 'lepas'),
-      ...molekul.map((m, i) => arc(m.karboksil, 850, 320 + i * 200, 100, 1100)),
+      ...molekul.map((m, i) => {
+        speedLines(p, m.karboksil, 1)
+        return arc(m.karboksil, 850, 320 + i * 200, 130, 850)
+      }),
     ])
     if (pilihan === 2) await say(p, 'energi')
     if (pilihan === 1) await say(p, 'oksigen')
@@ -399,6 +402,7 @@ async function oksidasi(p: Panggung, molekul: Piruvat[]) {
         nadh.forEach((n) => relabel(n, 'NADH'))
         await Promise.all([
           comic(p, 'NADH!', 800, 220, 'var(--color-nad)', p.fx),
+          ...nadh.map((n) => shake(p, n, 2.4, 360)),
           ...elektronKeluar.flat().map((e) => to(e, { o: 0 }, 200)),
         ])
         elektronKeluar.flat().forEach((e) => e.remove())
@@ -439,7 +443,10 @@ async function ikat(p: Panggung, molekul: Piruvat[]) {
       await arc(k, m.asetil._x + 110, m.asetil._y, 110, 850)
       strip(m.asetil, 0, -12, 55, 0, 8, 'var(--color-paper)')
       bunyi('kertas-kait')
-      await comic(p, 'KLIK!', m.asetil._x + 110, m.asetil._y - 95, 'var(--color-paper)', p.world)
+      await Promise.all([
+        comic(p, 'KLIK!', m.asetil._x + 110, m.asetil._y - 95, 'var(--color-paper)', p.world),
+        shake(p, m.asetil, 2.2, 360),
+      ])
       m.asetil.dataset.molecule = 'asetil-koa'
       m.nama.remove()
       m.nama = label(m.asetil, 20, 92, 'Asetil KoA · 2 C', 20)
