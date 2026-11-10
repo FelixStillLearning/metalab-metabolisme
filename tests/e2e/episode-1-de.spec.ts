@@ -50,6 +50,10 @@ async function soalD(page: Page) {
   await expect(tempat).toBeVisible()
   const k = (await tempat.boundingBox())!
   const panggung = (await page.locator('[data-panggung]').boundingBox())!
+  if (test.info().project.name === 'desktop') {
+    expect(Math.abs(k.x + k.width / 2 - (panggung.x + panggung.width / 2))).toBeLessThan(2)
+    expect(k.y).toBeLessThan(panggung.y + panggung.height * 0.12)
+  }
   expect(k.x).toBeGreaterThanOrEqual(panggung.x)
   expect(k.x + k.width).toBeLessThanOrEqual(panggung.x + panggung.width)
   expect(k.y).toBeGreaterThanOrEqual(panggung.y)

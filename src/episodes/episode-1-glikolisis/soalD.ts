@@ -37,18 +37,21 @@ export async function soalD(p: Panggung, [m1, m2]: [Separuh, Separuh]) {
     ph.label?.remove()
     ph.label = label(ph, ph.side * 75, 138, 'PGAL · 3 C', 20)
   }
-  // Label tetap di ruang kanan atas selama kamera mendekat, termasuk di HP miring.
-  const tempat = p.world.querySelector<Objek>('[data-objek="label-sitosol"]')!
-  tempat.style.display = 'inline'
+  const tempat = p.svg.querySelector<Objek>('[data-objek="label-sitosol"]')!
+  const hp = matchMedia('(max-height: 500px) and (orientation: landscape)').matches
   // Desktop lebih ke kiri; di HP atom C tetap di luar popup petunjuk.
-  const geser = matchMedia('(max-height: 500px) and (orientation: landscape)').matches ? 0 : 160
+  const geser = hp ? 0 : 160
   bunyi('geser')
   await Promise.all([
     camTo(p, 1000, 460, 1.15, 1100),
-    to(tempat, { x: 1270, y: 125 }, 1100),
     to(m1, { x: 1155 - geser }, 1100),
     to(m2, { x: 1005 - geser }, 1100),
   ])
+  if (hp) {
+    const [x, y] = keLayar(p, 1270, 125)
+    await to(tempat, { x, y }, 0)
+    tempat.style.display = 'inline'
+  }
   await say(p, 'e1-d-01')
 
   // Dua elektron per PGAL, di samping PGAL atas (y 270) dan bawah (y 540)
@@ -178,9 +181,9 @@ export async function soalD(p: Panggung, [m1, m2]: [Separuh, Separuh]) {
     to(r1, { x: 1130, y: 360 }, 1200),
     to(r2, { x: 1130, y: 560 }, 1200),
     camTo(p, 800, 450, 1, 1200),
-    to(tempat, { x: 800, y: 80 }, 1200),
   ])
   tempat.style.removeProperty('display')
+  await to(tempat, { x: 800, y: 80 }, 0)
 
   useJawaban
     .getState()

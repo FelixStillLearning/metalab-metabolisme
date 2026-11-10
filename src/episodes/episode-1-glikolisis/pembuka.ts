@@ -79,7 +79,9 @@ export async function pembuka(p: Panggung) {
   await pasangLatar(p, gambarLatar, 'sitosol')
   p.world.replaceChildren()
   await to(p.cam, { x: 0, y: 0, s: 1 }, 0)
-  const tempat = obj(800, 80, p.world)
+  // Label lokasi tetap di layar, terpisah dari kamera dan efek yang dibersihkan tiap tahap.
+  const tempat = obj(800, 80, p.svg)
+  p.signal.addEventListener('abort', () => tempat.remove(), { once: true })
   tempat.dataset.objek = 'label-sitosol'
   teks(tempat, 0, 0, 'SITOSOL · TANPA OKSIGEN', 26, 'var(--color-paper)')
   await to(panel, { o: 0 }, 600)
