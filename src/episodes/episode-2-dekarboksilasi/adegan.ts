@@ -141,9 +141,9 @@ function konteksAerob(p: Panggung) {
   )
   gambar(isi, gambarO2, -170, -30, 130, 65)
   teks(isi, 60, -55, 'Respirasi aerob', 28, 'var(--color-ink)')
-  teks(isi, 60, -10, 'O₂ dipakai pada', 24, 'var(--color-ink)')
-  teks(isi, 60, 25, 'transpor elektron', 24, 'var(--color-ink)')
-  teks(isi, 0, 85, 'Tidak dikonsumsi langsung di sini.', 24, 'var(--color-ink)')
+  teks(isi, 60, -10, 'O₂ dipakai nanti:', 24, 'var(--color-ink)')
+  teks(isi, 60, 25, 'di transpor elektron', 24, 'var(--color-ink)')
+  teks(isi, 0, 85, 'Piruvat → asetil KoA belum memakai O₂.', 22, 'var(--color-ink)')
   return g
 }
 

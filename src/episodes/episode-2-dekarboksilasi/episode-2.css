@@ -39,6 +39,9 @@
 .episode-2 .poe-steps {
   top: 5%;
 }
+.episode-2 [data-objek='jumlah-piruvat'] polygon:not([data-bayangan]) {
+  fill: var(--color-accent);
+}
 @media (max-width: 760px), (max-height: 500px) {
   .e2-bagan {
     overflow: visible;
