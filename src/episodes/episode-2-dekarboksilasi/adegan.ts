@@ -57,9 +57,9 @@ function jalur(p: Panggung, dari: string, tujuan: string, x1: number, x2: number
       'rect',
       {
         x: x - 180,
-        y: 300,
+        y: 280,
         width: 360,
-        height: 400,
+        height: 360,
         rx: 18,
         fill: 'none',
         stroke: 'var(--color-paper)',
@@ -124,7 +124,7 @@ async function pembuka(p: Panggung) {
   await to(p.cam, { x: 0, y: 0, s: 1 }, 0)
   await to(panel, { o: 0 }, 350)
   panel.remove()
-  const tempat = label(p.latar, 800, 160, 'MATRIKS MITOKONDRIA · AEROB', 24)
+  const tempat = label(p.latar, 800, 100, 'MATRIKS MITOKONDRIA · AEROB', 24)
   tempat.dataset.objek = 'label-matriks'
 }
 
