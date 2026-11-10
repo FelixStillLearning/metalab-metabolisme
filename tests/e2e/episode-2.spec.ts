@@ -55,6 +55,25 @@ test('E2 alur penuh, dua POE, karbon, hasil/cetak, data terpisah dan replay', as
     if (r.status() === 404) galat.push(r.url())
   })
   page.on('pageerror', (e) => galat.push(e.message))
+  await page.addInitScript(() => {
+    const w = window as unknown as { gerak: { kata: string[]; elektron: number; zoom: boolean } }
+    w.gerak = { kata: [], elektron: 0, zoom: false }
+    new MutationObserver(() => {
+      for (const n of document.querySelectorAll<HTMLElement>('[data-word]'))
+        if (!w.gerak.kata.includes(n.dataset.word!)) w.gerak.kata.push(n.dataset.word!)
+      w.gerak.elektron = Math.max(
+        w.gerak.elektron,
+        document.querySelectorAll('[data-electron]').length,
+      )
+      const kamera = document.querySelector('[data-jalur-reaksi]')?.parentElement?.parentElement
+      if (kamera && new DOMMatrix(getComputedStyle(kamera).transform).a > 1.05) w.gerak.zoom = true
+    }).observe(document, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['data-word', 'style', 'transform'],
+    })
+  })
   await mulai(page)
   await expect(page.locator('#poe-tebak-judul')).toHaveText(POE.c.judul, { timeout: 20000 })
   await expect(page.locator('[data-carbon]')).toHaveCount(6)
@@ -62,6 +81,24 @@ test('E2 alur penuh, dua POE, karbon, hasil/cetak, data terpisah dan replay', as
   await latarMemenuhiLayar(page, 'matriks')
   await page.screenshot({ path: info.outputPath('karboksil-tebak.png') })
   await tebak(page, 'c', 2)
+  await page.waitForFunction(() => document.querySelector('[data-word="LEPAS!"]'), null, {
+    polling: 'raf',
+  })
+  await page.getByRole('button', { name: 'Jeda (spasi)' }).click()
+  await expect(page.locator('[data-effect="split-burst"]')).toHaveCount(2)
+  expect(
+    await page
+      .locator('[data-effect="split-burst"]')
+      .evaluateAll((bs) =>
+        bs.every((b) =>
+          [...document.querySelectorAll('[data-carbon]')].every(
+            (c) => !!(b.compareDocumentPosition(c) & Node.DOCUMENT_POSITION_FOLLOWING),
+          ),
+        ),
+      ),
+  ).toBe(true)
+  await page.screenshot({ path: info.outputPath('reaksi-karboksil.png') })
+  await page.getByRole('button', { name: 'Lanjut (spasi)' }).click()
   await expect(page.locator('#poe-explain-judul')).toBeVisible({ timeout: 25000 })
   await expect(page.locator('.poe-verdict').first()).toContainText('energi belum tepat')
   for (const m of await page.locator('[data-molecule="co2"]').all()) {
@@ -70,6 +107,24 @@ test('E2 alur penuh, dua POE, karbon, hasil/cetak, data terpisah dan replay', as
   }
   await jelaskan(page, 'c')
   await tebak(page, 'b·2', 1, true)
+  await page.waitForFunction(() => document.querySelector('[data-word="NADH!"]'), null, {
+    polling: 'raf',
+  })
+  await page.getByRole('button', { name: 'Jeda (spasi)' }).click()
+  for (const n of await page.locator('[data-carrier="NADH"]').all()) {
+    const a = (await n.boundingBox())!
+    for (const t of await page.locator('[data-jalur-reaksi] text').all()) {
+      const b = (await t.boundingBox())!
+      expect(
+        a.x + a.width <= b.x ||
+          b.x + b.width <= a.x ||
+          a.y + a.height <= b.y ||
+          b.y + b.height <= a.y,
+      ).toBe(true)
+    }
+  }
+  await page.screenshot({ path: info.outputPath('reaksi-elektron.png') })
+  await page.getByRole('button', { name: 'Lanjut (spasi)' }).click()
   await expect(page.locator('#poe-explain-judul')).toBeVisible({ timeout: 25000 })
   await expect(page.locator('[data-carrier="NADH"]')).toHaveCount(2)
   await jelaskan(page, 'b·2')
@@ -99,6 +154,8 @@ test('E2 alur penuh, dua POE, karbon, hasil/cetak, data terpisah dan replay', as
     page.getByRole('button', { name: 'Asetil KoA 1, 2 karbon', exact: true }),
   ).toBeVisible({ timeout: 15000 })
   await expect(page.locator('[data-carbon]')).toHaveCount(6)
+  for (const g of await page.locator('[data-molecule="asetil-koa"], [data-molecule="co2"]').all())
+    await expect(g).toHaveCSS('opacity', '1')
   await page.screenshot({ path: info.outputPath('hitung-karbon.png') })
   for (const teks of [
     'Asetil KoA 1, 2 karbon',
@@ -152,6 +209,13 @@ test('E2 alur penuh, dua POE, karbon, hasil/cetak, data terpisah dan replay', as
   expect(await baca()).toEqual(tersimpan)
   for (const key of ['metalab-jawaban', 'metalab-jawaban-e0'])
     expect(await page.evaluate((k) => JSON.parse(localStorage.getItem(k)!), key)).toEqual(LAMA)
+  const gerak = await page.evaluate(
+    () =>
+      (window as unknown as { gerak: { kata: string[]; elektron: number; zoom: boolean } }).gerak,
+  )
+  expect(gerak.kata).toEqual(expect.arrayContaining(['DRRRT', 'LEPAS!', 'NADH!', 'KLIK!', 'WUSH!']))
+  expect(gerak.elektron).toBe(4)
+  expect(gerak.zoom).toBe(true)
   expect(galat).toEqual([])
 })
 

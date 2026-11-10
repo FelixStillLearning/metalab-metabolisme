@@ -16,6 +16,9 @@ export type NamaSuara =
   | 'tepat'
   | 'belum-tepat'
   | 'klik'
+  | 'kertas-getar'
+  | 'kertas-lepas'
+  | 'kertas-kait'
   | 'getar'
   | 'belah'
   | 'atp'
@@ -56,7 +59,7 @@ export function putar(nama: NamaSuara) {
   if (!usePengaturan.getState().suaraAktif) return
   const suara = ambil(nama)
   // Gerak serentak berbagi satu suara agar swish dan tempel tidak menumpuk.
-  if (nama === 'geser' || nama === 'tempel') suara.stop()
+  if (nama === 'geser' || nama === 'tempel' || nama.startsWith('kertas-')) suara.stop()
   suara.play()
 }
 
@@ -74,6 +77,9 @@ export type SlotSuara =
   | 'geser'
   | 'tempel'
   | 'klik'
+  | 'kertas-getar'
+  | 'kertas-lepas'
+  | 'kertas-kait'
   | 'getar'
   | 'belah'
   | 'atp'
@@ -94,6 +100,9 @@ const BERKAS_SLOT: Record<SlotSuara, NamaSuara> = {
   geser: 'geser',
   tempel: 'tempel',
   klik: 'klik',
+  'kertas-getar': 'kertas-getar',
+  'kertas-lepas': 'kertas-lepas',
+  'kertas-kait': 'kertas-kait',
   getar: 'getar',
   belah: 'belah',
   atp: 'atp',

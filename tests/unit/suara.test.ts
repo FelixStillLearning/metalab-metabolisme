@@ -106,15 +106,16 @@ test('musik tidak dimulai saat musik mati atau semua suara bisu', () => {
 })
 
 test('efek gerak dan tempel memakai berkas episode, tidak menumpuk, dan mengikuti efek/bisu', () => {
-  for (const nama of ['geser', 'tempel'] as const) {
+  const efek = ['geser', 'tempel', 'kertas-getar', 'kertas-lepas', 'kertas-kait'] as const
+  for (const nama of efek) {
     bunyi(nama)
     expect(Howl).toHaveBeenLastCalledWith({ src: [`/audio/${nama}.ogg`, `/audio/${nama}.mp3`] })
   }
-  expect(stop).toHaveBeenCalledTimes(2)
-  expect(play).toHaveBeenCalledTimes(2)
+  expect(stop).toHaveBeenCalledTimes(efek.length)
+  expect(play).toHaveBeenCalledTimes(efek.length)
   bunyi('geser')
-  expect(stop).toHaveBeenCalledTimes(3)
-  expect(play).toHaveBeenCalledTimes(3)
+  expect(stop).toHaveBeenCalledTimes(efek.length + 1)
+  expect(play).toHaveBeenCalledTimes(efek.length + 1)
   vi.clearAllMocks()
   usePengaturan.getState().atur('efek', false)
   bunyi('geser')

@@ -39,3 +39,13 @@ Status belum terverifikasi bukan pernyataan bahwa penggunaan pasti dilarang. Cat
 | `tempel`             | Fosfat/elektron menempel dan hasil mendarat                        | Kenney, `pluck_001.wav`, [Interface Sounds](https://kenney.nl/assets/interface-sounds)                        | CC0-1.0 |
 
 Sumber memakai salinan lokal beserta catatan lisensi yang sudah tersedia. Versi episode: durasi maksimal 320 ms (geser) / 160 ms (tempel), mono 44,1 kHz, high-pass 90 Hz, low-pass 6.500 Hz, target −23 LUFS dan −3 dBTP, fade akhir 35 ms. MP3 dikonversi dari OGG dengan libmp3lame kualitas 4. Berkas melesat/klik lama tetap tersedia untuk pemakaian lainnya. Gerakan serentak memakai satu cue; swish dan tempel yang sedang aktif dimulai ulang agar tidak menumpuk. Semua cue mengikuti saklar efek, bisu, dan volume utama.
+
+## Efek kertas Episode 2
+
+| Berkas (OGG dan MP3) | Pemakaian                               | Sumber                                                |
+| -------------------- | --------------------------------------- | ----------------------------------------------------- |
+| `kertas-getar`       | Getaran singkat sebelum karboksil lepas | Sintesis prosedural proyek; tanpa sampel pihak ketiga |
+| `kertas-lepas`       | Pelepasan karboksil sebagai CO₂         | Sintesis prosedural proyek; tanpa sampel pihak ketiga |
+| `kertas-kait`        | Elektron diterima NAD⁺ dan KoA menempel | Sintesis prosedural proyek; tanpa sampel pihak ketiga |
+
+Mono 44,1 kHz; durasi masing-masing sekitar 480, 260, dan 160 ms. Filter 100–6.000 Hz, target −23 LUFS dan −6 dBTP; fade awal/akhir. Tidak mengganti berkas getar, belah, atau tempel episode sebelumnya. Semua mengikuti saklar efek, bisu dan volume utama.

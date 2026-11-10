@@ -12,10 +12,15 @@ import gambarFadh from '../../assets/images/pembawa-fadh2.webp'
 import gambarAdp from '../../assets/images/pembawa-adp.webp'
 import { cut, el, hapusBentuk, label, strip } from '../../features/pemutar-episode/kertas'
 import {
+  arc,
+  burstBehind,
   camTo,
+  comic,
   hide,
   obj,
   pasangLatar,
+  shake,
+  speedLines,
   teks,
   to,
   type Objek,
@@ -43,13 +48,63 @@ function gambar(parent: Element, href: string, x: number, y: number, w: number, 
   return g
 }
 
+function jalur(p: Panggung, dari: string, tujuan: string, x1: number, x2: number) {
+  const g = obj(0, 0, p.world)
+  g.dataset.jalurReaksi = ''
+  for (const x of [x1, x2])
+    el(
+      'rect',
+      {
+        x: x - 180,
+        y: 300,
+        width: 360,
+        height: 400,
+        rx: 18,
+        fill: 'none',
+        stroke: 'var(--color-paper)',
+        'stroke-width': 4,
+        'stroke-dasharray': '10 12',
+      },
+      g,
+    )
+  label(g, x1, 270, dari, 22).dataset.judulJalur = 'asal'
+  label(g, x2, 270, tujuan, 22)
+  el(
+    'path',
+    {
+      d: `M${x1 + 195} 470 H${x2 - 195} m-18 -12 l18 12 -18 12`,
+      fill: 'none',
+      stroke: 'var(--color-paper)',
+      'stroke-width': 6,
+      'stroke-linecap': 'round',
+    },
+    g,
+  )
+  return g
+}
+
 async function pembuka(p: Panggung) {
   const mito = gambar(p.world, mitokondria, 800, 450, 1200, 600)
   mito.dataset.objek = 'mitokondria-zoom'
   label(mito, -32, -56, 'Matriks mitokondria', 24)
   bunyi('muncul')
   await to(hide(mito), { o: 1 }, 600)
+  const masuk = [piruvat(p, -180, 360), piruvat(p, -180, 540)]
+  label(p.fx, 260, 190, 'Dari sitosol', 24)
+  bunyi('geser')
+  await Promise.all(masuk.map((m, i) => tempatkan(m, 700 + i * 180, 360 + i * 80, 0.65, 1400)))
   await say(p, 'pembuka', '01-ramah')
+  await Promise.all(
+    masuk.flatMap((m) => [
+      to(m.asetil, { o: 0, s: 0.15 }, 450),
+      to(m.karboksil, { o: 0, s: 0.15 }, 450),
+    ]),
+  )
+  masuk.forEach((m) => {
+    m.asetil.remove()
+    m.karboksil.remove()
+  })
+  p.fx.replaceChildren()
   bunyi('geser')
   // Jangkar matriks sumber C04: (840, 360) pada gambar bersih 1774 × 887.
   await camTo(p, 800 + ((840 - 887) * 1200) / 1774, 450 + ((360 - 443.5) * 600) / 887, 4.2, 1800)
@@ -215,6 +270,8 @@ async function poe(p: Panggung, k: PoeE2, amati: (pilihan: number) => Promise<vo
     reasons: isi.alasan,
     right: 0,
     zat: isi.zat.map((teks, i) => ({
+      shake,
+      speedLines,
       teks,
       gambar: (k === 'c' ? [gambarCo2, gambarO2] : [gambarNad, gambarFad, gambarAdp])[i],
     })),
@@ -258,68 +315,119 @@ async function poe(p: Panggung, k: PoeE2, amati: (pilihan: number) => Promise<vo
 
 async function lepas(p: Panggung, molekul: Piruvat[]) {
   usePemutar.setState({ bab: 2 })
+  const panduan = hide(jalur(p, 'Piruvat · 3 C', 'Karbon yang keluar', 430, 850))
   label(p.fx, 450, 210, '1 · Lepas karboksil', 24).dataset.objek = 'judul-tahap'
   await say(p, 'karboksil', '04-penasaran')
   await poe(p, 'c', async (pilihan) => {
-    bunyi('belah')
+    p.fx.replaceChildren()
+    await to(panduan, { o: 1 }, 300)
+    await Promise.all(molekul.map((m, i) => tempatkan(m, 430, 330 + i * 200)))
+    await camTo(p, 650, 420, 1.25, 900)
+    bunyi('kertas-getar')
+    await Promise.all([
+      comic(p, 'DRRRT', 640, 300, 'var(--color-hot)', p.world),
+      ...molekul.map((m) => shake(p, m.karboksil, 2, 480)),
+    ])
+    bunyi('kertas-lepas')
+    const retak = comic(p, 'LEPAS!', 800, 220, 'var(--color-hot)', p.fx)
+    panduan.querySelector('[data-judul-jalur="asal"]')?.remove()
+    label(panduan, 430, 270, 'Gugus asetil · 2 C', 22)
     for (const m of molekul) {
+      burstBehind(p, m.karboksil, 200)
       hapusBentuk(m.ikatan)
       m.karboksil.dataset.molecule = 'co2'
       m.nama.remove()
       m.nama = label(m.asetil, -32, 92, 'Gugus asetil · 2 C', 20)
       label(m.karboksil, 0, 78, 'CO₂ · 1 C', 20)
     }
-    await Promise.all(
-      molekul.map((m, i) => to(m.karboksil, { x: 740, y: 340 + i * 200 }, 1100, 'busur')),
-    )
+    p.world.prepend(...p.world.querySelectorAll<SVGGElement>('[data-effect="split-burst"]'))
+    await Promise.all([
+      retak,
+      say(p, 'lepas'),
+      ...molekul.map((m, i) => arc(m.karboksil, 850, 320 + i * 200, 100, 1100)),
+    ])
     if (pilihan === 2) await say(p, 'energi')
     if (pilihan === 1) await say(p, 'oksigen')
-    await say(p, 'lepas')
+    await camTo(p, 800, 450, 1, 850)
+    await Promise.all(molekul.map((m, i) => to(m.asetil, { x: 400, y: 400 + i * 190 }, 600)))
+    await to(panduan, { o: 0 }, 300)
   })
+  panduan.remove()
   p.fx.replaceChildren()
   bunyi('geser')
-  await Promise.all(molekul.map((m, i) => to(m.karboksil, { x: 1180, y: 310 + i * 160 }, 800)))
+  await Promise.all(molekul.map((m, i) => arc(m.karboksil, 1180, 310 + i * 160, 65, 800)))
 }
 
 async function oksidasi(p: Panggung, molekul: Piruvat[]) {
   usePemutar.setState({ bab: 3 })
+  const panduan = hide(jalur(p, 'Gugus asetil', 'Pembawa elektron', 430, 850))
   label(p.fx, 450, 210, '2 · Oksidasi → NADH', 24).dataset.objek = 'judul-tahap'
   await say(p, 'oksidasi', '04-penasaran')
   const nadh: ReturnType<typeof badge>[] = []
   await poe(p, 'b·2', async (pilihan) => {
-    // Dua elektron per gugus, dibawa satu NAD⁺.
+    p.fx.replaceChildren()
+    await to(panduan, { o: 1 }, 300)
+    await Promise.all(molekul.map((m, i) => to(m.asetil, { x: 430, y: 330 + i * 200 }, 600)))
+    await camTo(p, 700, 420, 1.2, 850)
     const elektronKeluar = molekul.map((m) =>
-      [-1, 1].map((sisi) => elektron(p.world, m.asetil._x + sisi * 22, m.asetil._y - 60)),
+      [-1, 1].map((sisi) => elektron(p.world, m.asetil._x + 100, m.asetil._y + sisi * 18)),
     )
     if (pilihan !== 0) {
       const salah = gambar(p.world, pilihan === 1 ? gambarFad : gambarAdp, 800, 300, 128, 52)
-      await to(salah, { x: 600, y: 310 }, 600)
+      await arc(salah, 650, 310, 60, 600)
       await say(p, pilihan === 1 ? 'fad' : 'adp')
       await to(salah, { o: 0 }, 300)
       salah.remove()
     }
-    nadh.push(...molekul.map((m) => badge(p, 800, m.asetil._y, 'NAD⁺')))
+    await Promise.all([
+      say(p, 'nad'),
+      (async () => {
+        nadh.push(...molekul.map((m) => badge(p, 1050, m.asetil._y, 'NAD⁺')))
+        bunyi('geser')
+        nadh.forEach((n) => speedLines(p, n, -1))
+        await Promise.all([
+          comic(p, 'WUSH!', 800, 220, 'var(--color-paper)', p.fx),
+          ...nadh.map((n, i) => arc(n, 850, molekul[i].asetil._y, 75, 800)),
+        ])
+        bunyi('geser')
+        await Promise.all(
+          elektronKeluar.flatMap((pasangan, i) =>
+            pasangan.map((e, j) => arc(e, nadh[i]._x - 28 + j * 28, nadh[i]._y, -60 - j * 15, 900)),
+          ),
+        )
+        bunyi('kertas-kait')
+        nadh.forEach((n) => relabel(n, 'NADH'))
+        await Promise.all([
+          comic(p, 'NADH!', 800, 220, 'var(--color-nad)', p.fx),
+          ...elektronKeluar.flat().map((e) => to(e, { o: 0 }, 200)),
+        ])
+        elektronKeluar.flat().forEach((e) => e.remove())
+      })(),
+    ])
+    await camTo(p, 800, 450, 1, 850)
     bunyi('geser')
-    await Promise.all(nadh.map((n, i) => to(n, { x: 640, y: molekul[i].asetil._y - 60 }, 700)))
-    await Promise.all(
-      elektronKeluar.flatMap((pasangan, i) =>
-        pasangan.map((e) => to(e, { x: nadh[i]._x, y: nadh[i]._y, o: 0 }, 600)),
-      ),
-    )
-    elektronKeluar.flat().forEach((e) => e.remove())
-    nadh.forEach((n) => relabel(n, 'NADH'))
-    bunyi('tempel')
-    await say(p, 'nad')
-    await Promise.all(nadh.map((n, i) => to(n, { x: 1420, y: 340 + i * 160 }, 700)))
+    await Promise.all([
+      ...nadh.map((n, i) => arc(n, 1420, 340 + i * 160, 70, 850)),
+      ...molekul.map((m, i) => to(m.asetil, { x: 400, y: 400 + i * 190 }, 650)),
+    ])
+    await to(panduan, { o: 0 }, 300)
   })
+  panduan.remove()
   p.fx.replaceChildren()
   return nadh
 }
 
 async function ikat(p: Panggung, molekul: Piruvat[]) {
   usePemutar.setState({ bab: 4 })
+  const panduan = jalur(p, 'Gugus asetil', 'Koenzim A datang', 400, 850)
+  const koas = molekul.map((m) => koa(p, 1750, m.asetil._y))
+  bunyi('geser')
+  koas.forEach((k) => speedLines(p, k, -1))
+  await Promise.all([
+    comic(p, 'WUSH!', 800, 220, 'var(--color-paper)', p.fx),
+    ...koas.map((k, i) => arc(k, 850, molekul[i].asetil._y, 80, 900)),
+  ])
   label(p.fx, 800, 220, '3 · Ikat koenzim A', 26).dataset.objek = 'judul-tahap'
-  const koas = molekul.map((m) => koa(p, 850, m.asetil._y))
   await say(p, 'koa', '08-menunjuk')
   await mintaKetukSemua(
     p.signal,
@@ -328,9 +436,10 @@ async function ikat(p: Panggung, molekul: Piruvat[]) {
     async (i) => {
       const m = molekul[i]
       const k = koas[i]
-      await to(k, { x: m.asetil._x + 110 }, 700)
+      await arc(k, m.asetil._x + 110, m.asetil._y, 110, 850)
       strip(m.asetil, 0, -12, 55, 0, 8, 'var(--color-paper)')
-      bunyi('tempel')
+      bunyi('kertas-kait')
+      await comic(p, 'KLIK!', m.asetil._x + 110, m.asetil._y - 95, 'var(--color-paper)', p.world)
       m.asetil.dataset.molecule = 'asetil-koa'
       m.nama.remove()
       m.nama = label(m.asetil, 20, 92, 'Asetil KoA · 2 C', 20)
@@ -338,14 +447,21 @@ async function ikat(p: Panggung, molekul: Piruvat[]) {
   )
   useJawabanE2.getState().catat('d')
   await say(p, 'terikat')
+  await to(panduan, { o: 0 }, 300)
+  panduan.remove()
   p.fx.replaceChildren()
   return koas
 }
 
 async function hasil(p: Panggung, molekul: Piruvat[], koas: Objek[], nadh: Objek[]) {
   usePemutar.setState({ bab: 5 })
+  bunyi('geser')
+  await Promise.all(
+    [...molekul.flatMap((m) => [m.asetil, m.karboksil]), ...koas, ...nadh].map((g) =>
+      to(g, { o: 0 }, 450),
+    ),
+  )
   for (const g of [...molekul.flatMap((m) => [m.asetil, m.karboksil]), ...koas, ...nadh]) g.remove()
-  await say(p, 'hasil')
   const items = [
     { teks: '2 asetil KoA', gambar: gambarKoa },
     { teks: '2 ATP', gambar: gambarAtp },
@@ -356,8 +472,12 @@ async function hasil(p: Panggung, molekul: Piruvat[], koas: Objek[], nadh: Objek
   const chips = items.map((item, i) => {
     const g = gambar(p.fx, item.gambar, 280 + i * 260, 450, 180, 90)
     label(g, 0, 80, item.teks, 22)
+    hide(g)
     return g
   })
+  bunyi('muncul')
+  await Promise.all(chips.map((g) => to(g, { o: 1 }, 450)))
+  await say(p, 'hasil')
   let got = 0
   await mintaKetukSemua(
     p.signal,
@@ -365,7 +485,7 @@ async function hasil(p: Panggung, molekul: Piruvat[], koas: Objek[], nadh: Objek
     items.map((item, i) => ({ teks: item.teks, posisi: [chips[i]._x, 480], ukuran: [230, 200] })),
     async (i) => {
       const x = 500 + got++ * 300
-      await to(chips[i], { x, y: 300 }, 600)
+      await arc(chips[i], x, 300, 100, 700)
       bunyi('tempel')
     },
     {
@@ -384,9 +504,9 @@ async function hasil(p: Panggung, molekul: Piruvat[], koas: Objek[], nadh: Objek
   p.world.append(...molekul.flatMap((m) => [m.asetil, m.karboksil]), ...koas)
   await Promise.all(
     molekul.flatMap((m, i) => [
-      to(m.asetil, { x: 500, y: 340 + i * 200 }, 600),
-      to(koas[i], { x: 610, y: 340 + i * 200 }, 600),
-      to(m.karboksil, { x: 1000, y: 340 + i * 200 }, 600),
+      to(m.asetil, { x: 500, y: 340 + i * 200, o: 1 }, 600),
+      to(koas[i], { x: 610, y: 340 + i * 200, o: 1 }, 600),
+      to(m.karboksil, { x: 1000, y: 340 + i * 200, o: 1 }, 600),
     ]),
   )
   const counter = label(p.fx, 800, 680, 'Karbon terhitung: 0 dari 6', 28)
@@ -416,7 +536,16 @@ async function hasil(p: Panggung, molekul: Piruvat[], koas: Objek[], nadh: Objek
 }
 
 export async function episode(p: Panggung) {
-  siapkan('geser', 'tempel', 'muncul', 'belah', 'selesai')
+  siapkan(
+    'geser',
+    'tempel',
+    'muncul',
+    'belah',
+    'selesai',
+    'kertas-getar',
+    'kertas-lepas',
+    'kertas-kait',
+  )
   useJawabanE2.getState().mulai()
   await pembuka(p)
   const molekul = await bahan(p)
