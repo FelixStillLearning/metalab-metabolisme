@@ -56,6 +56,9 @@
 .episode-2 .poe-steps {
   top: 5%;
 }
+.episode-2 .pemutar-panggung:has(.poe-steps) [data-objek='label-matriks'] {
+  display: none;
+}
 .episode-2 [data-objek='jumlah-piruvat'] polygon:not([data-bayangan]) {
   fill: var(--color-accent);
 }
