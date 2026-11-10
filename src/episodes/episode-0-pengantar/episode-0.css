@@ -729,7 +729,7 @@
 }
 @media (max-height: 500px) and (orientation: landscape) {
   .episode-0 .pemutar-soal {
-    bottom: 16%;
+    bottom: 14%;
     padding: 8px 14px;
   }
   .episode-0 .pemutar-konfirmasi {
@@ -751,13 +751,9 @@
 
 @media (min-height: 501px) {
   .e0-reaksi {
-    top: 15%;
-  }
-  .e0-reaksi[data-terjawab] {
     top: 22%;
-    transition: top 280ms var(--ease-keluar);
   }
-}
-.episode-0 [data-tenang] .e0-reaksi {
-  transition: none;
+  .episode-0 .pemutar-soal {
+    bottom: 12%;
+  }
 }

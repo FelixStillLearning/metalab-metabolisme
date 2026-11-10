@@ -82,7 +82,6 @@ export default function PapanReaksi() {
       aria-label={`Reaksi (${k})`}
       data-reaksi={k}
       data-butir={soal % 3}
-      data-terjawab={terjawab || undefined}
     >
       <header className="e0-judul-reaksi">
         <span>Reaksi ({k})</span>

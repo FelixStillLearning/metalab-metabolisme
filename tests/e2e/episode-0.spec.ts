@@ -40,6 +40,7 @@ async function siapkan(page: Page, hasil = false) {
 }
 
 async function selesaikan15(page: Page, keyboard = false) {
+  let posisiBagan: number | undefined
   for (const s of SOAL) {
     const kartu = page.getByRole('region', {
       name: `${s.k.replace('1.5', '1.5 ')} · ${s.judul}`,
@@ -47,6 +48,11 @@ async function selesaikan15(page: Page, keyboard = false) {
     })
     const pilihan = kartu.getByRole('button', { name: s.opsi[s.benar], exact: true })
     await expect(pilihan).toBeVisible({ timeout: 20000 })
+    const bagan = (await page.locator('.e0-reaksi').boundingBox())!
+    if (posisiBagan !== undefined) expect(Math.abs(bagan.y - posisiBagan)).toBeLessThan(1)
+    posisiBagan = bagan.y
+    const kotakSoal = (await kartu.boundingBox())!
+    expect(bagan.y + bagan.height).toBeLessThanOrEqual(kotakSoal.y)
     if (s.k === '1.5a' || s.k === '1.5d') {
       await expect(page.locator('.e0-molekul clipPath rect')).toHaveCount(4)
       const kiri = (await page.locator('.e0-zat-sisi').first().boundingBox())!
@@ -318,9 +324,12 @@ test('jawaban mengisi kotak saat narasi pertanyaan masih berjalan dan petunjuk d
   await expect(page.locator('[data-isian="nama"]')).not.toHaveAttribute('data-terisi', 'true')
   await page.getByRole('button', { name: 'Jawab', exact: true }).click()
   await expect(page.locator('[data-isian="nama"]')).toHaveAttribute('data-terisi', 'true')
+  await page
+    .locator('.e0-reaksi')
+    .evaluate((n) => Promise.all(n.getAnimations().map((a) => a.finished)))
   await expect
-    .poll(async () => (await page.locator('.e0-reaksi').boundingBox())!.y)
-    .toBeGreaterThan(posisiAwal + 25)
+    .poll(async () => Math.abs((await page.locator('.e0-reaksi').boundingBox())!.y - posisiAwal))
+    .toBeLessThan(1)
   await page.screenshot({ path: info.outputPath('isian-terisi-di-tengah.png') })
   expect(
     await page.evaluate(() => (window as unknown as { pertanyaanAktif: boolean }).pertanyaanAktif),
