@@ -9,6 +9,8 @@ export function petunjukInteraksi({
   if (petunjuk) return petunjuk
   if (pilihan) {
     if (pilihan.opsi.every((o) => o.selesai)) return ''
+    if (pilihan.konfirmasi)
+      return 'Pilih jawaban, lalu tekan Jawab untuk mengisi kotak yang disorot.'
     return pilihan.opsi[0]?.posisi ? pilihan.judul : 'Pilih salah satu jawaban di kartu.'
   }
   if (lengkapi) return `Pilih jawaban untuk rumpang ${lengkapi.terisi.length + 1}.`

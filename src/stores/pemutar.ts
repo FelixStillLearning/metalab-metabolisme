@@ -13,6 +13,9 @@ export type PoseMaskot =
 
 export type SoalPilihan = {
   judul: string
+  konfirmasi?: boolean
+  memeriksa?: boolean
+  pesan?: string
   // posisi dan ukuran dalam satuan adegan 1600x900; selesai = sasaran ketuk-semua yang sudah diketuk
   opsi: {
     teks: string
@@ -21,7 +24,7 @@ export type SoalPilihan = {
     ukuran?: [number, number]
     selesai?: boolean
   }[]
-  pilih: (index: number) => void
+  pilih: (index: number) => void | Promise<void>
 }
 
 // Lengkapi kalimat: rumpang ke-terisi.length sedang aktif, opsi = pilihan rumpang itu

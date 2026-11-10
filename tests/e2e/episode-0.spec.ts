@@ -47,12 +47,28 @@ async function selesaikan15(page: Page, keyboard = false) {
     })
     const pilihan = kartu.getByRole('button', { name: s.opsi[s.benar], exact: true })
     await expect(pilihan).toBeVisible({ timeout: 20000 })
+    if (s.k === '1.5a' || s.k === '1.5d') {
+      await expect(page.locator('.e0-molekul clipPath rect')).toHaveCount(4)
+      const kiri = (await page.locator('.e0-zat-sisi').first().boundingBox())!
+      const kanan = (await page.locator('.e0-zat-sisi').last().boundingBox())!
+      const panah = (await page.locator('.e0-panah-model').boundingBox())!
+      expect(panah.x).toBeGreaterThanOrEqual(kiri.x + kiri.width)
+      expect(panah.x + panah.width).toBeLessThanOrEqual(kanan.x)
+      const rumusKiri = (await page.locator('.e0-persamaan > span').first().boundingBox())!
+      const rumusKanan = (await page.locator('.e0-persamaan > span').last().boundingBox())!
+      expect(rumusKanan.x - rumusKiri.x - rumusKiri.width).toBeLessThan(100)
+    }
     if (s.k === '1.5a' || s.k === '1.5f')
       await page.screenshot({ path: test.info().outputPath(`${s.k}.png`) })
     if (keyboard) {
       await pilihan.focus()
       await page.keyboard.press('Enter')
     } else await pilihan.click()
+    const jawab = kartu.getByRole('button', { name: 'Jawab', exact: true })
+    if (keyboard) {
+      await jawab.focus()
+      await page.keyboard.press('Enter')
+    } else await jawab.click()
   }
 }
 
@@ -253,4 +269,61 @@ test('sampul memakai ilustrasi tajam dan dekorasi utuh di dalam panggung', async
     expect(dekorasi.y + dekorasi.height).toBeLessThanOrEqual(panggung.y + panggung.height)
   }
   await page.screenshot({ path: info.outputPath('sampul-tajam.png') })
+})
+
+test('jawaban mengisi kotak saat narasi pertanyaan masih berjalan dan petunjuk di bawah kontrol', async ({
+  page,
+}, info) => {
+  test.skip(info.project.name !== 'desktop', 'Narasi terkendali pada desktop')
+  await siapkan(page)
+  await page.addInitScript((tanya) => {
+    localStorage.setItem(
+      'metalab-pengaturan',
+      JSON.stringify({
+        state: { suaraAktif: true, narasi: true, efek: false, musik: false },
+        version: 0,
+      }),
+    )
+    Object.defineProperty(window, 'SpeechSynthesisUtterance', {
+      value: class {
+        text: string
+        constructor(teks: string) {
+          this.text = teks
+        }
+      },
+    })
+    Object.defineProperty(speechSynthesis, 'getVoices', {
+      value: () => [{ lang: 'id-ID', name: 'Suara uji' }],
+    })
+    Object.defineProperty(speechSynthesis, 'speak', {
+      value: (u: SpeechSynthesisUtterance) => {
+        if (u.text === tanya)
+          (window as unknown as { pertanyaanAktif: boolean }).pertanyaanAktif = true
+        else queueMicrotask(() => u.onend?.(new Event('end') as SpeechSynthesisEvent))
+      },
+    })
+  }, SOAL[0].tanya)
+  await page.goto('/#/episode/0?cepat')
+  await page.getByRole('button', { name: 'Mulai episode' }).click()
+  const pilihan = page.getByRole('button', { name: SOAL[0].opsi[0], exact: true })
+  await expect(pilihan).toBeVisible({ timeout: 15000 })
+  await expect(page.locator('[data-isian="nama"]')).toHaveAttribute('data-aktif', 'true')
+  const panduan = (await page.locator('.pemutar-panduan').boundingBox())!
+  const bilah = (await page.locator('.pemutar-bilah').boundingBox())!
+  expect(panduan.y).toBeGreaterThanOrEqual(bilah.y + bilah.height)
+  expect(Math.abs(panduan.x - bilah.x)).toBeLessThan(8)
+
+  const posisiAwal = (await page.locator('.e0-reaksi').boundingBox())!.y
+  await pilihan.click()
+  await expect(page.locator('[data-isian="nama"]')).not.toHaveAttribute('data-terisi', 'true')
+  await page.getByRole('button', { name: 'Jawab', exact: true }).click()
+  await expect(page.locator('[data-isian="nama"]')).toHaveAttribute('data-terisi', 'true')
+  await expect
+    .poll(async () => (await page.locator('.e0-reaksi').boundingBox())!.y)
+    .toBeGreaterThan(posisiAwal + 25)
+  await page.screenshot({ path: info.outputPath('isian-terisi-di-tengah.png') })
+  expect(
+    await page.evaluate(() => (window as unknown as { pertanyaanAktif: boolean }).pertanyaanAktif),
+  ).toBe(true)
+  await page.goto('/#/peta-materi')
 })

@@ -21,16 +21,6 @@
   height: clamp(32px, 4cqw, 64px);
   object-fit: contain;
 }
-.episode-0 .pemutar-panduan {
-  top: auto;
-  bottom: 12px;
-  left: 12px;
-  width: min(40vw, 420px);
-}
-.episode-0 .pemutar-panduan-kartu {
-  font-size: 14px;
-  padding: 10px 16px;
-}
 .episode-0 .pemutar-narator {
   --maskot: min(14cqw, 180px);
   bottom: 2%;
@@ -44,17 +34,19 @@
 .e0-reaksi {
   position: absolute;
   inset: 13% 5% auto;
-  height: 44%;
+  height: 43%;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto auto auto;
+  gap: 8px;
   color: var(--color-paper);
   text-align: center;
   pointer-events: none;
 }
 .e0-judul-reaksi {
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   gap: 14px;
-  font: 800 clamp(16px, 2cqw, 30px)/1.2 var(--font-head);
 }
 .e0-judul-reaksi > span {
   background: var(--color-accent);
@@ -62,56 +54,145 @@
   padding: 8px 14px;
   box-shadow: var(--shadow-kertas-sm);
   transform: rotate(-2deg);
+  font: 800 clamp(16px, 2cqw, 30px)/1.2 var(--font-head);
 }
-.e0-energi {
+.e0-isian {
+  padding: 7px 12px;
+  background: var(--color-paper);
+  border: 2px dashed var(--color-muted);
+  border-radius: 8px;
+  color: var(--color-ink);
+  box-shadow: var(--shadow-kertas-sm);
+}
+.e0-isian small {
+  display: block;
+  font: 700 clamp(11px, 1cqw, 15px)/1.2 var(--font-body);
+}
+.e0-isian b {
+  font: 800 clamp(14px, 1.5cqw, 24px)/1.2 var(--font-head);
+}
+.e0-isian[data-aktif] {
+  background: var(--color-accent);
+  border-color: var(--color-ink);
+}
+.e0-isian[data-terisi] {
+  background: var(--color-ok);
+  border-style: solid;
+  border-color: var(--color-screen-3);
+}
+.e0-model-reaksi {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(150px, 18%) minmax(0, 1fr);
+  align-items: stretch;
+  gap: 14px;
+}
+.e0-zat-sisi {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  padding: 6px 10px;
+  border: 1px solid color-mix(in srgb, var(--color-paper) 45%, transparent);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--color-screen-3) 35%, transparent);
+}
+.e0-zat-sisi h3 {
+  font: 700 clamp(12px, 1.15cqw, 18px)/1.2 var(--font-body);
+}
+.e0-kelompok-zat {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  min-height: 0;
+}
+.e0-molekul {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+.e0-molekul svg {
+  display: block;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  overflow: hidden;
+}
+.e0-molekul > b {
+  font: 700 clamp(12px, 1.2cqw, 19px)/1.2 var(--font-body);
+}
+.e0-tambah {
   position: absolute;
-  left: 40%;
-  top: 16%;
-  width: 20%;
+  left: -14px;
+  top: 45%;
+  font: 800 22px/1 var(--font-body);
+}
+.e0-tengah-reaksi {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 3px;
+}
+.e0-isian-energi {
+  width: 100%;
+  position: relative;
+}
+.e0-isian-energi > div {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  font: 700 clamp(12px, 1.15cqw, 19px)/1.15 var(--font-body);
 }
-.e0-energi img {
-  width: clamp(24px, 4cqw, 54px);
-  height: clamp(24px, 4cqw, 54px);
+.e0-isian-energi img {
+  width: 30px;
+  height: 30px;
   object-fit: contain;
 }
-.e0-papan-molekul {
-  width: 100%;
-  height: 72%;
-  object-fit: contain;
-  margin-top: 2%;
-  animation: e0-tempel 500ms var(--ease-pose) both;
+.e0-isian-energi b {
+  font-size: clamp(13px, 1.2cqw, 19px);
+}
+.e0-isian-energi .e0-simbol-kimia {
+  position: absolute;
+  right: -10px;
+  bottom: -10px;
+  width: 22px;
+  height: 22px;
+}
+.e0-panah-model {
+  font: 800 clamp(32px, 4cqw, 60px)/0.8 var(--font-body);
+  color: var(--color-accent);
 }
 .e0-persamaan {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  display: grid;
-  grid-template-columns: 1fr 50px 1fr;
+  display: flex;
   align-items: center;
-  gap: 8px;
-  font: 800 clamp(15px, 1.8cqw, 28px)/1.15 var(--font-body);
+  justify-content: center;
+  gap: 12px;
+  font: 800 clamp(14px, 1.4cqw, 22px)/1.2 var(--font-body);
 }
 .e0-persamaan b {
+  color: var(--color-accent);
   font-size: 1.6em;
-  color: var(--color-accent);
 }
-.e0-kesimpulan {
-  position: absolute;
-  top: 106%;
-  left: 0;
-  width: 100%;
-  color: var(--color-accent);
-  font: 800 clamp(16px, 2.2cqw, 32px)/1.2 var(--font-head);
+.e0-isian-perubahan {
+  justify-self: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 4px 10px;
 }
-.e0-kesimpulan small {
-  display: block;
-  color: var(--color-paper);
-  font: 700 clamp(14px, 1.3cqw, 22px)/1.4 var(--font-body);
+.e0-isian-perubahan b {
+  font-size: clamp(13px, 1.3cqw, 21px);
+}
+.e0-isian-perubahan > span {
+  font: 400 clamp(12px, 1cqw, 16px)/1.2 var(--font-body);
+}
+.e0-catatan-atom {
+  font: 400 clamp(11px, 1cqw, 16px)/1.2 var(--font-body);
 }
 .e0-pilah {
   position: absolute;
@@ -393,39 +474,91 @@
     padding: 6px 16px;
   }
   .e0-reaksi {
-    top: 16%;
-    height: 37%;
+    top: 17%;
+    height: 39%;
     inset-inline: 3%;
+    gap: 3px;
+    grid-template-rows: 24px minmax(0, 1fr) 16px 12px;
   }
   .e0-judul-reaksi {
-    font-size: 15px;
-    gap: 8px;
+    gap: 6px;
   }
   .e0-judul-reaksi > span {
+    font-size: 13px;
+    padding: 3px 7px;
+  }
+  .e0-isian-nama {
     padding: 3px 8px;
   }
-  .e0-energi {
-    top: 19%;
+  .e0-isian-nama small {
+    display: none;
+  }
+  .e0-isian-nama b {
+    font-size: 13px;
+  }
+  .e0-model-reaksi {
+    grid-template-columns: minmax(0, 1fr) 100px minmax(0, 1fr);
+    gap: 6px;
+  }
+  .e0-zat-sisi {
+    padding: 3px 5px;
+  }
+  .e0-zat-sisi h3 {
     font-size: 11px;
   }
-  .e0-energi img {
+  .e0-kelompok-zat {
+    gap: 10px;
+  }
+  .e0-molekul > b {
+    font-size: 11px;
+  }
+  .e0-tambah {
+    font-size: 16px;
+    left: -10px;
+  }
+  .e0-isian-energi {
+    padding: 3px 5px;
+  }
+  .e0-isian-energi small {
+    font-size: 10px;
+  }
+  .e0-isian-energi b {
+    font-size: 11px;
+  }
+  .e0-isian-energi img {
     width: 22px;
     height: 22px;
   }
-  .e0-papan-molekul {
-    height: 66%;
-    margin-top: 0;
+  .e0-panah-model {
+    font-size: 30px;
   }
   .e0-persamaan {
-    grid-template-columns: 1fr 24px 1fr;
-    font-size: 14px;
-  }
-  .e0-kesimpulan {
-    top: 110%;
-    font-size: 16px;
-  }
-  .e0-kesimpulan small {
     font-size: 13px;
+    gap: 8px;
+  }
+  .e0-isian-perubahan {
+    position: absolute;
+    left: 50%;
+    top: 29px;
+    transform: translateX(-50%);
+    width: 100px;
+    padding: 3px 5px;
+  }
+  .e0-isian-perubahan small,
+  .e0-isian-perubahan b {
+    font-size: 10px;
+  }
+  .e0-isian-perubahan > span {
+    display: none;
+  }
+  .e0-reaksi:not([data-butir='2']) .e0-isian-perubahan {
+    display: none;
+  }
+  .e0-reaksi[data-butir='2'] .e0-isian-energi {
+    visibility: hidden;
+  }
+  .e0-catatan-atom {
+    font-size: 10px;
   }
   .e0-pilah-kepala {
     top: 17%;
@@ -553,13 +686,6 @@
   box-shadow: 0 0 0 5px var(--color-paper);
 }
 
-.e0-catatan-atom {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  width: 100%;
-  font: 400 clamp(11px, 1cqw, 16px)/1.2 var(--font-body);
-}
 @media print {
   .hasil-cetak .e0-tabel-hasil th,
   .hasil-cetak .e0-tabel-hasil td {
@@ -579,4 +705,59 @@
   .episode-0 .pemutar-sampul {
     grid-template-rows: minmax(0, 1fr);
   }
+}
+
+.episode-0 .pemutar-konfirmasi {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+}
+.episode-0 .pemutar-konfirmasi .pemutar-opsi {
+  flex: 1;
+  min-width: 0;
+}
+.episode-0 .pemutar-kirim {
+  min-height: 44px;
+  min-width: 76px;
+  padding: 8px 16px;
+  font: 800 16px var(--font-head);
+  cursor: pointer;
+}
+.episode-0 .pemutar-status-pilihan {
+  margin: 6px 0 0;
+  font: 700 13px/1.3 var(--font-body);
+}
+@media (max-height: 500px) and (orientation: landscape) {
+  .episode-0 .pemutar-soal {
+    bottom: 16%;
+    padding: 8px 14px;
+  }
+  .episode-0 .pemutar-konfirmasi {
+    gap: 5px;
+  }
+  .episode-0 .pemutar-konfirmasi .pemutar-opsi {
+    gap: 5px;
+  }
+  .episode-0 .pemutar-kirim {
+    min-width: 58px;
+    padding: 6px 10px;
+    font-size: 13px;
+  }
+  .episode-0 .pemutar-status-pilihan {
+    font-size: 11px;
+    margin-top: 4px;
+  }
+}
+
+@media (min-height: 501px) {
+  .e0-reaksi {
+    top: 15%;
+  }
+  .e0-reaksi[data-terjawab] {
+    top: 22%;
+    transition: top 280ms var(--ease-keluar);
+  }
+}
+.episode-0 [data-tenang] .e0-reaksi {
+  transition: none;
 }

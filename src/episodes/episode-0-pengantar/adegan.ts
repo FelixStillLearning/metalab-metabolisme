@@ -86,15 +86,17 @@ export async function jalankanEpisode0(p: Panggung) {
         p.signal,
         {
           judul: `${s.k.replace('1.5', '1.5 ')} · ${s.judul}`,
+          konfirmasi: true,
           opsi: s.opsi.map((teks, j) => ({ teks, gambar: gambar[j] })),
         },
         s.benar,
         () => katakan(p, `e0-${s.k}-balik`, s.salah),
-      ),
+      ).then(() => {
+        useJawabanE0.getState().catat(s.k)
+        useAdeganE0.setState({ terjawab: true })
+        bunyi(i === 4 ? 'atp' : 'tempel')
+      }),
     ])
-    useJawabanE0.getState().catat(s.k)
-    useAdeganE0.setState({ terjawab: true })
-    bunyi(i === 4 ? 'atp' : 'tempel')
     await katakan(p, `e0-${s.k}-jawab`, s.narasi)
   }
   useAdeganE0.setState({ soal: 6, terjawab: false })

@@ -127,3 +127,26 @@ test('mode otomatis: pilihan langsung benar dan semua sasaran (tanpa pengecoh) d
   expect(ketuk.mock.calls).toEqual([[0], [2]])
   expect(usePemutar.getState().pilihan).toBeNull()
 })
+
+test('pilihan konfirmasi memperlihatkan pemeriksaan dan membuka kembali setelah umpan balik', async () => {
+  let selesaiBalik!: () => void
+  const balik = new Promise<void>((resolve) => {
+    selesaiBalik = resolve
+  })
+  const janji = mintaPilihan(
+    new AbortController().signal,
+    { ...isi, konfirmasi: true },
+    1,
+    () => balik,
+  )
+  const pilih = usePemutar.getState().pilihan!.pilih
+  const sedang = pilih(0)
+  expect(usePemutar.getState().pilihan!.memeriksa).toBe(true)
+  selesaiBalik()
+  await sedang
+  expect(usePemutar.getState().pilihan!.memeriksa).toBe(false)
+  expect(usePemutar.getState().pilihan!.pesan).toContain('Pilih lagi')
+  await pilih(1)
+  await janji
+  expect(usePemutar.getState().pilihan).toBeNull()
+})
