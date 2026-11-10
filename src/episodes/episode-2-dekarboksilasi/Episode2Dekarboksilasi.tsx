@@ -12,7 +12,7 @@ export default function Episode2Dekarboksilasi() {
     <div className="episode-2">
       <PemutarEpisode
         judul="Dekarboksilasi oksidatif"
-        label="Episode 2 · Aktivitas 1.8"
+        label="Episode 2"
         ringkasan="Ikuti dua asam piruvat di matriks mitokondria. Amati karbon yang keluar, elektron yang ditangkap, dan pembentukan asetil KoA."
         gambarSampul={mitokondria}
         bab={[...BAB]}
