@@ -7,6 +7,8 @@ import Episode0Pengantar from '../episodes/episode-0-pengantar/Episode0Pengantar
 import HasilEpisode0 from '../episodes/episode-0-pengantar/HasilEpisode0'
 import Episode2Dekarboksilasi from '../episodes/episode-2-dekarboksilasi/Episode2Dekarboksilasi'
 import HasilEpisode2 from '../episodes/episode-2-dekarboksilasi/HasilEpisode2'
+import Episode3Krebs from '../episodes/episode-3-krebs/Episode3Krebs'
+import HasilEpisode3 from '../episodes/episode-3-krebs/HasilEpisode3'
 import Beranda from '../features/beranda/Beranda'
 import PetaMateri from '../features/peta-materi/PetaMateri'
 
@@ -21,6 +23,8 @@ const router = createHashRouter([
   { path: '/episode/1/penutup', element: <PenutupEpisode1 /> },
   { path: '/episode/2', element: <Episode2Dekarboksilasi /> },
   { path: '/episode/2/hasil', element: <HasilEpisode2 /> },
+  { path: '/episode/3', element: <Episode3Krebs /> },
+  { path: '/episode/3/hasil', element: <HasilEpisode3 /> },
   { path: '*', element: <Navigate to="/" replace /> },
 ])
 
