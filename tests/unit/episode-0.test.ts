@@ -4,6 +4,7 @@ import { useJawabanE0, lengkap } from '../../src/stores/jawaban-episode-0'
 import { useJawaban } from '../../src/stores/jawaban'
 import { kendali } from '../../src/features/pemutar-episode/mesin'
 import { mintaPilah, usePilah } from '../../src/episodes/episode-0-pengantar/pilah'
+import { bunyi } from '../../src/lib/suara'
 import { usePemutar } from '../../src/stores/pemutar'
 
 vi.mock('../../src/lib/suara', () => ({ bunyi: vi.fn() }))
@@ -82,8 +83,10 @@ test('pemilahan menolak pengecoh, sisi salah, jeda, duplikasi dan callback setel
   usePemutar.setState({ dijeda: true })
   expect(pilih(0, 0)).toBe(false)
   usePemutar.setState({ dijeda: false })
+  vi.mocked(bunyi).mockClear()
   expect(pilih(0, 0)).toBe(true)
   expect(pilih(0, 0)).toBe(false)
+  expect(bunyi).toHaveBeenCalledExactlyOnceWith('tempel')
   expect(pilih(1, 1)).toBe(true)
   await janji
   expect(usePilah.getState().soal).toBeNull()

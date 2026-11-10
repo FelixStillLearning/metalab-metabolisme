@@ -66,7 +66,7 @@ export function mintaPilah(signal: AbortSignal, baris: BarisPilah) {
             usePilah.setState((s) => ({ soal: s.soal && { ...s.soal, pesan } }))
             return false
           }
-          bunyi('tepat')
+          bunyi('tempel')
           terpasang.add(index)
           useJawabanE0.getState().catatSel(baris.k, sisi)
           usePilah.setState((s) => ({

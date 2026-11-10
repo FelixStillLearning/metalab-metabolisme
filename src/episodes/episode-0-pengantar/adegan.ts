@@ -63,7 +63,7 @@ function rangka(p: Panggung, x: number, urai: boolean) {
 export async function jalankanEpisode0(p: Panggung) {
   useAdeganE0.setState({ soal: -1, terjawab: false, baris: -1 })
   useJawabanE0.getState().mulai()
-  siapkan('muncul', 'geser', 'tempel', 'atp')
+  siapkan('muncul', 'geser', 'tempel')
   await pasangLatar(p, latar, 'pengantar')
   await katakan(
     p,
@@ -94,7 +94,6 @@ export async function jalankanEpisode0(p: Panggung) {
       ).then(() => {
         useJawabanE0.getState().catat(s.k)
         useAdeganE0.setState({ terjawab: true })
-        bunyi(i === 4 ? 'atp' : 'tempel')
       }),
     ])
     await katakan(p, `e0-${s.k}-jawab`, s.narasi)
@@ -109,9 +108,7 @@ export async function jalankanEpisode0(p: Panggung) {
   for (const [i, r] of TABEL.entries()) {
     useAdeganE0.setState({ baris: i })
     await mintaPilah(p.signal, r)
-    bunyi('geser')
     await Promise.all([kiri(i + 1), kanan(i + 1)])
-    bunyi('tempel')
     await wait(p, 220)
   }
   await katakan(

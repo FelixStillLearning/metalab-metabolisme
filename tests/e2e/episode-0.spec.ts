@@ -351,3 +351,104 @@ test('jawaban mengisi kotak saat narasi pertanyaan masih berjalan dan petunjuk d
   ).toBe(true)
   await page.goto('/#/peta-materi')
 })
+
+test('satu cue jawaban, kartu terbang mengikuti jeda, bersih saat keluar, mode tenang langsung', async ({
+  page,
+}, info) => {
+  test.skip(info.project.name !== 'desktop', 'Interaksi dan jejak audio khusus desktop')
+  test.setTimeout(60000)
+  await siapkan(page)
+  await page.addInitScript(() => {
+    const w = window as unknown as { jumlahBunyi: number }
+    w.jumlahBunyi = 0
+    const start = AudioBufferSourceNode.prototype.start
+    AudioBufferSourceNode.prototype.start = function (...args) {
+      if (this.buffer && this.buffer.length > 1) w.jumlahBunyi++
+      return start.apply(this, args)
+    }
+  })
+  await page.goto('/#/episode/0?cepat')
+  await page.evaluate(async () => {
+    const { usePengaturan } = await import('/src/' + 'stores/pengaturan.ts')
+    usePengaturan.setState({ suaraAktif: true, efek: true, musik: false, narasi: false })
+  })
+  await page.getByRole('button', { name: 'Mulai episode' }).click()
+  for (const s of SOAL) {
+    const soal = page.getByRole('region', {
+      name: `${s.k.replace('1.5', '1.5 ')} · ${s.judul}`,
+      exact: true,
+    })
+    await soal.getByRole('button', { name: s.opsi[s.benar], exact: true }).click({ timeout: 15000 })
+    const sebelum = await page.evaluate(
+      () => (window as unknown as { jumlahBunyi: number }).jumlahBunyi,
+    )
+    await soal.getByRole('button', { name: 'Jawab', exact: true }).click()
+    await expect
+      .poll(() =>
+        page.evaluate(
+          (awal) => (window as unknown as { jumlahBunyi: number }).jumlahBunyi - awal,
+          sebelum,
+        ),
+      )
+      .toBe(1)
+    await page.waitForTimeout(120)
+    expect(
+      await page.evaluate(
+        (awal) => (window as unknown as { jumlahBunyi: number }).jumlahBunyi - awal,
+        sebelum,
+      ),
+    ).toBe(1)
+  }
+  const kiri = page.getByRole('button', {
+    name: `Taruh di Anabolisme: ${TABEL[0].sel[0]}`,
+    exact: true,
+  })
+  await expect(kiri).toBeVisible({ timeout: 15000 })
+  await page.evaluate(async () => {
+    const { kendali } = await import('/src/' + 'features/pemutar-episode/mesin.ts')
+    kendali.cepat = 1
+    const { usePengaturan } = await import('/src/' + 'stores/pengaturan.ts')
+    usePengaturan.setState({ pelan: true })
+  })
+  await page
+    .getByRole('button', { name: `Taruh di Katabolisme: ${TABEL[0].sel[0]}`, exact: true })
+    .click()
+  await expect(page.locator('.e0-kartu-terbang')).toHaveCount(0)
+  const kanan = page.getByRole('button', {
+    name: `Taruh di Katabolisme: ${TABEL[0].sel[1]}`,
+    exact: true,
+  })
+  await kanan.click()
+  const terbang = page.locator('.e0-kartu-terbang')
+  await expect(terbang).toBeVisible()
+  await expect(kanan).toBeDisabled()
+  await page.getByRole('button', { name: 'Jeda (spasi)' }).click()
+  const posisi = await terbang.getAttribute('style')
+  await page.waitForTimeout(150)
+  expect(await terbang.getAttribute('style')).toBe(posisi)
+  await expect(page.locator('[data-riwayat="1"] li')).toHaveCount(0)
+  await page.screenshot({ path: info.outputPath('kartu-terbang-dijeda.png') })
+  await page.getByRole('button', { name: 'Lanjut (spasi)' }).click()
+  await expect(terbang).toHaveCount(0)
+  await expect(page.locator('[data-riwayat="1"]')).toContainText(TABEL[0].sel[1])
+  await expect(kiri).toBeFocused()
+  await kiri.click()
+  await expect(terbang).toBeVisible()
+  await page.goto('/#/peta-materi')
+  await expect(terbang).toHaveCount(0)
+  const data = await page.evaluate(
+    () => JSON.parse(localStorage.getItem('metalab-jawaban-e0')!).state.draf.tabel.bahan,
+  )
+  expect(data[0]).toBeUndefined()
+  await page.goto('/#/episode/0?cepat')
+  await page.reload()
+  await page.evaluate(async () => {
+    const { usePengaturan } = await import('/src/' + 'stores/pengaturan.ts')
+    usePengaturan.setState({ tenang: true, suaraAktif: false, pelan: false })
+  })
+  await page.getByRole('button', { name: 'Mulai episode' }).click()
+  await selesaikan15(page)
+  await kiri.click({ timeout: 15000 })
+  await expect(terbang).toHaveCount(0)
+  await expect(page.locator('[data-riwayat="0"]')).toContainText(TABEL[0].sel[0])
+})

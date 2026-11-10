@@ -853,3 +853,16 @@
     padding: 5px 12px;
   }
 }
+
+.e0-kartu-ciri[data-melayang] {
+  opacity: 0.3;
+}
+.e0-kartu-terbang {
+  position: fixed;
+  z-index: 100;
+  pointer-events: none;
+  grid-template-columns: minmax(0, 1fr);
+  text-align: center;
+  place-content: center;
+  font: 700 clamp(13px, 1.15vw, 18px)/1.3 var(--font-body);
+}

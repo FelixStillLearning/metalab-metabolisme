@@ -1,4 +1,7 @@
 import { useEffect, useRef, useState, type PointerEvent } from 'react'
+import { gsap } from 'gsap'
+import { durasi } from '../../features/pemutar-episode/mesin'
+import { tenangAktif } from '../../stores/pengaturan'
 import { usePemutar } from '../../stores/pemutar'
 import { useAdeganE0 } from './adegan'
 import { usePilah } from './pilah'
@@ -9,6 +12,17 @@ export default function PilahAdegan() {
   const dijeda = usePemutar((s) => s.dijeda)
   const { soal: tahap, baris } = useAdeganE0()
   const [aktif, setAktif] = useState(0)
+  const [melayang, setMelayang] = useState<number | null>(null)
+  const terbang = useRef<HTMLElement | null>(null)
+  useEffect(
+    () => () => {
+      if (terbang.current) {
+        gsap.killTweensOf(terbang.current)
+        terbang.current.remove()
+      }
+    },
+    [],
+  )
   const kartu = useRef<HTMLDivElement>(null)
   const awal = useRef<{ id: number; x: number; y: number; index: number } | null>(null)
   const zona = useRef<Array<HTMLElement | null>>([])
@@ -29,8 +43,8 @@ export default function PilahAdegan() {
     }
   }, [dijeda])
   useEffect(() => {
-    tombol.current?.focus()
-  }, [index])
+    if (melayang === null) tombol.current?.focus()
+  }, [index, melayang])
   if (tahap !== 6) return null
   const terisi = (sisi: 0 | 1) =>
     soal?.terpasang.some((i) => soal.kartu[i] === soal.baris.sel[sisi])
@@ -51,10 +65,43 @@ export default function PilahAdegan() {
       ))}
     </ol>
   )
-  const taruh = (i: number, sisi: 0 | 1) => {
-    if (!soal) return
-    soal.pilih(i, sisi)
-    tombol.current?.focus()
+  const taruh = (i: number, sisi: 0 | 1, dari: DOMRect) => {
+    if (!soal || dijeda || terbang.current) return
+    const tujuan = zona.current[sisi]?.querySelector('.e0-sel')
+    if (tenangAktif() || !tujuan || soal.kartu[i] !== soal.baris.sel[sisi]) {
+      soal.pilih(i, sisi)
+      tombol.current?.focus()
+      return
+    }
+    const ke = tujuan.getBoundingClientRect()
+    const keping = document.createElement('div')
+    keping.className = 'e0-kartu-ciri e0-kartu-terbang'
+    keping.textContent = soal.kartu[i]
+    keping.setAttribute('aria-hidden', 'true')
+    Object.assign(keping.style, {
+      left: `${dari.x}px`,
+      top: `${dari.y}px`,
+      width: `${dari.width}px`,
+      height: `${dari.height}px`,
+    })
+    document.body.append(keping)
+    terbang.current = keping
+    setMelayang(i)
+    gsap.to(keping, {
+      x: ke.x + ke.width / 2 - dari.x - dari.width / 2,
+      y: ke.y + ke.height / 2 - dari.y - dari.height / 2,
+      scale: Math.min(1, ke.width / dari.width),
+      opacity: 0.45,
+      duration: durasi(360) / 1000,
+      ease: 'keluar',
+      onComplete: () => {
+        keping.remove()
+        terbang.current = null
+        setMelayang(null)
+        soal.pilih(i, sisi)
+        tombol.current?.focus()
+      },
+    })
   }
   const batal = () => {
     awal.current = null
@@ -62,13 +109,21 @@ export default function PilahAdegan() {
     if (kartu.current) delete kartu.current.dataset.seret
   }
   const turun = (e: PointerEvent<HTMLDivElement>, i: number) => {
-    if (dijeda || (e.target as HTMLElement).closest('button') || !soal || e.button !== 0) return
+    if (
+      dijeda ||
+      terbang.current ||
+      (e.target as HTMLElement).closest('button') ||
+      !soal ||
+      e.button !== 0
+    )
+      return
     kartu.current = e.currentTarget
     awal.current = { id: e.pointerId, x: e.clientX, y: e.clientY, index: i }
     e.currentTarget.setPointerCapture(e.pointerId)
   }
   const lepas = (e: PointerEvent<HTMLElement>) => {
     const drag = awal.current
+    const dari = e.currentTarget.getBoundingClientRect()
     batal()
     if (!drag || !soal || drag.id !== e.pointerId || dijeda) return
     if (Math.hypot(e.clientX - drag.x, e.clientY - drag.y) < 8) return
@@ -81,7 +136,7 @@ export default function PilahAdegan() {
         e.clientY >= r.top &&
         e.clientY <= r.bottom
       ) {
-        soal.pilih(drag.index, sisi)
+        taruh(drag.index, sisi, dari)
         break
       }
     }
@@ -135,7 +190,7 @@ export default function PilahAdegan() {
                 key={i}
                 aria-label={`Pilih kartu: ${soal.kartu[i]}`}
                 aria-pressed={index === i}
-                disabled={dijeda}
+                disabled={dijeda || melayang !== null}
                 onClick={() => setAktif(i)}
               >
                 Kartu {i + 1}
@@ -148,6 +203,7 @@ export default function PilahAdegan() {
                 key={`${soal.baris.k}-${i}`}
                 className="e0-kartu-ciri"
                 data-aktif={i === index || undefined}
+                data-melayang={melayang === i || undefined}
                 onPointerDown={(e) => turun(e, i)}
                 onPointerMove={(e) => {
                   const a = awal.current
@@ -162,19 +218,23 @@ export default function PilahAdegan() {
               >
                 <button
                   type="button"
-                  disabled={dijeda}
+                  disabled={dijeda || melayang !== null}
                   ref={i === index ? tombol : undefined}
                   aria-label={`Taruh di Anabolisme: ${soal.kartu[i]}`}
-                  onClick={() => taruh(i, 0)}
+                  onClick={(e) =>
+                    taruh(i, 0, e.currentTarget.parentElement!.getBoundingClientRect())
+                  }
                 >
                   ◀
                 </button>
                 <p>{soal.kartu[i]}</p>
                 <button
                   type="button"
-                  disabled={dijeda}
+                  disabled={dijeda || melayang !== null}
                   aria-label={`Taruh di Katabolisme: ${soal.kartu[i]}`}
-                  onClick={() => taruh(i, 1)}
+                  onClick={(e) =>
+                    taruh(i, 1, e.currentTarget.parentElement!.getBoundingClientRect())
+                  }
                 >
                   ▶
                 </button>
