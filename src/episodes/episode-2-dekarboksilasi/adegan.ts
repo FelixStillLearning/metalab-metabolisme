@@ -50,7 +50,7 @@ function gambar(parent: Element, href: string, x: number, y: number, w: number, 
   return g
 }
 
-function jalur(p: Panggung, dari: string, tujuan: string, x1: number, x2: number) {
+function jalur(p: Panggung, dari: string, tujuan: string, x1: number, x2: number, tinggi = 360) {
   const g = obj(0, 0, p.world)
   g.dataset.jalurReaksi = ''
   for (const x of [x1, x2])
@@ -60,7 +60,7 @@ function jalur(p: Panggung, dari: string, tujuan: string, x1: number, x2: number
         x: x - 180,
         y: 280,
         width: 360,
-        height: 360,
+        height: tinggi,
         rx: 18,
         fill: 'none',
         stroke: 'var(--color-paper)',
@@ -469,7 +469,7 @@ async function oksidasi(p: Panggung, molekul: Piruvat[]) {
 
 async function ikat(p: Panggung, molekul: Piruvat[]) {
   usePemutar.setState({ bab: 4 })
-  const panduan = jalur(p, 'Gugus asetil', 'Koenzim A datang', 400, 850)
+  const panduan = jalur(p, 'Gugus asetil', 'Koenzim A datang', 400, 850, 440)
   const koas = molekul.map((m) => koa(p, 1750, m.asetil._y))
   bunyi('geser')
   koas.forEach((k) => speedLines(p, k, -1))
