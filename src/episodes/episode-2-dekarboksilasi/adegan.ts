@@ -67,8 +67,8 @@ function jalur(p: Panggung, dari: string, tujuan: string, x1: number, x2: number
       },
       g,
     )
-  label(g, x1, 270, dari, 22).dataset.judulJalur = 'asal'
-  label(g, x2, 270, tujuan, 22)
+  label(g, x1, 215, dari, 22).dataset.judulJalur = 'asal'
+  label(g, x2, 215, tujuan, 22)
   el(
     'path',
     {
@@ -331,7 +331,7 @@ async function lepas(p: Panggung, molekul: Piruvat[]) {
     ])
     bunyi('kertas-lepas')
     panduan.querySelector('[data-judul-jalur="asal"]')?.remove()
-    label(panduan, 430, 270, 'Gugus asetil · 2 C', 22)
+    label(panduan, 430, 215, 'Gugus asetil · 2 C', 22)
     for (const m of molekul) {
       burstBehind(p, m.karboksil, 300)
       hapusBentuk(m.ikatan)
