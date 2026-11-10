@@ -239,10 +239,14 @@ test('sampul memakai ilustrasi tajam dan dekorasi utuh di dalam panggung', async
   await expect
     .poll(() => gambar.evaluate((n) => (n as HTMLImageElement).naturalWidth))
     .toBeGreaterThanOrEqual(1200)
+  await page.evaluate(() => Promise.all(document.getAnimations().map((a) => a.finished)))
   if (info.project.name === 'desktop') {
-    await page.evaluate(() => Promise.all(document.getAnimations().map((a) => a.finished)))
     const panggung = (await page.locator('[data-panggung]').boundingBox())!
     const dekorasi = (await page.locator('.pemutar-sampul-dekorasi-kanan').boundingBox())!
+    for (const selector of ['.pemutar-sampul-isi', '.pemutar-sampul-gambar']) {
+      const r = (await page.locator(selector).boundingBox())!
+      expect(Math.abs(r.y + r.height / 2 - panggung.y - panggung.height / 2)).toBeLessThan(2)
+    }
     expect(dekorasi.x).toBeGreaterThanOrEqual(panggung.x)
     expect(dekorasi.y).toBeGreaterThanOrEqual(panggung.y)
     expect(dekorasi.x + dekorasi.width).toBeLessThanOrEqual(panggung.x + panggung.width)

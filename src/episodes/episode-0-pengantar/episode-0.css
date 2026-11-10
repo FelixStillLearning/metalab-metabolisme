@@ -574,3 +574,9 @@
   width: 15%;
   transform: rotate(10deg);
 }
+
+@media (min-height: 501px) {
+  .episode-0 .pemutar-sampul {
+    grid-template-rows: minmax(0, 1fr);
+  }
+}
