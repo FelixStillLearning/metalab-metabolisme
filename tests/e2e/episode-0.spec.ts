@@ -79,17 +79,25 @@ async function selesaikan15(page: Page, keyboard = false) {
 }
 
 async function selesaikan16(page: Page, keyboard = false) {
-  for (const r of TABEL) {
+  for (const [baris, r] of TABEL.entries()) {
     await expect(page.locator('.e0-pilah-kepala p')).toContainText(r.judul, { timeout: 15000 })
-    await expect(page.locator('.e0-pilih-kartu')).toBeVisible()
+    const pc = page.viewportSize()!.height > 500
+    if (pc) {
+      await expect(page.locator('.e0-pilih-kartu')).toBeHidden()
+      await expect(page.locator('.e0-kartu-ciri:visible')).toHaveCount('pengecoh' in r ? 3 : 2)
+      const cards = await page.locator('.e0-kartu-ciri:visible').all()
+      let bawah = 0
+      for (const card of cards) {
+        const box = (await card.boundingBox())!
+        expect(box.y).toBeGreaterThanOrEqual(bawah)
+        bawah = box.y + box.height
+      }
+    } else await expect(page.locator('.e0-pilih-kartu')).toBeVisible()
     expect(await page.locator('[data-rangka="anabolisme"] [data-carbon]').count()).toBe(6)
     expect(await page.locator('[data-rangka="katabolisme"] [data-carbon]').count()).toBe(6)
     for (const sisi of [0, 1]) {
       const kartu = page.getByRole('button', { name: `Pilih kartu: ${r.sel[sisi]}`, exact: true })
-      if (keyboard) {
-        await kartu.focus()
-        await page.keyboard.press('Enter')
-      } else await kartu.click()
+      if (!pc) await kartu.click()
       const tombol = page.getByRole('button', {
         name: `Taruh di ${sisi === 0 ? 'Anabolisme' : 'Katabolisme'}: ${r.sel[sisi]}`,
       })
@@ -102,6 +110,13 @@ async function selesaikan16(page: Page, keyboard = false) {
         await tombol.focus()
         await page.keyboard.press('Enter')
       } else await tombol.click()
+      if (pc) {
+        const daftar = page.locator(`[data-riwayat="${sisi}"]`)
+        await expect(daftar.locator('li')).toHaveCount(baris + 1)
+        await expect(daftar).toContainText(r.sel[sisi])
+        await expect(daftar).toContainText(TABEL[0].sel[sisi])
+        expect(await daftar.evaluate((n) => n.scrollHeight <= n.clientHeight)).toBe(true)
+      }
     }
   }
 }
@@ -194,7 +209,7 @@ test('HP 667×375: atom bebas overlap, drag luar zona, jeda dan tombol keyboard'
   await page.goto('/#/episode/0?cepat')
   await page.getByRole('button', { name: 'Mulai episode' }).click()
   await selesaikan15(page)
-  await expect(page.locator('.e0-kartu-ciri')).toBeVisible({ timeout: 20000 })
+  await expect(page.locator('.e0-kartu-ciri:visible')).toBeVisible({ timeout: 20000 })
   await page.screenshot({ path: info.outputPath('1.6-sempit.png') })
   const atom = page.locator('[data-rangka="anabolisme"] [data-carbon]')
   const boxes = await atom.evaluateAll((nodes) =>
@@ -211,7 +226,7 @@ test('HP 667×375: atom bebas overlap, drag luar zona, jeda dan tombol keyboard'
       const distance = Math.hypot(a.x + a.w / 2 - b.x - b.w / 2, a.y + a.h / 2 - b.y - b.h / 2)
       expect(distance).toBeGreaterThanOrEqual((Math.min(a.w, a.h) + Math.min(b.w, b.h)) / 2 - 1)
     }
-  const kartu = page.locator('.e0-kartu-ciri p')
+  const kartu = page.locator('.e0-kartu-ciri:visible p')
   const awal = (await kartu.boundingBox())!
   await page.mouse.move(awal.x + awal.width / 2, awal.y + awal.height / 2)
   await page.mouse.down()

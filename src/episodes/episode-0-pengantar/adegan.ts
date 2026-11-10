@@ -26,20 +26,20 @@ const katakan = (p: Panggung, id: string, teks: string) =>
 
 function rangka(p: Panggung, x: number, urai: boolean) {
   const hp = matchMedia('(max-height: 500px) and (orientation: landscape)').matches
-  const g = obj(x, hp ? 350 : 340, p.world)
+  const g = obj(x, hp ? 350 : 315, p.world)
   g.dataset.rangka = urai ? 'katabolisme' : 'anabolisme'
   const hex: Titik[] = Array.from({ length: 6 }, (_, i) => [
-    Math.cos((i * Math.PI) / 3) * 65,
-    Math.sin((i * Math.PI) / 3) * (hp ? 40 : 65),
+    Math.cos((i * Math.PI) / 3) * (hp ? 65 : 55),
+    Math.sin((i * Math.PI) / 3) * (hp ? 40 : 55),
   ])
-  const lepas: Titik[] = hex.map(([x, y]) => [x * (hp ? 1.15 : 1.4), y * (hp ? 1.15 : 1.4)])
+  const lepas: Titik[] = hex.map(([x, y]) => [x * (hp ? 1.15 : 1.3), y * (hp ? 1.15 : 1.3)])
   const ikatan = el('g', {}, g)
   const atom = hex.map((_, i) => {
     const c = obj(0, 0, g)
     const [x, y] = urai ? hex[i] : lepas[i]
     c._x = x
     c._y = y
-    carbon(c, 0, 0, hp ? 18 : 22)
+    carbon(c, 0, 0, 18)
     void to(c, { x, y }, 0)
     return c
   })

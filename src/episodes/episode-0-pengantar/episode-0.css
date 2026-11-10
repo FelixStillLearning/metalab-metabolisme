@@ -757,3 +757,100 @@
     bottom: 12%;
   }
 }
+
+.e0-pilah-kepala {
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: 72%;
+  padding: 10px 20px;
+  border-image: url('../../assets/images/interaksi-kartu-soal.webp') 100 fill / 16px stretch;
+  color: var(--color-ink);
+}
+.e0-tumpukan-kartu {
+  display: grid;
+  gap: 10px;
+}
+.e0-riwayat {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  width: 100%;
+  display: grid;
+  gap: 6px;
+  max-height: 40cqh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 3px;
+  text-align: left;
+}
+.e0-riwayat li {
+  padding: 8px 16px;
+  min-height: 44px;
+  display: grid;
+  gap: 2px;
+  border-image: url('../../assets/images/interaksi-sel-tabel-terisi.webp') 100 200 fill / 10px 18px
+    stretch;
+  color: var(--color-ink);
+  font: 700 clamp(13px, 1cqw, 16px)/1.25 var(--font-body);
+}
+.e0-riwayat li > b {
+  font-size: 0.85em;
+}
+.e0-riwayat:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 2px;
+}
+@media (min-height: 501px) {
+  .e0-zona {
+    top: 18%;
+    height: 32%;
+    width: 32%;
+  }
+  .e0-zona-kiri {
+    left: 3%;
+  }
+  .e0-zona-kanan {
+    right: 3%;
+  }
+  .e0-dek {
+    top: 30%;
+    width: 28%;
+  }
+  .e0-pilih-kartu {
+    display: none;
+  }
+  .e0-kartu-ciri {
+    min-height: 72px;
+    gap: 6px;
+    padding: 8px 10px;
+    grid-template-columns: 44px minmax(0, 1fr) 44px;
+    border-image-width: 8px 55px;
+  }
+  .e0-kartu-ciri p {
+    font-size: clamp(14px, 1.15cqw, 18px);
+  }
+  .e0-zona h3 {
+    font-size: clamp(18px, 1.6cqw, 26px);
+  }
+  .e0-zona small {
+    top: 29px;
+  }
+  .e0-sel {
+    min-height: 44px;
+    padding: 8px 18px;
+  }
+  .episode-0 .pemutar-panggung:has(.e0-pilah) .pemutar-narator {
+    --maskot: 100px;
+    width: 28%;
+  }
+}
+@media (max-height: 500px) and (orientation: landscape) {
+  .e0-kartu-ciri:not([data-aktif]),
+  .e0-riwayat {
+    display: none;
+  }
+  .e0-pilah-kepala {
+    padding: 5px 12px;
+  }
+}

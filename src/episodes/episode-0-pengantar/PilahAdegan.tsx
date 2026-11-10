@@ -34,9 +34,26 @@ export default function PilahAdegan() {
   if (tahap !== 6) return null
   const terisi = (sisi: 0 | 1) =>
     soal?.terpasang.some((i) => soal.kartu[i] === soal.baris.sel[sisi])
-  const taruh = (sisi: 0 | 1) => {
+  const riwayat = (sisi: 0 | 1) =>
+    TABEL.filter((_, i) => i < baris || (i === baris && (!soal || terisi(sisi))))
+  const daftar = (sisi: 0 | 1) => (
+    <ol
+      className="e0-riwayat"
+      data-riwayat={sisi}
+      aria-label={`Ciri ${sisi === 0 ? 'anabolisme' : 'katabolisme'} yang sudah ditempatkan`}
+      tabIndex={0}
+    >
+      {riwayat(sisi).map((r) => (
+        <li key={r.k} data-baris={r.k}>
+          <b>{r.judul}</b>
+          <span>{r.sel[sisi]}</span>
+        </li>
+      ))}
+    </ol>
+  )
+  const taruh = (i: number, sisi: 0 | 1) => {
     if (!soal) return
-    soal.pilih(index, sisi)
+    soal.pilih(i, sisi)
     tombol.current?.focus()
   }
   const batal = () => {
@@ -44,9 +61,10 @@ export default function PilahAdegan() {
     kartu.current?.style.removeProperty('transform')
     if (kartu.current) delete kartu.current.dataset.seret
   }
-  const turun = (e: PointerEvent<HTMLElement>) => {
+  const turun = (e: PointerEvent<HTMLDivElement>, i: number) => {
     if (dijeda || (e.target as HTMLElement).closest('button') || !soal || e.button !== 0) return
-    awal.current = { id: e.pointerId, x: e.clientX, y: e.clientY, index }
+    kartu.current = e.currentTarget
+    awal.current = { id: e.pointerId, x: e.clientX, y: e.clientY, index: i }
     e.currentTarget.setPointerCapture(e.pointerId)
   }
   const lepas = (e: PointerEvent<HTMLElement>) => {
@@ -91,6 +109,7 @@ export default function PilahAdegan() {
         <div className="e0-sel" data-terisi={terisi(0) || undefined}>
           {terisi(0) ? soal?.baris.sel[0] : 'Tempatkan ciri anabolisme'}
         </div>
+        {daftar(0)}
       </div>
       <div
         className="e0-zona e0-zona-kanan"
@@ -105,13 +124,13 @@ export default function PilahAdegan() {
         <div className="e0-sel" data-terisi={terisi(1) || undefined}>
           {terisi(1) ? soal?.baris.sel[1] : 'Tempatkan ciri katabolisme'}
         </div>
+        {daftar(1)}
       </div>
       {soal && (
         <div className="e0-dek">
           <div className="e0-pilih-kartu" aria-label="Pilih kartu untuk dipilah">
             {sisa.map((i) => (
               <button
-                ref={i === index ? tombol : undefined}
                 type="button"
                 key={i}
                 aria-label={`Pilih kartu: ${soal.kartu[i]}`}
@@ -123,38 +142,44 @@ export default function PilahAdegan() {
               </button>
             ))}
           </div>
-          <div
-            className="e0-kartu-ciri"
-            ref={kartu}
-            onPointerDown={turun}
-            onPointerMove={(e) => {
-              const a = awal.current
-              if (a?.id === e.pointerId && !dijeda) {
-                e.currentTarget.style.transform = `translate(${e.clientX - a.x}px, ${e.clientY - a.y}px)`
-                e.currentTarget.dataset.seret = 'true'
-              }
-            }}
-            onPointerUp={lepas}
-            onPointerCancel={batal}
-            onLostPointerCapture={batal}
-          >
-            <button
-              type="button"
-              disabled={dijeda}
-              aria-label={`Taruh di Anabolisme: ${soal.kartu[index]}`}
-              onClick={() => taruh(0)}
-            >
-              ◀
-            </button>
-            <p>{soal.kartu[index]}</p>
-            <button
-              type="button"
-              disabled={dijeda}
-              aria-label={`Taruh di Katabolisme: ${soal.kartu[index]}`}
-              onClick={() => taruh(1)}
-            >
-              ▶
-            </button>
+          <div className="e0-tumpukan-kartu">
+            {sisa.map((i) => (
+              <div
+                key={`${soal.baris.k}-${i}`}
+                className="e0-kartu-ciri"
+                data-aktif={i === index || undefined}
+                onPointerDown={(e) => turun(e, i)}
+                onPointerMove={(e) => {
+                  const a = awal.current
+                  if (a?.id === e.pointerId && !dijeda) {
+                    e.currentTarget.style.transform = `translate(${e.clientX - a.x}px, ${e.clientY - a.y}px)`
+                    e.currentTarget.dataset.seret = 'true'
+                  }
+                }}
+                onPointerUp={lepas}
+                onPointerCancel={batal}
+                onLostPointerCapture={batal}
+              >
+                <button
+                  type="button"
+                  disabled={dijeda}
+                  ref={i === index ? tombol : undefined}
+                  aria-label={`Taruh di Anabolisme: ${soal.kartu[i]}`}
+                  onClick={() => taruh(i, 0)}
+                >
+                  ◀
+                </button>
+                <p>{soal.kartu[i]}</p>
+                <button
+                  type="button"
+                  disabled={dijeda}
+                  aria-label={`Taruh di Katabolisme: ${soal.kartu[i]}`}
+                  onClick={() => taruh(i, 1)}
+                >
+                  ▶
+                </button>
+              </div>
+            ))}
           </div>
           <p className="e0-umpan-balik" role="status">
             {soal.pesan || 'Seret ke salah satu sisi, atau ketuk ◀ / ▶.'}
