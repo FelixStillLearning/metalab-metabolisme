@@ -115,14 +115,12 @@ async function pembuka(p: Panggung) {
   bunyi('geser')
   // Jangkar matriks sumber C04: (840, 360) pada gambar bersih 1774 × 887.
   await Promise.all([
-    to(panel, { x: 800, y: 450, s: 4.9 }, 1800, 'kamera'),
+    to(panel, { x: 800, y: 450, s: 4.9, o: 0 }, 1800, 'kamera'),
     camTo(p, matriksX, matriksY, 4.2, 1800),
-    to(mito, { o: 0.25 }, 1800),
   ])
   await pasangLatar(p, matriks, 'matriks')
   mito.remove()
   await to(p.cam, { x: 0, y: 0, s: 1 }, 0)
-  await to(panel, { o: 0 }, 600)
   panel.remove()
   const tempat = label(p.latar, 800, 160, 'MATRIKS MITOKONDRIA · AEROB', 24)
   tempat.dataset.objek = 'label-matriks'
