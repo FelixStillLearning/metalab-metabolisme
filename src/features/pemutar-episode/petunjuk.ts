@@ -15,7 +15,8 @@ export function petunjukInteraksi({
   }
   if (lengkapi) return `Pilih jawaban untuk rumpang ${lengkapi.terisi.length + 1}.`
   if (poe?.tahap === 'tebak') {
-    if (!poe.placed.length) return `Ketuk atau seret ATP ke ${poe.zone.name}.`
+    if (!poe.placed.length)
+      return `Ketuk atau seret ${poe.zat ? 'satu zat' : 'ATP'} ke ${poe.zone.name}.`
     if (poe.alasan === null) return 'Pilih alasan tebakanmu.'
     return 'Ketuk Kunci tebakan.'
   }

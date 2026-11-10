@@ -110,6 +110,8 @@ export function PoeAdegan() {
 
           <div className="poe-tokens" ref={wadahToken}>
             {poe.supply.map((xy, i) => {
+              const zat = poe.zat?.[i]
+              const nama = zat?.teks ?? `ATP ${i + 1}`
               const placedIdx = poe.placed.indexOf(i)
               const isPlaced = placedIdx >= 0
               const diseret = seret?.i === i
@@ -122,15 +124,16 @@ export function PoeAdegan() {
                 <button
                   key={i}
                   type="button"
-                  className={`tok${isPlaced ? ' placed' : ''}`}
+                  className={`tok${isPlaced ? ' placed' : ''}${zat ? ' tok-zat' : ''}`}
                   style={{ left: `${x / 16}%`, top: `${y / 9}%` }}
                   data-seret={diseret || undefined}
                   disabled={dijeda}
-                  aria-label={`ATP ${i + 1}${isPlaced ? ` di ${poe.zone.name}` : ''}`}
+                  aria-label={`${nama}${isPlaced ? ` di ${poe.zone.name}` : ''}`}
+                  aria-pressed={isPlaced}
                   title={
                     isPlaced
-                      ? 'Ketuk atau seret keluar untuk mengambil ATP kembali'
-                      : `Ketuk atau seret ke ${poe.zone.name} untuk menaruh ATP`
+                      ? `Ketuk atau seret keluar untuk mengambil ${nama} kembali`
+                      : `Ketuk atau seret ke ${poe.zone.name} untuk menaruh ${nama}`
                   }
                   onPointerDown={(e) => {
                     abaikanKlik.current = false
@@ -165,7 +168,17 @@ export function PoeAdegan() {
                   }}
                 >
                   {/* Gambar tidak diseret sendiri oleh browser; yang diseret tokennya */}
-                  <img src={gambarAtp} alt="" width={128} height={52} draggable={false} />
+                  {zat && !zat.gambar ? (
+                    <span>{nama}</span>
+                  ) : (
+                    <img
+                      src={zat?.gambar ?? gambarAtp}
+                      alt=""
+                      width={128}
+                      height={52}
+                      draggable={false}
+                    />
+                  )}
                 </button>
               )
             })}
@@ -185,7 +198,12 @@ export function PoeAdegan() {
           >
             <h3 id="poe-tebak-judul">{poe.judul}</h3>
             <p>
-              Sekarang: <b id="cnt">{poe.placed.length} ATP</b>
+              Sekarang:{' '}
+              <b id="cnt">
+                {poe.zat
+                  ? (poe.zat[poe.placed[0]]?.teks ?? 'belum dipilih')
+                  : `${poe.placed.length} ATP`}
+              </b>
             </p>
             <p>
               <b>Kenapa?</b>

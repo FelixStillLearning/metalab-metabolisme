@@ -16,6 +16,7 @@ export function mintaTebak(
     right: number
     zone: PoeTebakState['zone']
     supply: [number, number][]
+    zat?: PoeTebakState['zat']
     slot: (i: number, n: number) => [number, number]
     kartu?: [number, number]
   },
@@ -26,7 +27,7 @@ export function mintaTebak(
     return Promise.resolve({
       g: right,
       r: 1,
-      from: Array.from({ length: right }, (_, i) => slot(i, right)),
+      from: Array.from({ length: konfigurasi.zat ? 1 : right }, (_, i) => slot(i, right)),
     })
   }
   return new Promise<HasilTebak>((selesai, gagal) => {
@@ -51,12 +52,19 @@ export function mintaTebak(
       right: konfigurasi.right,
       zone: konfigurasi.zone,
       supply: konfigurasi.supply,
+      zat: konfigurasi.zat,
       slot: konfigurasi.slot,
       kartu: konfigurasi.kartu,
       placed: [],
       alasan: null,
       taruhToken: (tokenIdx) => {
-        if (!aktif || usePemutar.getState().dijeda) return
+        if (
+          !aktif ||
+          usePemutar.getState().dijeda ||
+          !Number.isInteger(tokenIdx) ||
+          !konfigurasi.supply[tokenIdx]
+        )
+          return
         const state = usePemutar.getState().poe
         if (!state || state.tahap !== 'tebak') return
         const idx = state.placed.indexOf(tokenIdx)
@@ -66,7 +74,7 @@ export function mintaTebak(
           baru = state.placed.filter((i) => i !== tokenIdx)
         } else {
           bunyi('muncul')
-          baru = [...state.placed, tokenIdx]
+          baru = konfigurasi.zat ? [tokenIdx] : [...state.placed, tokenIdx]
         }
         usePemutar.setState({ poe: { ...state, placed: baru } })
       },
@@ -74,6 +82,7 @@ export function mintaTebak(
         if (!aktif || usePemutar.getState().dijeda) return
         const state = usePemutar.getState().poe
         if (!state || state.tahap !== 'tebak') return
+        if (!Number.isInteger(alasanIdx) || !konfigurasi.reasons[alasanIdx]) return
         bunyi('ketuk')
         usePemutar.setState({ poe: { ...state, alasan: alasanIdx } })
       },
@@ -86,7 +95,7 @@ export function mintaTebak(
         bersih()
         const from = state.placed.map((_, i) => konfigurasi.slot(i, state.placed.length))
         const hasil: HasilTebak = {
-          g: state.placed.length,
+          g: konfigurasi.zat ? state.placed[0] : state.placed.length,
           r: state.alasan,
           from,
         }
@@ -100,13 +109,14 @@ export function mintaTebak(
   })
 }
 
-export function tampilkanAmati(tebakan: number, unit = 'ATP') {
+export function tampilkanAmati(tebakan: number | string, unit = 'ATP') {
+  const teks = typeof tebakan === 'string' ? tebakan : `${tebakan} ${unit}`
   usePemutar.setState({
     pose: '03-netral',
     poe: {
       tahap: 'amati',
-      gtagText: `Tebakanmu: ${tebakan} ${unit}`,
-      tebakan: `${tebakan} ${unit}`,
+      gtagText: `Tebakanmu: ${teks}`,
+      tebakan: teks,
       statusTebakan: null,
     },
   })
@@ -126,6 +136,7 @@ export function mintaJelaskan(
     g: number
     r: number
     unit: string
+    zat?: string[]
     reasons: string[]
     back: string[]
     // right = jumlah yang benar untuk vonis tebakan; alasanBenar = indeks alasan yang benar
@@ -154,10 +165,11 @@ export function mintaJelaskan(
     if (signal.aborted) return batal()
     signal.addEventListener('abort', batal, { once: true })
 
+    const tebakan = opsi.zat?.[opsi.g] ?? `${opsi.g} ${opsi.unit}`
     const tepat = opsi.g === opsi.right
     const verdict = tepat
       ? `Tebakanmu tepat: ${opsi.hasil}.`
-      : `Tebakanmu ${opsi.g} ${opsi.unit} belum tepat. Yang terjadi: ${opsi.hasil}.`
+      : `Tebakanmu ${tebakan} belum tepat. Yang terjadi: ${opsi.hasil}.`
 
     bunyi('muncul')
     usePemutar.setState({
@@ -165,7 +177,7 @@ export function mintaJelaskan(
       poe: {
         tahap: 'jelaskan',
         judul: 'Alasan mana yang menjelaskan apa yang baru kamu lihat?',
-        tadiText: `Tadi: ${opsi.g} ${opsi.unit} · ${opsi.reasons[opsi.r]}`,
+        tadiText: `Tadi: ${tebakan} · ${opsi.reasons[opsi.r]}`,
         verdictText: verdict,
         verdictTepat: tepat,
         reasons: opsi.reasons,
@@ -174,7 +186,13 @@ export function mintaJelaskan(
         selectedExplain: null,
         explainDone: false,
         pilihExplain: (idx: number) => {
-          if (!aktif || usePemutar.getState().dijeda) return
+          if (
+            !aktif ||
+            usePemutar.getState().dijeda ||
+            !Number.isInteger(idx) ||
+            !opsi.reasons[idx]
+          )
+            return
           if (firstSelected === null) firstSelected = idx
           if (idx === opsi.alasanBenar) {
             bunyi('tepat')
@@ -196,6 +214,8 @@ export function mintaJelaskan(
         },
         lanjut: () => {
           if (!aktif || usePemutar.getState().dijeda) return
+          const state = usePemutar.getState().poe
+          if (state?.tahap !== 'jelaskan' || !state.explainDone) return
           bunyi('ketuk')
           const hasil = firstSelected ?? opsi.alasanBenar
           bersih()

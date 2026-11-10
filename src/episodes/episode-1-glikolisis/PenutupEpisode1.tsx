@@ -117,6 +117,9 @@ function PenutupEpisode1() {
     >
       {selesai && (
         <div className="pemutar-akhir">
+          <Link to="/episode/2" className="tombol-utama" onClick={() => bunyi('melesat')}>
+            Lanjut ke Episode 2
+          </Link>
           <Link to="/peta-materi" className="tombol-utama" onClick={() => bunyi('kembali')}>
             Ke peta materi
           </Link>

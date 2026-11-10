@@ -46,6 +46,8 @@ export type PoeTebakState = {
   // cap = keterangan di bawah zona; nampan = zona memakai gambar nampan G01, bukan zona taruh G02
   zone: { x: number; y: number; w: number; h: number; name: string; cap?: string; nampan?: boolean }
   supply: [number, number][]
+  // Pilihan satu zat; tanpa ini token tetap dihitung sebagai ATP.
+  zat?: { teks: string; gambar?: string }[]
   slot: (i: number, n: number) => [number, number]
   // Posisi kiri-atas kartu dalam persen, seperti cardAt di prototype
   kartu?: [number, number]

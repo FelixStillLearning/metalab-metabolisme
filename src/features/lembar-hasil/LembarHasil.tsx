@@ -11,7 +11,13 @@ import { tenangAktif } from '../../stores/pengaturan'
 import './lembar-hasil.css'
 
 // Tebakan POE sebelum menonton lawan yang terjadi; tidak dinilai
-export type PasanganPoe = { k: string; q: string; tebakan: number; nyata: number; alasan: string }
+export type PasanganPoe = {
+  k: string
+  q: string
+  tebakan: number | string
+  nyata: number | string
+  alasan: string
+}
 
 type Props = {
   label: string
@@ -26,7 +32,7 @@ type Props = {
   cetak: {
     judul: string
     jawaban: { k: string; bagian: string; isi: string }[]
-    poe: { k: string; tebakan: number; awal: string; akhir: string }[]
+    poe: { k: string; tebakan: number | string; awal: string; akhir: string }[]
     tabel?: ReactNode
   }
   rute: { episode: string; lanjut: string }
