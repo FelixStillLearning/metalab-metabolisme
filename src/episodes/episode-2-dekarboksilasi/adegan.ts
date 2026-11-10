@@ -24,6 +24,7 @@ import {
   speedLines,
   teks,
   to,
+  wait,
   type Objek,
   type Panggung,
 } from '../../features/pemutar-episode/mesin'
@@ -115,10 +116,13 @@ async function pembuka(p: Panggung) {
   bunyi('geser')
   // Jangkar matriks sumber C04: (840, 360) pada gambar bersih 1774 × 887.
   await Promise.all([
-    to(panel, { x: 800, y: 450, s: 4.9 }, 1800, 'kamera'),
-    camTo(p, matriksX, matriksY, 4.2, 1800),
-    to(mito, { o: 0 }, 1800),
-    pasangLatar(p, matriks, 'matriks'),
+    to(panel, { x: 800, y: 450, s: 4.9 }, 3000, 'kamera'),
+    camTo(p, matriksX, matriksY, 4.2, 3000),
+    (async () => {
+      await wait(p, 1000)
+      await pasangLatar(p, matriks, 'matriks')
+      await to(mito, { o: 0 }, 1400)
+    })(),
   ])
   mito.remove()
   await to(p.cam, { x: 0, y: 0, s: 1 }, 0)
