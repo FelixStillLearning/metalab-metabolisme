@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, expect, test } from 'vitest'
 import { kendali } from '../../src/features/pemutar-episode/mesin'
+import { BENTUK } from '../../src/episodes/episode-3-krebs/molekul'
 import { BAB, JAWABAN, TAHAP, ZAT, total } from '../../src/episodes/episode-3-krebs/isi'
 import { lengkap, useJawabanE3 } from '../../src/stores/jawaban-episode-3'
 
@@ -82,4 +83,19 @@ test('rehidrasi menolak hasil rusak dan mempertahankan draf sah', async () => {
   expect(useJawabanE3.getState().penjelasan).toBe('')
   expect(useJawabanE3.getState().draf.poe).toEqual({})
   expect(typeof useJawabanE3.getState().mulai).toBe('function')
+})
+
+test('susunan delapan molekul memuat karbon dan ikatan yang sah', () => {
+  expect(BENTUK.map((b) => b.titik.length)).toEqual([6, 6, 5, 4, 4, 4, 4, 4])
+  expect(BENTUK[0].titik).not.toEqual(BENTUK[1].titik)
+  for (const b of BENTUK) {
+    expect(b.ikatan.length).toBe(b.titik.length - 1)
+    for (const [a, c] of b.ikatan) {
+      expect(b.titik[a]).toBeDefined()
+      expect(b.titik[c]).toBeDefined()
+      expect(
+        Math.hypot(b.titik[a][0] - b.titik[c][0], b.titik[a][1] - b.titik[c][1]),
+      ).toBeGreaterThan(48)
+    }
+  }
 })

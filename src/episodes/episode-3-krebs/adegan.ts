@@ -6,6 +6,7 @@ import piruvat from '../../assets/images/molekul-piruvat.webp'
 import glukosa from '../../assets/images/glukosa.webp'
 import oksigen from '../../assets/images/molekul-o2.webp'
 import koa from '../../assets/images/molekul-koa.webp'
+import co2 from '../../assets/images/molekul-co2.webp'
 import h2o from '../../assets/images/molekul-h2o.webp'
 import atp from '../../assets/images/pembawa-atp.webp'
 import adp from '../../assets/images/pembawa-adp.webp'
@@ -16,6 +17,9 @@ import fadh2 from '../../assets/images/pembawa-fadh2.webp'
 import { label } from '../../features/pemutar-episode/kertas'
 import {
   arc,
+  arrive,
+  burstBehind,
+  comic,
   camTo,
   hide,
   pasangLatar,
@@ -137,21 +141,35 @@ async function bahan(p: Panggung) {
   p.world.replaceChildren()
   const a = rangka(p, 2, 'Gugus asetil', 320, 410)
   const b = rangka(p, 4, 'Oksaloasetat', 1080, 410)
+  a.g.dataset.objek = 'asetil-bergabung'
+  b.g.dataset.objek = 'oksaloasetat-bergabung'
   const air = gambar(p.world, h2o, 800, 580, 100, 100)
   const k = gambar(p.world, koa, 320, 560)
   bunyi('geser')
   await Promise.all([
-    to(a.g, { x: 600 }, 800),
-    to(b.g, { x: 820 }, 800),
-    to(air, { x: 710, y: 410, o: 0 }, 800),
+    to(a.g, { x: 380 }, 800),
+    to(b.g, { x: 600 }, 800),
+    to(air, { x: 500, y: 460, o: 0 }, 800),
   ])
+  air.remove()
+  const sitrat = rangka(p, 6, 'Sitrat', 500, 460)
+  sitrat.atom.forEach((c) => c.remove())
+  sitrat.ikatan.replaceChildren()
+  sitrat.atom.splice(0, 6, ...a.atom, ...b.atom)
+  for (const asal of [a, b])
+    for (const c of asal.atom) {
+      sitrat.g.append(c)
+      await to(c, { x: asal.g._x + c._x - sitrat.g._x, y: asal.g._y + c._y - sitrat.g._y }, 0)
+    }
   a.g.remove()
   b.g.remove()
-  air.remove()
-  const sitrat = rangka(p, 6, 'Sitrat', 710, 410)
+  await sitrat.susun('Sitrat', 1)
+  sitrat.g.dataset.objek = 'sitrat-ikhtisar'
+  burstBehind(p, sitrat.g)
   bunyi('tempel')
-  await to(k, { x: 1100, y: 550 }, 650)
+  await to(k, { x: 850, y: 520 }, 650)
   label(k, 0, 70, 'KoA dilepas', 24)
+  await comic(p, 'KLIK', 800, 260, 'var(--color-paper)')
   await say(
     p,
     'gabung',
@@ -159,6 +177,11 @@ async function bahan(p: Panggung) {
   )
   catat('b')
   bab('c')
+  await say(
+    p,
+    'delapan-tahap',
+    'Sitrat enam karbon akan berubah melalui beberapa reaksi hingga oksaloasetat terbentuk kembali. Ada berapa tahap pada siklus ini?',
+  )
   await mintaPilihan(
     p.signal,
     {
@@ -182,7 +205,7 @@ async function poe(p: Panggung, k: PoeE3, amati: () => Promise<void>) {
     reasons: isi.alasan,
     right: 1,
     zat: isi.zat.map((teks) => ({ teks })),
-    zone: { x: 500, y: 480, w: 380, h: 250, name: 'roda siklus Krebs' },
+    zone: { x: 500, y: 480, w: 380, h: 280, name: 'roda siklus Krebs' },
     supply: [
       [850, 300],
       [850, 460],
@@ -221,24 +244,26 @@ async function pembawa(p: Panggung, tahap: number, hasil: 'NADH' | 'FADH₂' | '
   g.dataset.hasil = hasil
   g.dataset.tahap = String(tahap)
   bunyi(hasil === 'ATP' ? 'atp' : 'tempel')
-  await to(g, { x: 1100, y: 530 }, 650)
+  await arrive(p, g, 1100, 530)
   label(g, 0, 65, `${hasil} · tahap ${tahap}`, 24)
   return g
 }
 
 async function putar(p: Panggung, roda: Roda) {
   let m: Rangka | null = null
-  const labelPutaran = label(p.fx, 1100, 240, 'SATU PUTARAN · SATU ASETIL KoA', 24)
+  const labelPutaran = label(p.fx, 1100, 170, 'SATU PUTARAN · SATU ASETIL KoA', 24)
   const tahapJudul = label(p.fx, 1100, 310, '4 · α-ketoglutarat', 26)
   for (const [i, t] of TAHAP.entries()) {
     roda.aktif(i)
     tahapJudul.querySelector('text')!.textContent = `${i + 1} · ${t.nama}`
     if (!m) m = rangka(p, 6, t.nama)
     const lepas = i === 2 || i === 3 ? await lepasCo2(p, m, i + 1) : null
-    m.susun(t.nama, i + 1)
+    await m.susun(t.nama, i + 1)
     if (lepas) {
+      burstBehind(p, m.g)
       bunyi('belah')
       await arc(lepas, 850, 280 + (i - 2) * 240, 110, 1000)
+      await comic(p, 'POP!', 740, 370, 'var(--color-paper)')
     } else {
       bunyi('geser')
       await to(m.g, { s: 1.06 }, 260)
@@ -302,7 +327,6 @@ async function tempatkan(p: Panggung, roda: Roda) {
       0,
       () => {},
     )
-    const diterima: ReturnType<typeof gambar>[] = []
     await mintaKetukSemua(
       p.signal,
       `Ketuk tahap penempatan ${z.nama}.`,
@@ -314,8 +338,8 @@ async function tempatkan(p: Panggung, roda: Roda) {
       async (i) => {
         roda.aktif(i)
         const g = gambar(p.fx, href, 1100, 350, 100, 50)
-        diterima.push(g)
-        await arc(g, ...posisi(i), 90, 650)
+        const [x, y] = posisi(i)
+        await arc(g, 500 + (x - 500) * 0.66, 480 + (y - 480) * 0.66, 90, 650)
         bunyi('tempel')
       },
       {
@@ -328,14 +352,25 @@ async function tempatkan(p: Panggung, roda: Roda) {
     catat(z.k)
     await say(p, `zat-${z.k}-selesai`, z.pesan)
     token.remove()
-    diterima.forEach((g) => g.remove())
   }
 }
 async function duaPutaran(p: Panggung, roda: Roda) {
-  const judul = label(p.fx, 1100, 280, 'Per 1 glukosa · 2 asetil KoA', 28)
-  const penghitung = label(p.fx, 1100, 500, RINGKASAN(2), 25)
-  const lingkup = label(p.fx, 1100, 440, 'Putaran 1 mulai', 30)
+  const judul = label(p.fx, 1100, 170, 'Per 1 glukosa · 2 asetil KoA', 28)
+  const penghitung = label(p.fx, 1100, 690, RINGKASAN(2), 24)
+  const lingkup = label(p.fx, 1100, 265, 'Putaran 1 mulai', 28)
+  judul.dataset.objek = 'judul-panen'
+  lingkup.dataset.objek = 'putaran-panen'
   penghitung.querySelector('text')!.textContent = ''
+  const panen = [
+    { href: nadh, nama: 'NADH', per: 3, x: 1030, y: 440 },
+    { href: fadh2, nama: 'FADH₂', per: 1, x: 1310, y: 440 },
+    { href: atp, nama: 'ATP', per: 1, x: 1030, y: 575 },
+    { href: co2, nama: 'CO₂', per: 2, x: 1310, y: 575 },
+  ].map((t) => ({
+    ...t,
+    g: hide(gambar(p.fx, t.href, t.x, t.y, 150, 75)),
+    hitung: label(p.fx, t.x, t.y + 56, `0 ${t.nama}`, 26),
+  }))
   const asetil = [0, 1].map((i) => {
     const g = gambar(p.world, asetilKoa, 1040 + i * 240, 350, 180, 100)
     g.dataset.asetil = String(i + 1)
@@ -349,6 +384,11 @@ async function duaPutaran(p: Panggung, roda: Roda) {
       await wait(p, 230)
     }
     bunyi('tempel')
+    await Promise.all(panen.map((t) => to(t.g, { o: 1, s: 1.08 }, 300, 'letup')))
+    for (const t of panen) {
+      t.hitung.querySelector('text')!.textContent = `${t.per * (k + 1)} ${t.nama}`
+      await to(t.g, { s: 1 }, 120)
+    }
     lingkup.querySelector('text')!.textContent = `Putaran ${k + 1} selesai`
     penghitung.querySelector('text')!.textContent = RINGKASAN(k + 1)
     penghitung.dataset.putaran = String(k + 1)
@@ -360,6 +400,10 @@ async function duaPutaran(p: Panggung, roda: Roda) {
         : 'Asetil KoA kedua menjalankan putaran kedua. Untuk satu glukosa totalnya enam NADH, dua FADH₂, dua ATP, empat CO₂. Oksaloasetat terbentuk kembali di setiap putaran.',
     )
   }
+  panen.forEach((t) => {
+    t.g.remove()
+    t.hitung.remove()
+  })
   judul.remove()
   lingkup.remove()
   penghitung.remove()
@@ -371,6 +415,11 @@ export async function episode(p: Panggung) {
   await pembuka(p)
   await bahan(p)
   const roda = rodaKrebs(p)
+  bunyi('muncul')
+  await to(hide(roda.g), { o: 1 }, 700)
+  const pratinjau = rangka(p, 6, 'Sitrat')
+  await pratinjau.susun('Sitrat', 1)
+  await to(pratinjau.g, { s: 0.78, y: 475 }, 0)
   await say(
     p,
     'roda',
@@ -378,6 +427,7 @@ export async function episode(p: Panggung) {
   )
   let m: Rangka | null = null
   await poe(p, 'i·1', async () => {
+    pratinjau.g.remove()
     m = await putar(p, roda)
   })
   m!.g.remove()

@@ -114,3 +114,21 @@
     height: 30px;
   }
 }
+
+.episode-3 .pemutar-panggung:has([data-objek='sitrat-ikhtisar']) .pemutar-soal {
+  left: auto;
+  right: 2%;
+  top: 24%;
+  bottom: auto;
+  width: 36%;
+  transform: none;
+}
+@media (max-width: 760px), (max-height: 500px) {
+  .episode-3 .pemutar-panggung:has([data-objek='sitrat-ikhtisar']) .pemutar-soal {
+    right: 1%;
+    top: 20%;
+    width: 41%;
+    max-height: 70%;
+    overflow: auto;
+  }
+}
