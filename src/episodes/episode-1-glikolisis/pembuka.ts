@@ -1,7 +1,7 @@
 // Pembuka Episode 1: sel utuh, glukosa masuk, penanda menunjuk mitokondria lalu sitoplasma,
 // kemudian panel zoom membawa kamera ke panggung sitosol. Gerak sel, glukosa, dan kamera dari
 // intro() prototype; penanda dan panel zoom tambahan dari rancangan episode.
-import gambarLatar from '../../assets/images/latar-sitosol.webp'
+import gambarLatar from '../../assets/images/latar-sitosol-lebar.webp'
 import gambarPanel from '../../assets/images/organel-panel-zoom.webp'
 import gambarPenanda from '../../assets/images/organel-penanda-zoom.webp'
 import gambarSel from '../../assets/images/sel-hewan.webp'
@@ -11,6 +11,7 @@ import {
   camTo,
   hide,
   obj,
+  pasangLatar,
   teks,
   to,
   wait,
@@ -36,13 +37,14 @@ export async function pembuka(p: Panggung) {
   sel.dataset.objek = 'sel'
   el('image', { href: gambarSel, x: -550, y: -367, width: 1100, height: 733 }, sel)
   teks(sel, 0, -385, 'SEL', 34, 'var(--color-paper)')
+  bunyi('muncul')
   await wait(p, 500)
   await say(p, 'e1-pembuka-01')
 
   const g = glukosa(p, 1650, 700)
   g.label.style.opacity = '0'
   await to(g, { s: 0.45 }, 0)
-  bunyi('melesat')
+  bunyi('geser')
   await arrive(p, g, ...SITOPLASMA)
 
   const penanda = obj(...TITIK_MITOKONDRIA, p.world)
@@ -50,9 +52,11 @@ export async function pembuka(p: Panggung) {
   gambar(penanda, gambarPenanda)
   hide(penanda)
   penanda._s = 0.85
+  bunyi('muncul')
   await to(penanda, { o: 1, s: 1 }, 600)
   await say(p, 'e1-pembuka-02', { pendamping: '01-ramah' })
 
+  bunyi('geser')
   await to(penanda, { x: SITOPLASMA[0], y: SITOPLASMA[1] })
   await say(p, 'e1-pembuka-03')
 
@@ -61,7 +65,9 @@ export async function pembuka(p: Panggung) {
   panel.dataset.objek = 'panel-zoom'
   gambar(panel, gambarPanel)
   hide(panel)
+  bunyi('muncul')
   await Promise.all([to(panel, { o: 1 }, 300), to(penanda, { o: 0 }, 300)])
+  bunyi('geser')
   // Kurva dan durasi sama dengan kamera, jadi titik sitoplasma tetap di tengah panel
   await Promise.all([
     to(panel, { x: 800, y: 450, s: 4.9 }, 1800, 'kamera'),
@@ -70,14 +76,12 @@ export async function pembuka(p: Panggung) {
   ])
 
   // Pindah ke panggung sitosol (labScene() di prototype)
-  const latar = obj(0, 0, p.latar)
-  latar.dataset.latar = 'sitosol'
-  el('image', { href: gambarLatar, width: 1600, height: 900 }, latar)
-  hide(latar)
-  await to(latar, { o: 1 }, 600)
+  await pasangLatar(p, gambarLatar, 'sitosol')
   p.world.replaceChildren()
   await to(p.cam, { x: 0, y: 0, s: 1 }, 0)
-  const tempat = obj(800, 80, p.world)
+  // Label lokasi tetap di layar, terpisah dari kamera dan efek yang dibersihkan tiap tahap.
+  const tempat = obj(800, 80, p.svg)
+  p.signal.addEventListener('abort', () => tempat.remove(), { once: true })
   tempat.dataset.objek = 'label-sitosol'
   teks(tempat, 0, 0, 'SITOSOL · TANPA OKSIGEN', 26, 'var(--color-paper)')
   await to(panel, { o: 0 }, 600)

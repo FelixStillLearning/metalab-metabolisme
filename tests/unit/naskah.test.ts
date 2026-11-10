@@ -1,7 +1,9 @@
 import { afterEach, expect, test } from 'vitest'
 import { NASKAH, say } from '../../src/episodes/episode-1-glikolisis/naskah'
+import { soalH } from '../../src/episodes/episode-1-glikolisis/soalH'
 import { kendali, wait, type Panggung } from '../../src/features/pemutar-episode/mesin'
 import { usePengaturan } from '../../src/stores/pengaturan'
+import { usePemutar } from '../../src/stores/pemutar'
 
 test('naskah memuat semua kalimat utama episode 1', () => {
   const kalimat = Object.values(NASKAH)
@@ -17,6 +19,24 @@ test('naskah memuat semua kalimat utama episode 1', () => {
 afterEach(() => {
   kendali.cepat = 1
   usePengaturan.setState({ tenang: null, narasi: true })
+  usePemutar.setState({ bab: -1, kalimat: '', pendamping: null })
+})
+
+test('soal h langsung menampilkan pertanyaan saat narasi petunjuk dimulai', async () => {
+  usePengaturan.setState({ narasi: false })
+  const kontrol = new AbortController()
+  const p = {
+    signal: kontrol.signal,
+    fx: document.createElementNS('http://www.w3.org/2000/svg', 'g'),
+  } as Panggung
+  const janji = soalH(p, [])
+  try {
+    expect(usePemutar.getState().lengkapi?.judul).toBe('Lengkapi kalimat pengertian glikolisis')
+    expect(usePemutar.getState().kalimat).toBe(NASKAH['e1-h-02'].teks)
+  } finally {
+    kontrol.abort()
+    await expect(janji).rejects.toMatchObject({ name: 'AbortError' })
+  }
 })
 
 const lama = async (janji: Promise<void>) => {

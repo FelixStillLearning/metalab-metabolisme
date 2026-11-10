@@ -1,0 +1,87 @@
+.episode-2 .tok-zat {
+  width: max(78px, 8cqw);
+  height: max(60px, 5.8cqw);
+  padding: 6px;
+  border: 3px dashed var(--color-ink);
+  border-radius: 12px;
+  background: rgb(245 241 232 / 0.35);
+  color: var(--color-ink);
+  font: 700 max(14px, 1.3cqw) / 1 var(--font-body);
+}
+.episode-2 .pemutar-sampul-dekorasi-kanan {
+  top: 3%;
+  right: 3%;
+  width: 15%;
+  transform: rotate(10deg);
+}
+.episode-2 .tok-zat[aria-pressed='true'] {
+  width: max(52px, 7cqw);
+  height: max(30px, 2.7cqw);
+  padding: 0;
+  border: 0;
+  background: none;
+}
+.episode-2 .tok-zat span {
+  display: block;
+  padding: 10px;
+  background: var(--color-paper);
+  box-shadow: var(--shadow-kertas-sm);
+}
+.e2-diagram {
+  width: 100%;
+  max-height: 100%;
+  font: 700 22px var(--font-body);
+  fill: var(--color-ink);
+}
+.e2-jawaban {
+  display: grid;
+  gap: 16px;
+  list-style: none;
+  padding: 16px;
+  font-size: clamp(16px, 1.15vw, 20px);
+}
+.e2-jawaban p {
+  margin: 4px 0 0;
+}
+
+.e2-bagan {
+  min-height: 0;
+  overflow: auto;
+}
+.e2-diagram .flow {
+  fill: none;
+  stroke: var(--color-screen-3);
+  stroke-width: 3;
+}
+.episode-2 .poe-steps {
+  top: 5%;
+}
+.episode-2 .pemutar-panggung:has(.poe-steps) [data-objek='label-matriks'] {
+  display: none;
+}
+.episode-2 [data-objek='jumlah-piruvat'] polygon:not([data-bayangan]) {
+  fill: var(--color-accent);
+}
+@media (max-width: 760px), (max-height: 500px) {
+  .e2-bagan {
+    overflow: visible;
+  }
+  .episode-2 [data-objek='judul-tahap'],
+  .episode-2 [data-objek='label-matriks'] {
+    display: none;
+  }
+  .episode-2 .poe-steps {
+    top: 3%;
+  }
+}
+
+.episode-2 .pemutar-panggung:has([data-objek='jumlah-piruvat']) .pemutar-soal {
+  left: auto;
+  right: 2%;
+  transform: none;
+}
+@media (max-height: 500px) and (orientation: landscape) {
+  .episode-2 .e2-konteks-isi {
+    transform: translateY(-190px);
+  }
+}

@@ -3,6 +3,8 @@
    skala adegan. Kontrol selalu diam di tempat. */
 
 .pemutar {
+  /* Lebar panggung 16:9 yang muat di layar; juga dipakai .pemutar-latar */
+  --panggung: min(100vw, calc(100dvh * 16 / 9));
   position: fixed;
   inset: 0;
   display: grid;
@@ -11,9 +13,30 @@
   background: var(--color-screen);
 }
 
+/* Latar lebar (sumber 1672x941 + 293 px tiap sisi) di belakang panggung. Ukuran dan letaknya sama
+   dengan gambar latar di adegan, jadi bilah di luar 16:9 berisi lanjutan latar yang menyambung. */
+.pemutar-latar {
+  position: absolute;
+  inset: 0;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: calc(var(--panggung) * 2258 / 1672) calc(var(--panggung) * 9 / 16 * 1527 / 941);
+  animation: pemutar-latar-masuk 600ms both;
+}
+
+@keyframes pemutar-latar-masuk {
+  from {
+    opacity: 0;
+  }
+}
+
+[data-tenang] .pemutar-latar {
+  animation: none;
+}
+
 .pemutar-panggung {
   position: relative;
-  width: min(100vw, calc(100dvh * 16 / 9));
+  width: var(--panggung);
   aspect-ratio: 16 / 9;
   container-type: size;
   overflow: hidden;
@@ -67,7 +90,31 @@
   grid-template-columns: 1fr 1fr;
   place-items: center;
   gap: 2%;
-  padding: 10% 7%;
+  padding: 8% 7%;
+  overflow: hidden;
+}
+
+.pemutar-sampul-dekorasi-kanan {
+  position: absolute;
+  top: -6%;
+  right: -5%;
+  width: 22%;
+  max-width: 320px;
+  transform: rotate(18deg);
+  opacity: 0.85;
+  pointer-events: none;
+  z-index: 0;
+  filter: drop-shadow(2px 5px 0 #0d252640);
+  animation: sampul-tempel 500ms var(--ease-letup) 50ms backwards;
+}
+
+.pemutar-sampul-logo {
+  display: block;
+  width: clamp(120px, 13cqw, 200px);
+  height: auto;
+  margin-bottom: 0.2cqw;
+  filter: drop-shadow(1px 2px 0 #0d252633);
+  animation: sampul-tempel 420ms var(--ease-letup) 0ms backwards;
 }
 
 .pemutar-sampul-gambar {
@@ -75,6 +122,7 @@
   width: 115%;
   margin-left: -5%;
   transform: rotate(-5deg);
+  animation: sampul-luncur-sel 600ms var(--ease-pose) 90ms backwards;
 }
 
 .pemutar-sampul-gambar img {
@@ -87,7 +135,8 @@
   grid-area: 1 / 1;
   display: grid;
   justify-items: start;
-  gap: 1.6cqw;
+  gap: 1.4cqw;
+  z-index: 1;
 }
 
 .pemutar-label {
@@ -98,23 +147,63 @@
   font-size: clamp(13px, 1.15cqw, 20px);
   font-weight: 700;
   transform: rotate(-2deg);
+  animation: sampul-tempel 420ms var(--ease-letup) 70ms backwards;
 }
 
 .pemutar-sampul h1 {
-  margin: 0.2em 0;
+  margin: 0.1em 0;
   padding: 0.22em 0.3em 0.12em;
   background: var(--color-paper);
   color: var(--color-ink);
-  font: 800 5.8cqw/1 var(--font-head);
+  font: 800 5.8cqw / 1 var(--font-head);
   letter-spacing: -0.04em;
   clip-path: polygon(0 2%, 99% 0, 100% 97%, 1% 100%);
   transform: rotate(-2deg);
+  animation: sampul-tempel 420ms var(--ease-letup) 140ms backwards;
 }
 
 .pemutar-sampul p {
   max-width: 35ch;
   font-size: clamp(16px, 1.55cqw, 26px);
   line-height: 1.5;
+  animation: sampul-tempel 420ms var(--ease-letup) 210ms backwards;
+}
+
+.pemutar-sampul-aksi {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.2cqw;
+  margin-top: 0.6cqw;
+  animation: sampul-tempel 420ms var(--ease-letup) 280ms backwards;
+}
+
+/* Sama dengan beranda-tempel: hanya titik awal, jadi rotasi bawaan elemen tidak tertumpuk */
+@keyframes sampul-tempel {
+  from {
+    opacity: 0;
+    scale: 0.85;
+    rotate: -4deg;
+  }
+}
+
+@keyframes sampul-luncur-sel {
+  from {
+    opacity: 0;
+    translate: 10% -3%;
+    rotate: 7deg;
+  }
+}
+
+/* data-tenang sudah mencakup prefers-reduced-motion saat saklar tenang belum diatur */
+[data-tenang] .pemutar-sampul-logo,
+[data-tenang] .pemutar-label,
+[data-tenang] .pemutar-sampul h1,
+[data-tenang] .pemutar-sampul p,
+[data-tenang] .pemutar-sampul-aksi,
+[data-tenang] .pemutar-sampul-gambar,
+[data-tenang] .pemutar-sampul-dekorasi-kanan {
+  animation: none;
 }
 
 .pemutar-sampul .tombol-utama,
@@ -126,7 +215,7 @@
 }
 
 .pemutar-sampul .tombol-utama {
-  margin-top: 1cqw;
+  margin-top: 0;
 }
 
 .pemutar-sampul .tombol-utama:hover,
@@ -155,36 +244,81 @@
 .pemutar-kembali {
   display: inline-flex;
   align-items: center;
-  gap: 0.4em;
-  margin-top: 8px;
-  color: var(--color-paper);
-  font-size: clamp(13px, 1.1cqw, 18px);
-  text-decoration: underline;
-  text-underline-offset: 5px;
+  gap: 0.5em;
+  padding: 0.45em 1.2em 0.55em;
+  border-radius: 999px;
+  background: var(--color-paper);
+  box-shadow: var(--shadow-kertas-sm);
+  color: var(--color-ink);
+  font: 800 clamp(13px, 1.15cqw, 18px) / 1.2 var(--font-head);
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    translate var(--durasi-ui) var(--ease-pose),
+    box-shadow var(--durasi-ui) var(--ease-pose);
+}
+
+.pemutar-kembali:hover {
+  translate: 0 -3px;
+  box-shadow: 2px 4px 0 #0d252640;
+}
+
+.pemutar-kembali:active {
+  translate: 0 1px;
 }
 
 .pemutar-kembali svg {
-  width: 1.1em;
-  height: 1.1em;
+  width: 1.15em;
+  height: 1.15em;
+  flex-shrink: 0;
 }
 
 /* ---------- narator dan gelembung ---------- */
 
+/* Didaftarkan sebagai panjang agar perubahan ukuran maskot bisa ditransisikan */
+@property --maskot {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: 200px;
+}
+
+@property --pendamping {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: 128px;
+}
+
 .pemutar-narator {
+  /* Ikut lebar panggung: 1440 px ≈ 260 px dan 175 px */
+  --maskot: clamp(200px, 18cqw, 300px);
+  --pendamping: clamp(128px, 12cqw, 200px);
   position: absolute;
   left: 50%;
   bottom: 3%;
   display: grid;
-  grid-template-columns: 200px minmax(0, 1fr);
+  grid-template-columns: var(--maskot) minmax(0, 1fr);
   align-items: end;
   gap: 12px;
   width: 90%;
   transform: translateX(-50%);
   pointer-events: none;
+  transition:
+    --maskot 300ms var(--ease-pose),
+    --pendamping 300ms var(--ease-pose);
+}
+
+/* Ukuran lama (prototype) selama siswa diberi tugas, supaya pilihan di kiri bawah tidak tertutup */
+.pemutar-narator[data-tugas] {
+  --maskot: 200px;
+  --pendamping: 128px;
+}
+
+[data-tenang] .pemutar-narator {
+  transition: none;
 }
 
 .pemutar-narator:has(.pemutar-pendamping) {
-  grid-template-columns: 200px minmax(0, 1fr) 128px;
+  grid-template-columns: var(--maskot) minmax(0, 1fr) var(--pendamping);
 }
 
 .pemutar-maskot,
@@ -194,13 +328,13 @@
 }
 
 .pemutar-maskot {
-  width: 200px;
-  height: 200px;
+  width: var(--maskot);
+  height: var(--maskot);
 }
 
 .pemutar-pendamping {
-  width: 128px;
-  height: 128px;
+  width: var(--pendamping);
+  height: var(--pendamping);
 }
 
 /* Gelembung G05: kedua ujung bulat tetap utuh, bagian tengah memanjang mengikuti kalimat */
@@ -491,25 +625,6 @@
   pointer-events: none;
 }
 
-.pemutar-petunjuk {
-  position: absolute;
-  top: 11%;
-  right: 2.5%;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 10px;
-  background: var(--color-accent);
-  color: var(--color-ink);
-  font: 800 clamp(13px, 1.1cqw, 20px) var(--font-body);
-}
-
-.pemutar-petunjuk img {
-  width: 28px;
-  height: 28px;
-  object-fit: contain;
-}
-
 .pemutar-sasaran {
   position: absolute;
   width: 22%;
@@ -523,8 +638,9 @@
 
 .pemutar-sasaran:hover,
 .pemutar-sasaran:focus-visible {
-  outline: 3px solid var(--color-accent);
-  outline-offset: 3px;
+  /* Krem putus-putus, sejenis panah tahap soal b dan zona taruh */
+  outline: 5px dashed var(--color-paper);
+  outline-offset: 4px;
 }
 
 .pemutar-soal {
@@ -540,7 +656,7 @@
 
 .pemutar-soal h2 {
   margin-bottom: 12px;
-  font: 800 clamp(17px, 1.55cqw, 28px) / 1.25 var(--font-head);
+  font: 800 clamp(17px, 1.55cqw, 28px) / 1.25 var(--font-body);
 }
 
 .pemutar-opsi {
@@ -552,24 +668,67 @@
   flex: 1;
   min-height: 44px;
   padding: 8px 18px;
-  border-image: url('../../assets/images/interaksi-tombol-pilihan.webp') 0 90 0 90 fill / 0 14px
-    stretch;
-  font: 700 clamp(14px, 1.1cqw, 20px) var(--font-body);
   cursor: pointer;
 }
 
-.pemutar-pilihan:hover {
-  color: var(--color-atp);
+/* Satu gaya jawaban untuk pilihan biasa, rumpang, dan alasan POE. */
+.pemutar-pilihan,
+.chip {
+  position: relative;
+  isolation: isolate;
+  color: var(--color-ink);
+  font: 700 clamp(14px, 1.1cqw, 20px) / 1.35 var(--font-body);
+}
+
+/* Bentuk dan tekstur kertas sama pada semua keadaan; warna hanya mengubah lapisan gambar. */
+.pemutar-pilihan::before,
+.chip::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  border-image: url('../../assets/images/interaksi-tombol-pilihan.webp') 0 90 0 90 fill / 0 14px
+    stretch;
+}
+
+@media (hover: hover) {
+  :is(.pemutar-pilihan, .chip):hover:not(:disabled, [aria-pressed='true']) {
+    filter: drop-shadow(0 3px 0 #0d25264d);
+  }
+}
+
+:is(.pemutar-pilihan, .chip)[aria-pressed='true'],
+:is(.pemutar-pilihan, .chip):active:not(:disabled) {
+  color: var(--color-paper);
+}
+
+:is(.pemutar-pilihan, .chip)[aria-pressed='true']::before,
+:is(.pemutar-pilihan, .chip):active:not(:disabled)::before {
+  filter: brightness(0.35) sepia(1) saturate(4) hue-rotate(175deg);
+}
+
+:is(.pemutar-pilihan, .chip):focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 2px;
 }
 
 .pemutar-pilihan:disabled,
+.chip:disabled,
 .pemutar-sasaran:disabled {
   cursor: default;
 }
 
 /* Lengkapi kalimat: lebih lebar dari kartu soal biasa; rumpang aktif disorot oker */
 .pemutar-lengkapi {
+  top: 50%;
+  bottom: auto;
+  transform: translate(-50%, -50%);
   width: min(66%, 900px);
+}
+
+.pemutar-panggung:has(.pemutar-lengkapi) .pemutar-narator {
+  --pendamping: clamp(128px, 12cqw, 200px);
 }
 
 .pemutar-kalimat {
@@ -643,42 +802,42 @@
 
 .gtag {
   position: absolute;
-  top: 3%;
-  right: 2.5%;
-  font: 800 clamp(13px, 1.1cqw, 20px) / 1.2 var(--font-body);
+  top: 76px;
+  left: max(12px, 1.2vw);
+  width: clamp(200px, 18vw, 260px);
+  padding: 12px 16px;
+  border-image: url('../../assets/images/interaksi-kartu-soal.webp') 100 fill / 20px stretch;
   color: var(--color-ink);
-  background: var(--color-paper);
-  border: 2px solid var(--color-ink);
-  border-radius: 999px;
-  padding: 6px 16px;
-  box-shadow: 2px 4px 0 #0d25264d;
+  font: 700 18px/1.35 var(--font-body);
   pointer-events: auto;
 }
 
-/* Setelah vonis: penanda G14 berisi tanda, jumlah tebakan di sebelahnya */
+/* Vonis dan jumlah tebakan bertumpuk, memakai penanda G14 yang sudah ada. */
 .gtag.ok,
 .gtag.no {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 6px;
-  padding: 0;
-  border: 0;
-  background: none;
-  box-shadow: none;
+  gap: 6px 10px;
+  width: max-content;
+  max-width: min(360px, 45vw);
 }
 
 .gtag img {
-  width: clamp(130px, 12.5cqw, 200px);
+  width: min(100%, 160px);
   height: auto;
 }
 
 .gtag.ok span,
 .gtag.no span {
-  padding: 6px 12px;
-  border: 2px solid var(--color-ink);
-  border-radius: 999px;
-  background: var(--color-paper);
-  box-shadow: 2px 4px 0 #0d25264d;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.gtag-catatan {
+  flex-basis: 100%;
+  margin: 0;
+  font-size: 16px;
 }
 
 .poe-zone {
@@ -708,11 +867,13 @@
   color: var(--color-paper);
 }
 
-.poe-zone-label {
-  font: 700 14px var(--font-head);
-  color: var(--color-accent);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+/* Token sedang diseret di atas zona, seperti .zone.over prototype */
+.poe-zone[data-over]::after {
+  content: '';
+  position: absolute;
+  inset: 8.2%;
+  border-radius: 1.5cqw;
+  background: rgb(245 241 232 / 0.18);
 }
 
 .poe-tokens {
@@ -734,10 +895,19 @@
   border: 0;
   cursor: pointer;
   pointer-events: auto;
+  /* Seret dengan jari tidak menggulir halaman */
+  touch-action: none;
   transition:
     transform 200ms var(--ease-keluar),
     left 300ms var(--ease-keluar),
     top 300ms var(--ease-keluar);
+}
+
+/* Mengikuti penunjuk tanpa jeda, di atas token lain */
+.tok[data-seret] {
+  z-index: 1;
+  cursor: grabbing;
+  transition: transform 200ms var(--ease-keluar);
 }
 
 .tok:hover {
@@ -766,18 +936,20 @@
 .poe-card {
   /* Posisi bawaan seperti cardAt [62, 20] prototype; soal e memakai [3, 7] */
   left: var(--kartu-x, 62%);
-  top: var(--kartu-y, 20%);
+  top: max(132px, var(--kartu-y, 20%));
   width: 34%;
+  max-height: 72%;
+  overflow-y: auto;
 }
 
 .card h3 {
-  font: 800 clamp(16px, 1.4cqw, 24px) / 1.25 var(--font-head);
+  font: 700 clamp(20px, 1.6cqw, 28px) / 1.25 var(--font-body);
   margin: 0;
 }
 
 .card p {
   margin: 0;
-  font: 500 15px / 1.4 var(--font-body);
+  font: 400 clamp(16px, 1.25cqw, 22px) / 1.4 var(--font-body);
 }
 
 .poe-reasons {
@@ -786,32 +958,40 @@
   gap: 8px;
 }
 
-/* Tombol pilihan G04; terpilih = penanda biru di kiri */
+/* Ruang teks alasan POE di atas lapisan kertas G04. */
 .chip {
-  border-image: url('../../assets/images/interaksi-tombol-pilihan.webp') 0 90 0 90 fill / 0 14px
-    stretch;
-  color: var(--color-ink);
-  font: 600 clamp(13px, 1.05cqw, 18px) / 1.3 var(--font-body);
   padding: 10px 18px 10px 22px;
   min-height: 44px;
   text-align: left;
   cursor: pointer;
 }
 
-.chip:hover:not(:disabled, [aria-pressed='true']) {
-  color: var(--color-atp);
-}
-
-.chip[aria-pressed='true'] {
-  border-image-source: url('../../assets/images/interaksi-tombol-pilihan-terpilih.webp');
-  font-weight: 800;
-}
-
 .card.bottom {
+  border-width: 12px;
+  border-style: solid;
+  border-color: transparent;
   left: 50%;
-  bottom: 24%;
+  top: 25%;
   transform: translateX(-50%);
   width: min(64%, 860px);
+  max-height: 67%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.poe-card .chip,
+.poe-card-explain .chip {
+  font-size: clamp(16px, 1.2cqw, 20px);
+}
+
+.card p.poe-tadi {
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--color-paper-3);
+  font-weight: 400;
+}
+
+.card p.poe-verdict {
+  font-weight: 700;
 }
 
 .poe-verdict {
@@ -864,13 +1044,18 @@
     margin-bottom: 6px;
   }
 
-  .pemutar-petunjuk {
-    top: 17%;
+  .pemutar-lengkapi {
+    top: 100px;
+    transform: translateX(-50%);
+    /* Kedua sisi untuk maskot, bagian bawah untuk subtitle. */
+    width: 62%;
+    max-height: calc(100% - 174px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
   }
 
-  .pemutar-lengkapi {
-    bottom: 21%;
-    width: 92%;
+  .pemutar-panggung:has(.pemutar-lengkapi) .pemutar-narator {
+    --pendamping: 104px;
   }
 
   .pemutar-kalimat {
@@ -883,9 +1068,14 @@
     gap: 6px;
   }
 
+  .pemutar-pilihan,
+  .chip {
+    font-size: 13px;
+    line-height: 1.3;
+  }
+
   .pemutar-lengkapi .pemutar-pilihan {
     padding: 6px 10px;
-    font-size: 13px;
   }
 }
 
@@ -895,11 +1085,16 @@
   display: none;
 }
 
-.pemutar-ikon-putar svg {
+.pemutar-ikon-putar {
   display: block;
-  width: 125px;
-  height: 100px;
-  color: var(--color-paper);
+  width: 200px;
+  height: auto;
+  /* I18 versi kertas komik: ditempel sekali seperti sampul, lalu diam */
+  animation: sampul-tempel 520ms var(--ease-letup) backwards;
+}
+
+[data-tenang] .pemutar-ikon-putar {
+  animation: none;
 }
 
 @media (orientation: portrait) and (max-width: 760px) {
@@ -948,11 +1143,20 @@
   }
 
   .pemutar-sampul {
-    padding: 12% 6% 5%;
+    padding: 10% 6% 5%;
+  }
+
+  .pemutar-sampul-dekorasi-kanan {
+    display: none;
+  }
+
+  .pemutar-sampul-logo {
+    width: clamp(80px, 9cqw, 110px);
+    margin-bottom: 0;
   }
 
   .pemutar-sampul-isi {
-    gap: 8px;
+    gap: 6px;
   }
 
   .pemutar-sampul p {
@@ -969,23 +1173,29 @@
     font-size: 12px;
   }
 
-  .pemutar-narator,
-  .pemutar-narator:has(.pemutar-pendamping) {
+  .pemutar-sampul-aksi {
+    gap: 8px;
+    margin-top: 4px;
+  }
+
+  .pemutar-sampul .pemutar-kembali {
+    padding: 0.35em 0.9em 0.45em;
+    font-size: 13px;
+  }
+
+  .pemutar-narator {
+    --maskot: 136px;
+    --pendamping: 88px;
     left: 0;
     bottom: 2%;
-    grid-template-columns: 112px minmax(0, 1fr);
     gap: 6px;
     width: 98%;
     transform: none;
   }
 
-  .pemutar-maskot {
-    width: 112px;
-    height: 112px;
-  }
-
-  .pemutar-pendamping {
-    display: none;
+  .pemutar-narator[data-tugas] {
+    --maskot: 112px;
+    --pendamping: 72px;
   }
 
   .pemutar-gelembung {
@@ -1019,19 +1229,29 @@
   }
 
   .gtag {
-    top: 13%;
-    right: 8px;
-    font-size: 12px;
-    padding: 4px 10px;
+    top: 60px;
+    left: 8px;
+    width: 220px;
+    padding: 8px 12px;
+    font-size: 16px;
+  }
+
+  .gtag.ok,
+  .gtag.no {
+    gap: 6px;
   }
 
   .gtag img {
-    width: 110px;
+    width: min(100%, 130px);
   }
 
   .gtag.ok span,
   .gtag.no span {
-    padding: 3px 8px;
+    font-size: 18px;
+  }
+
+  .gtag-catatan {
+    font-size: 14px;
   }
 
   /* Saat menebak, gelembung kalimat memberi tempat untuk kartu di kanan */
@@ -1043,37 +1263,38 @@
     font-size: 12px;
   }
 
-  /* Kartu Jelaskan tepat di bawah bilah kontrol; alasan berjajar agar seluruh kartu muat */
+  /* HP: kartu tetap di bawah kontrol, alasan bertumpuk dan digulir di dalam kartu. */
   .card.bottom {
-    top: 62px;
+    left: 50%;
+    top: 116px;
     bottom: auto;
-    width: 92%;
-    max-height: calc(100% - 66px);
-    padding: 8px 12px;
-    gap: 5px;
+    /* Sisi kiri dan kanan untuk molekul hasil Amati (PGAL soal c) */
+    width: 68%;
+    max-height: calc(100% - 128px);
+    padding: 12px 16px;
+    gap: 8px;
     overflow-y: auto;
   }
 
   .card.bottom h3 {
-    font-size: 14px;
+    font-size: 16px;
   }
 
   .card.bottom p,
   .card.bottom .poe-verdict {
-    font-size: 12px;
+    font-size: 14px;
     line-height: 1.3;
   }
 
   .card.bottom .poe-reasons {
-    flex-direction: row;
+    flex-direction: column;
     gap: 6px;
   }
 
   .card.bottom .chip {
-    flex: 1;
-    font-size: 12px;
-    line-height: 1.25;
-    padding: 5px 8px;
+    flex: none;
+    font-size: 14px;
+    padding: 8px 12px;
   }
 
   .card.bottom .poe-feedback {
@@ -1087,6 +1308,7 @@
     right: 1%;
     width: 41%;
     max-height: 87%;
+    overscroll-behavior: contain;
     padding: 8px 10px;
     gap: 5px;
     overflow-y: auto;
@@ -1102,17 +1324,72 @@
   }
 
   .poe-card .poe-reasons {
-    gap: 4px;
+    gap: 6px;
+    max-height: 36cqh;
+    min-height: 44px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 3px;
   }
 
   .poe-card .chip {
-    font-size: 12px;
-    line-height: 1.25;
-    padding: 5px 8px;
+    flex: none;
+    font-size: 14px;
+    padding: 6px 8px;
   }
 
   .poe-card .poe-kunci {
     font-size: 14px;
     padding: 6px 12px;
+  }
+}
+
+/* Petunjuk terpisah dari percakapan; tidak mengambil fokus atau menghalangi ketukan. */
+.pemutar-panduan-wadah {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.pemutar-panduan {
+  position: absolute;
+  left: max(12px, 1.2vw);
+  top: 76px;
+  width: clamp(260px, 24vw, 360px);
+}
+
+.pemutar-panduan-kartu {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 20px;
+  border-image: url('../../assets/images/interaksi-kartu-soal.webp') 100 fill / 20px stretch;
+  color: var(--color-ink);
+  font: 700 clamp(15px, 1.2cqw, 20px) / 1.35 var(--font-body);
+}
+
+.pemutar-panduan-ikon {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  color: var(--color-screen-3);
+}
+
+@media (max-height: 500px) and (orientation: landscape) {
+  .pemutar-panduan {
+    left: 8px;
+    top: 60px;
+    width: min(360px, calc(58vw - 20px));
+  }
+
+  .pemutar-panduan-kartu {
+    gap: 8px;
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+  .pemutar-panduan-ikon {
+    width: 18px;
+    height: 18px;
   }
 }

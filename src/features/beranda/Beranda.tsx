@@ -12,6 +12,7 @@ import maskot from '../../assets/images/maskot-ilmuwan-melambai.webp'
 import sel from '../../assets/images/sel-hewan.webp'
 import { bolehBersuaraSendiri, putar, type NamaSuara } from '../../lib/suara'
 import TombolSuara from '../../components/TombolSuara'
+import PengaturVolume from '../../components/PengaturVolume'
 import './beranda.css'
 
 const gambarLatar = { '--latar': `url("${latar}")`, '--latar-hp': `url("${latarHp}")` }
@@ -90,7 +91,10 @@ function Beranda() {
       style={gaya(gambarLatar)}
       className="beranda relative isolate grid min-h-dvh grid-cols-1 content-start gap-6 overflow-hidden bg-screen bg-(image:--latar-hp) bg-cover bg-center bg-no-repeat px-4 py-6 landscape:grid-cols-[6fr_5fr] landscape:content-center landscape:items-center landscape:gap-x-[4vw] landscape:gap-y-[2dvh] landscape:bg-(image:--latar) landscape:px-[7vw] landscape:py-[5dvh]"
     >
-      <TombolSuara saatDinyalakan={putarUlangSemua} className="absolute top-4 right-4 z-30" />
+      <div className="absolute top-4 right-4 z-30 flex gap-2">
+        <TombolSuara saatDinyalakan={putarUlangSemua} />
+        <PengaturVolume />
+      </div>
       <div key={putaran} className="contents">
         <div className="absolute inset-0 -z-10">
           {PARTIKEL.map(([kiri, atas, ukuran, dx, dy, durasi]) => (
@@ -119,7 +123,7 @@ function Beranda() {
             width={840}
             height={168}
             style={tunda(0)}
-            className="tempel h-auto w-[190px] landscape:w-[clamp(150px,min(21vw,38dvh),410px)]"
+            className="tempel h-auto w-[min(190px,calc(100vw-148px))] landscape:w-[clamp(150px,min(21vw,38dvh),410px)]"
           />
           <span
             style={tunda(90)}

@@ -12,7 +12,7 @@ test.beforeEach(async ({ page }) => {
 
 test('sampul episode menampilkan judul dan tombol mulai', async ({ page }) => {
   await expect(page.getByRole('heading', { level: 1, name: 'Glikolisis' })).toBeVisible()
-  await expect(page.getByText('Aktivitas 1.7 · Episode 01')).toBeVisible()
+  await expect(page.getByText('Episode 1')).toBeVisible()
   await expect(page.getByRole('button', { name: 'Mulai episode' })).toBeVisible()
   await expect(page.getByRole('link', { name: 'Peta materi', exact: true })).toBeVisible()
 })
@@ -86,7 +86,12 @@ test('Escape menutup panel dan fokus kembali', async ({ page }, info) => {
 test('HP tegak menampilkan ajakan putar HP', async ({ page }, info) => {
   test.skip(info.project.name !== 'hp-tegak', 'khusus HP tegak')
   await expect(page.getByRole('heading', { name: 'Putar HP-mu' })).toBeVisible()
-  await expect(page.getByRole('img', { name: 'Putar HP' })).toBeVisible()
+  // Ikon I18 versi kertas komik, ditempel sekali lalu diam
+  const ikon = page.getByRole('img', { name: 'Putar HP' })
+  await expect(ikon).toBeVisible()
+  await expect(ikon).toHaveAttribute('src', /ui-putar-hp.*\.webp/)
+  await expect(ikon).toHaveCSS('animation-name', 'sampul-tempel')
+  await expect(ikon).toHaveCSS('animation-iteration-count', '1')
   // Jalan kembali tetap ada walau HP belum diputar
   await expect(page.getByRole('link', { name: 'Peta materi', exact: true })).toBeVisible()
 })
@@ -101,10 +106,35 @@ test('HP miring: panggung dan kontrol muat di layar', async ({ page }, info) => 
   expect(kotak.y + kotak.height).toBeLessThanOrEqual(360)
   await expect(page.getByRole('button', { name: 'Jeda (spasi)' })).toBeInViewport()
   await expect(page.getByRole('button', { name: 'Pengaturan', exact: true })).toBeInViewport()
-  // Kalimat tentang mitokondria memanggil pendamping; di HP miring ia tidak ditampilkan
+  // Kalimat tentang mitokondria memanggil pendamping; di HP miring ia tetap tampil dan muat
   await expect(gelembung(page)).toHaveText(KALIMAT_2)
-  await expect(page.locator('[data-pendamping]')).toBeAttached()
-  await expect(page.locator('[data-pendamping]')).toBeHidden()
+  await expect(page.locator('[data-pendamping]')).toBeVisible()
+  await expect(page.locator('[data-pendamping]')).toBeInViewport({ ratio: 1 })
+  expect((await page.locator('.pemutar-maskot').boundingBox())!.width).toBeGreaterThanOrEqual(130)
+})
+
+test('desktop: kedua maskot cukup besar dan muat di layar', async ({ page }, info) => {
+  test.skip(info.project.name !== 'desktop', 'khusus desktop')
+  await mulai(page)
+  await expect(gelembung(page)).toHaveText(KALIMAT_2)
+  const maskot = page.locator('.pemutar-maskot')
+  const pendamping = page.locator('[data-pendamping]')
+  await expect(maskot).toBeInViewport({ ratio: 1 })
+  await expect(pendamping).toBeInViewport({ ratio: 1 })
+  expect((await maskot.boundingBox())!.width).toBeGreaterThanOrEqual(240)
+  expect((await pendamping.boundingBox())!.width).toBeGreaterThanOrEqual(160)
+})
+
+test('saat siswa diberi tugas, maskot kembali ke ukuran kecil', async ({ page }, info) => {
+  test.skip(info.project.name !== 'desktop', 'khusus desktop')
+  await mulai(page)
+  await expect(page.getByRole('button', { name: 'Glukosa (6 atom C)', exact: true })).toBeVisible({
+    timeout: 20000,
+  })
+  await expect(page.locator('[data-petunjuk]')).toBeVisible()
+  await expect
+    .poll(async () => (await page.locator('.pemutar-maskot').boundingBox())!.width)
+    .toBeLessThanOrEqual(205)
 })
 
 test('diputar ke tegak di tengah episode menjeda', async ({ page }, info) => {
@@ -151,8 +181,19 @@ test('menutup pengaturan setelah HP diputar tetap menjeda episode', async ({ pag
   await mulai(page)
   await expect(gelembung(page)).toHaveText(KALIMAT_1)
   await page.getByRole('button', { name: 'Pengaturan', exact: true }).click()
+  // Overlay CSS dapat terlihat sebelum event orientasi diproses pemutar.
+  await page.evaluate(() => {
+    matchMedia('(orientation: portrait) and (max-width: 760px)').addEventListener(
+      'change',
+      () => {
+        document.documentElement.dataset.tegakDiproses = 'true'
+      },
+      { once: true },
+    )
+  })
   await page.setViewportSize({ width: 360, height: 800 })
   await expect(page.getByRole('heading', { name: 'Putar HP-mu' })).toBeVisible()
+  await expect(page.locator('html')).toHaveAttribute('data-tegak-diproses', 'true')
   await page.setViewportSize({ width: 800, height: 360 })
   await page.getByRole('button', { name: 'Tutup pengaturan' }).click()
   await expect(page.getByRole('button', { name: 'Lanjut (spasi)' })).toBeVisible()

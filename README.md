@@ -8,11 +8,9 @@ Judul kegiatan: Rancang Bangun Media Pembelajaran Interaktif Berbasis Web pada M
 
 ## Status
 
-Tahap Assembly (MDLC). Kerangka proyek, token gaya, router, beranda, serta tampilan dan navigasi peta materi sudah tersedia. Panel Respirasi Aerob menampilkan empat episode; tautan Glikolisis membuka halaman sementara yang dapat kembali ke peta. Materi lain ditandai belum tersedia, dan progres siswa belum disimpan.
+Tahap Assembly (MDLC). Beranda, peta materi, serta Episode 0 (pengantar), Episode 1 (glikolisis), dan Episode 2 (dekarboksilasi oksidatif) sudah diimplementasikan. Episode 2 mencakup perpindahan dua piruvat, pelepasan CO₂, pembentukan NADH, pengikatan KoA, perhitungan enam karbon, dan Lembar Hasil. Animasi komik dan efek suara mengikuti tiap reaksi. Jawaban siswa tersimpan secara lokal per episode.
 
-Pengerjaan berikutnya: Episode 1, Glikolisis (Aktivitas 1.7).
-
-Episode lain dikerjakan setelah Episode 1 selesai diuji.
+Episode 3 dan 4 dikerjakan pada branch terpisah. Penilaian materi oleh guru, kenyamanan audio pada perangkat fisik, dan pemeriksaan Safari masih terbuka.
 
 ## Isi media
 
@@ -129,4 +127,4 @@ Mitra: SMA Negeri 16 Bandung.
 
 ## Lisensi
 
-Hak cipta program akan didaftarkan. Sampai ada keputusan lisensi, seluruh hak atas kode dan aset dalam repositori ini dilindungi.
+Hak cipta program akan didaftarkan. Sampai ada keputusan lisensi, seluruh hak atas kode dan aset milik proyek dalam repositori ini dilindungi. Aset pihak ketiga mengikuti lisensi pemiliknya; lihat [audit sumber audio Episode 1](public/audio/SUMBER.md) untuk status enam suara pilihan tim.

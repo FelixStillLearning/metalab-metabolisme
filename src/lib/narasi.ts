@@ -20,17 +20,22 @@ const lafal = (teks: string) =>
   teks.replace(/₂/g, '2').replace(/⁺/g, ' plus').replace(/−/g, ' kurang')
 
 export function ucapkan(id: string, teks: string, opsi: { signal?: AbortSignal } = {}) {
-  const { suaraAktif, narasi, pelan } = usePengaturan.getState()
+  const { suaraAktif, narasi, pelan, volume } = usePengaturan.getState()
   const { signal } = opsi
-  if (!suaraAktif || !narasi || signal?.aborted) return Promise.resolve()
+  if (!suaraAktif || !narasi || volume === 0 || signal?.aborted) return Promise.resolve()
 
   return new Promise<void>((selesai) => {
     let berhenti = () => {}
     const akhir = () => {
       howlAktif = null
+      berhentiMemantau()
       signal?.removeEventListener('abort', berhenti)
       selesai()
     }
+
+    const berhentiMemantau = usePengaturan.subscribe((s) => {
+      if (!s.suaraAktif || !s.narasi || s.volume === 0) berhenti()
+    })
 
     if (TEREKAM.has(id)) {
       const dasar = `${import.meta.env.BASE_URL}audio/narasi/${id}`
@@ -50,6 +55,8 @@ export function ucapkan(id: string, teks: string, opsi: { signal?: AbortSignal }
       u.voice = suara
       u.lang = suara.lang
       u.rate = pelan ? 0.85 : 1
+      // shortcut: volume narasi browser berlaku per kalimat, gunakan rekaman bila perlu berubah seketika.
+      u.volume = usePengaturan.getState().volume
       u.onend = u.onerror = () => {
         ucapanAktif = null
         akhir()

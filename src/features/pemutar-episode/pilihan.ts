@@ -43,6 +43,10 @@ export function mintaPilihan(
             selesai()
           } else {
             sibuk = true
+            if (isi.konfirmasi)
+              usePemutar.setState((s) => ({
+                pilihan: s.pilihan && { ...s.pilihan, memeriksa: true, pesan: '' },
+              }))
             bunyi('belum-tepat')
             try {
               await salah(index)
@@ -51,6 +55,14 @@ export function mintaPilihan(
               gagal(e)
             } finally {
               sibuk = false
+              if (aktif && isi.konfirmasi)
+                usePemutar.setState((s) => ({
+                  pilihan: s.pilihan && {
+                    ...s.pilihan,
+                    memeriksa: false,
+                    pesan: 'Belum tepat. Pilih lagi, lalu tekan Jawab.',
+                  },
+                }))
             }
           }
         },

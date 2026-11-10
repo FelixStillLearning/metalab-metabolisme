@@ -40,24 +40,46 @@ test('POE c: tebak, amati investasi energi, pembelahan 6C jadi 2 PGAL, dan jelas
   const tombolKunci = page.getByRole('button', { name: 'Kunci tebakan, lanjutkan video' })
   await expect(tombolKunci).toBeDisabled()
 
+  await expect(page.locator('[data-petunjuk]')).toHaveText('Ketuk atau seret ATP ke glukosa.')
+  await expect(page.locator('.pemutar-ajakan')).toHaveCount(0)
   // Taruh 2 ATP
   await page.getByRole('button', { name: 'ATP 1', exact: true }).click()
   await page.getByRole('button', { name: 'ATP 2', exact: true }).click()
   await expect(page.locator('#cnt')).toHaveText('2 ATP')
+  await expect(page.locator('.tok.placed .pemutar-ajakan')).toHaveCount(0)
+  await expect(page.locator('[data-petunjuk]')).toHaveText('Pilih alasan tebakanmu.')
 
   // Pilih alasan
   const alasan2 = page.getByRole('button', {
     name: 'Glukosa perlu dua fosfat agar terbelah, dan tiap ATP memberi satu fosfat.',
   })
+  const alasan1 = page.locator('.poe-reasons .chip').first()
+  await alasan1.click()
+  await expect(alasan1).toHaveAttribute('aria-pressed', 'true')
   await alasan2.click()
+  await expect(alasan1).toHaveAttribute('aria-pressed', 'false')
+  await expect(alasan2).toHaveAttribute('aria-pressed', 'true')
+  await expect
+    .poll(() => alasan2.evaluate((el) => getComputedStyle(el, '::before').filter))
+    .toContain('hue-rotate')
+  await expect(alasan2).toHaveCSS('color', 'rgb(245, 241, 232)')
+  await expect(alasan2).toHaveCSS('font-family', /Atkinson Hyperlegible/)
+  await expect(alasan2).toHaveCSS('font-weight', '700')
   await expect(tombolKunci).toBeEnabled()
+  await expect(page.locator('[data-petunjuk]')).toContainText('Ketuk Kunci tebakan')
 
   // Kunci tebakan
   await tombolKunci.click()
 
   // Masuk tahap Amati
   await expect(page.locator('.poe-steps span.on')).toHaveText('Amati', { timeout: 15000 })
+  await expect(page.locator('[data-petunjuk]')).toHaveCount(0)
   await expect(page.locator('.gtag')).toContainText('Tebakanmu: 2 ATP')
+  // Penanda vonis dan jumlah tebakan sebaris
+  await expect(page.locator('.gtag.ok')).toBeVisible({ timeout: 15000 })
+  const penanda = await kotak(page, '.gtag.ok img')
+  const jumlah = await kotak(page, '.gtag.ok span')
+  expect(Math.abs(penanda.y + penanda.height / 2 - (jumlah.y + jumlah.height / 2))).toBeLessThan(4)
 
   // Glukosa menerima fosfat dan terbelah menjadi 2 PGAL
   await expect(page.locator('[data-molecule="pgal"]')).toHaveCount(2, { timeout: 25000 })
@@ -77,6 +99,9 @@ test('POE c: tebak, amati investasi energi, pembelahan 6C jadi 2 PGAL, dan jelas
   })
   await alasanSalah.click()
   await expect(page.locator('.poe-feedback')).toContainText('Belum tepat')
+  expect(berisi(await kotak(page, '.poe-card-explain'), await kotak(page, '.poe-feedback'))).toBe(
+    true,
+  )
 
   // Pilih alasan yang benar
   const alasanBenar = page.getByRole('button', {
@@ -88,6 +113,11 @@ test('POE c: tebak, amati investasi energi, pembelahan 6C jadi 2 PGAL, dan jelas
   // Lanjutkan video
   const tombolLanjut = page.getByRole('button', { name: 'Lanjutkan video' })
   await expect(tombolLanjut).toBeVisible()
+  expect(berisi(await kotak(page, '.poe-card-explain'), (await tombolLanjut.boundingBox())!)).toBe(
+    true,
+  )
+  await expect(page.locator('[data-panggung]')).toHaveJSProperty('scrollTop', 0)
+  await expect(page.locator('.pemutar')).toHaveJSProperty('scrollTop', 0)
   await tombolLanjut.click()
 
   // Periksa data tersimpan di store jawaban
@@ -123,6 +153,13 @@ const gabungan = async (page: Page, pemilih: string): Promise<Kotak> => {
 }
 const bertumpuk = (a: Kotak, b: Kotak) =>
   a.x < b.x + b.width && b.x < a.x + a.width && a.y < b.y + b.height && b.y < a.y + a.height
+// Bagian dalam zona G02: bingkai kertasnya 8,2% dari lebar dan tinggi gambar
+const dalamZona = (z: Kotak): Kotak => ({
+  x: z.x + z.width * 0.082,
+  y: z.y + z.height * 0.082,
+  width: z.width * (1 - 0.164),
+  height: z.height * (1 - 0.164),
+})
 
 async function tebak(page: Page, n: number) {
   await expect(page.locator('#poe-tebak-judul')).toBeVisible({ timeout: 15000 })
@@ -156,7 +193,7 @@ async function tiapUkuran(
   }
 }
 
-// Kartu POE utuh di layar, di bawah bilah kontrol, dan semua tombolnya di dalam kartu
+// Kartu utuh di layar; tombol tetap terjangkau setelah digulir di dalam kartu.
 async function kartuMuat(
   page: Page,
   pemilih: string,
@@ -168,8 +205,12 @@ async function kartuMuat(
   expect(berisi({ x: 0, y: 0, width, height }, kartu), pesan).toBe(true)
   expect(bertumpuk(kartu, await kotak(page, '.pemutar-bilah')), pesan).toBe(false)
   for (const b of await page.locator(`${pemilih} button`).all()) {
+    await b.scrollIntoViewIfNeeded()
     expect(berisi(kartu, (await b.boundingBox())!), pesan).toBe(true)
   }
+  await page.locator(pemilih).evaluate((el) => {
+    el.scrollTop = 0
+  })
 }
 
 // Token ATP tidak saling menempel dan tidak menutupi atom C
@@ -198,24 +239,23 @@ for (const n of [1, 2, 3]) {
       FOSFAT,
       { polling: 'raf', timeout: 25000 },
     )
+    // Seperti prototype, glukosa terbelah saat KRAAK! masih tampil, bukan sesudahnya
+    await page.waitForFunction(
+      () =>
+        !!document.querySelector('[data-word="KRAAK!"]') &&
+        document.querySelectorAll('[data-molecule="pgal"]').length === 2,
+      null,
+      { polling: 'raf', timeout: 15000 },
+    )
 
-    await expect(page.locator('#poe-explain-judul')).toBeVisible({ timeout: 25000 })
-    // Vonis tebakan: hanya 2 ATP yang tepat
-    const vonis = page.locator('.poe-card-explain .poe-verdict').first()
-    if (n === 2) await expect(vonis).toContainText('Tebakanmu tepat')
-    else await expect(vonis).toContainText(`Tebakanmu ${n} ATP belum tepat. Yang terjadi`)
-    const pgal = page.locator('[data-molecule="pgal"]')
-    await expect(pgal).toHaveCount(2)
-    for (const h of await pgal.all()) {
-      await expect(h.locator(FOSFAT)).toHaveCount(1)
-      await expect(h.locator(KARBON)).toHaveCount(3)
-    }
-
-    // Setiap fosfat PGAL tergambar di dalam panggung
-    const panggung = await kotak(page, '[data-panggung]')
-    for (const f of await page.locator(`[data-molecule="pgal"] ${FOSFAT}`).all()) {
-      expect(berisi(panggung, (await f.boundingBox())!)).toBe(true)
-    }
+    // Tahap Amati, setelah glukosa terbelah
+    await expect(page.locator('[data-molecule="pgal"]')).toHaveCount(2, { timeout: 25000 })
+    // Label muncul setelah kedua PGAL berhenti bergerak
+    await expect(page.locator('svg text', { hasText: 'PGAL · 3 C' })).toHaveCount(2)
+    const panggungAmati = await kotak(page, '[data-panggung]')
+    const posisiAmati = await page
+      .locator('[data-molecule="pgal"]')
+      .evaluateAll((gs) => gs.map((g) => getComputedStyle(g).transform))
 
     // Fosfat tidak hilang: 2 ADP masing-masing 2 P, ATP sisa tetap 3 P
     await expect(page.locator('[data-carrier="ADP"]')).toHaveCount(2)
@@ -225,9 +265,31 @@ for (const n of [1, 2, 3]) {
     await expect(page.locator('[data-carrier="ATP"]')).toHaveCount(n > 2 ? 1 : 0)
     if (n > 2) await expect(page.locator(`[data-carrier="ATP"] ${FOSFAT}`)).toHaveCount(3)
 
-    // Panah putus-putus soal b sudah dipudarkan; lencana pembawa memakai gambar E01/E02
-    // (bayangannya di gambar), ikatan fosfatnya tanpa bayangan
-    await expect(page.locator('svg path[stroke-dasharray]')).toHaveCount(0)
+    // ADP dan ATP sisa berhenti di tempat yang terlihat: di panggung, tidak di belakang maskot,
+    // tidak menimpa atom PGAL
+    await expect
+      .poll(async () => {
+        const penghalang: Kotak[] = []
+        for (const m of ['.pemutar-maskot', '.pemutar-pendamping'])
+          if (await page.locator(m).isVisible()) penghalang.push(await kotak(page, m))
+        for (const a of await page
+          .locator(`[data-molecule="pgal"] :is(${KARBON}, ${FOSFAT})`)
+          .all())
+          penghalang.push((await a.boundingBox())!)
+        const pembawa = await Promise.all(
+          (await page.locator('[data-carrier]').all()).map(async (c) => (await c.boundingBox())!),
+        )
+        // Jumlah ikut diperiksa: setelah pembawa keluar saat Jelaskan, daftar kosong selalu lolos
+        return (
+          pembawa.length === (n > 2 ? 3 : 2) &&
+          pembawa.every(
+            (k) => berisi(panggungAmati, k) && penghalang.every((h) => !bertumpuk(h, k)),
+          )
+        )
+      })
+      .toBe(true)
+
+    // Lencana pembawa memakai gambar E01/E02 (bayangannya di gambar), ikatan fosfatnya tanpa bayangan
     await expect(page.locator('[data-carrier] > [data-bayangan]')).toHaveCount(0)
     for (const c of await page.locator('[data-carrier]').all()) {
       const jenis = await c.getAttribute('data-carrier')
@@ -236,6 +298,42 @@ for (const n of [1, 2, 3]) {
         new RegExp(`pembawa-${jenis!.toLowerCase()}`),
       )
     }
+
+    await expect(page.locator('#poe-explain-judul')).toBeVisible({ timeout: 25000 })
+    // Vonis tebakan: hanya 2 ATP yang tepat
+    const vonis = page.locator('.poe-card-explain .poe-verdict').first()
+    if (n === 2) await expect(vonis).toContainText('Tebakanmu tepat')
+    else await expect(vonis).toContainText(`Tebakanmu ${n} ATP belum tepat. Yang terjadi`)
+    const pgal = page.locator('[data-molecule="pgal"]')
+    await expect(pgal).toHaveCount(2)
+    // PGAL tetap di posisi setelah terbelah, di belakang kartu Jelaskan.
+    expect(await pgal.evaluateAll((gs) => gs.map((g) => getComputedStyle(g).transform))).toEqual(
+      posisiAmati,
+    )
+    for (const h of await pgal.all()) {
+      await expect(h.locator(FOSFAT)).toHaveCount(1)
+      await expect(h.locator(KARBON)).toHaveCount(3)
+    }
+    // Ikatan C-P beserta bayangannya tergambar di belakang atom C dan P
+    for (const h of await pgal.all()) {
+      const diDepanAtom = await h.evaluate((g) => {
+        const atom = g.querySelector(':scope > [data-carbon], :scope > [data-phosphate]')!
+        return Array.from(g.querySelectorAll(':scope > polygon')).filter(
+          (b) => atom.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING,
+        ).length
+      })
+      expect(diDepanAtom).toBe(0)
+    }
+
+    // Setiap fosfat PGAL tergambar di dalam panggung
+    const panggung = await kotak(page, '[data-panggung]')
+    for (const f of await page.locator(`[data-molecule="pgal"] ${FOSFAT}`).all()) {
+      expect(berisi(panggung, (await f.boundingBox())!)).toBe(true)
+    }
+
+    // Pembawa soal c sudah keluar: kartu Jelaskan akan menimpanya
+    await expect(page.locator('[data-carrier]')).toHaveCount(0)
+    await expect(page.locator('svg path[stroke-dasharray]')).toHaveCount(0)
 
     if (n !== 2) return
     // Chip tahap G07 memakai gambar tahap yang aktif
@@ -247,10 +345,20 @@ for (const n of [1, 2, 3]) {
     await expect(page.getByRole('button', { name: 'Lanjutkan video' })).toBeVisible()
     await tiapUkuran(page, info.project.name, async (pesan, width, height) => {
       await kartuMuat(page, '.poe-card-explain', pesan, width, height)
-      if (width > 1000) {
-        const gelembung = await kotak(page, '.pemutar-gelembung')
-        expect(bertumpuk(await kotak(page, '.poe-card-explain'), gelembung), pesan).toBe(false)
-      }
+      const kartu = await kotak(page, '.poe-card-explain')
+      expect(Math.abs(kartu.x + kartu.width / 2 - width / 2), pesan).toBeLessThan(2)
+      // Pendamping tidak tersisa setengah tertutup di belakang kartu
+      await expect(page.locator('.pemutar-pendamping'), pesan).toHaveCount(0)
+      await expect(page.locator('.pemutar-panduan')).toHaveCSS('transform', 'none')
+      const petunjuk = await kotak(page, '.pemutar-panduan')
+      expect(bertumpuk(kartu, petunjuk), pesan).toBe(false)
+      const kontrol = await kotak(page, '.pemutar-bilah')
+      expect(Math.abs(petunjuk.x - kontrol.x), pesan).toBeLessThan(2)
+      expect(petunjuk.y, pesan).toBeGreaterThanOrEqual(kontrol.y + kontrol.height)
+      await expect(page.locator('.poe-card-explain .poe-reasons')).toHaveCSS(
+        'flex-direction',
+        'column',
+      )
     })
   })
 }
@@ -268,11 +376,24 @@ test('POE c: chip tahap, label, zona glukosa, token, dan kartu tebakan tidak ber
       expect(bertumpuk(await kotak(page, '.pemutar-bilah'), kotakLabel), pesan).toBe(false)
     }
 
-    // Zona membingkai cincin glukosa dan tidak tertutup gelembung kalimat
+    // Zona membingkai cincin glukosa dan tidak tertutup popup perintah
     const zona = await kotak(page, '.poe-zone')
     const cincin = await gabungan(page, `[data-molecule="glukosa"] ${KARBON}`)
     expect(berisi(zona, cincin), pesan).toBe(true)
-    expect(bertumpuk(zona, await kotak(page, '.pemutar-gelembung')), pesan).toBe(false)
+    expect(bertumpuk(zona, await kotak(page, '.pemutar-panduan')), pesan).toBe(false)
+
+    // Tulisan adegan tidak tertutup bingkai zona atau kartu: di dalam zona atau di luar sama sekali
+    const dalam = dalamZona(zona)
+    const kartu = await kotak(page, '.poe-card')
+    for (const t of await page.locator('[data-panggung] svg text').all()) {
+      if (!(await t.isVisible())) continue
+      const k = (await t.boundingBox())!
+      const nama = `${pesan} "${await t.textContent()}"`
+      expect(bertumpuk(kartu, k), nama).toBe(false)
+      if (bertumpuk(zona, k)) expect(berisi(dalam, k), `${nama} di bingkai zona`).toBe(true)
+    }
+    // Tanpa tulisan nama zona di bingkai; label molekul sudah menyebut glukosa
+    await expect(page.locator('.poe-zone-label')).toHaveCount(0)
 
     // Kartu muat di layar: semua alasan dan tombol Kunci terlihat tanpa gulir
     await kartuMuat(page, '.poe-card', pesan, width, height)
@@ -284,13 +405,67 @@ test('POE c: chip tahap, label, zona glukosa, token, dan kartu tebakan tidak ber
   await alasan.click()
   await alasan.hover()
   await expect
-    .poll(() => alasan.evaluate((e) => getComputedStyle(e).borderImageSource))
-    .toContain('tombol-pilihan-terpilih')
+    .poll(() => alasan.evaluate((el) => getComputedStyle(el, '::before').filter))
+    .toContain('hue-rotate')
+  await expect(alasan).toHaveCSS('color', 'rgb(245, 241, 232)')
+  await expect
+    .poll(() => alasan.evaluate((el) => getComputedStyle(el, '::before').borderImageSource))
+    .toContain('interaksi-tombol-pilihan')
 
   // Ketiga token di zona glukosa
   for (let i = 1; i <= 3; i++) {
     await page.getByRole('button', { name: `ATP ${i}`, exact: true }).click()
   }
   await page.waitForTimeout(400)
-  await tiapUkuran(page, info.project.name, async (pesan) => tokenAman(page, `${pesan} di zona`))
+  await tiapUkuran(page, info.project.name, async (pesan) => {
+    await tokenAman(page, `${pesan} di zona`)
+    // Token tertaruh utuh di dalam bingkai zona
+    const dalam = dalamZona(await kotak(page, '.poe-zone'))
+    for (const t of await page.locator('.tok.placed').all()) {
+      const k = (await t.boundingBox())!
+      expect(berisi(dalam, k), `${pesan} token di zona`).toBe(true)
+    }
+  })
+})
+
+// Seret seperti dragPredict() prototype: lepas di zona = masuk, di luar zona = keluar atau kembali
+async function seret(page: Page, dari: Kotak, ke: { x: number; y: number }) {
+  await page.mouse.move(dari.x + dari.width / 2, dari.y + dari.height / 2)
+  await page.mouse.down()
+  await page.mouse.move(ke.x, ke.y, { steps: 8 })
+}
+
+test('POE c: ATP bisa diseret ke zona glukosa dan keluar lagi', async ({ page }) => {
+  await expect(page.locator('#poe-tebak-judul')).toBeVisible({ timeout: 15000 })
+  const zona = await kotak(page, '.poe-zone')
+  const tengahZona = { x: zona.x + zona.width / 2, y: zona.y + zona.height / 2 }
+  const atp1 = page.getByRole('button', { name: /^ATP 1/ })
+  const asal = (await atp1.boundingBox())!
+
+  // Diseret di atas zona: zona disorot dan token mengikuti penunjuk
+  await seret(page, asal, tengahZona)
+  await expect(page.locator('.poe-zone')).toHaveAttribute('data-over')
+  const ikut = (await atp1.boundingBox())!
+  expect(Math.abs(ikut.x + ikut.width / 2 - tengahZona.x)).toBeLessThan(4)
+  await page.mouse.up()
+  await expect(page.locator('#cnt')).toHaveText('1 ATP')
+  await expect(atp1).toHaveAccessibleName('ATP 1 di glukosa')
+  await expect(page.locator('.poe-zone')).not.toHaveAttribute('data-over')
+
+  // Dilepas di luar zona: keluar lagi dan kembali ke tempat asal (setelah token selesai
+  // meluncur ke slotnya, transisi 300 ms)
+  await page.waitForTimeout(400)
+  await seret(page, (await atp1.boundingBox())!, { x: asal.x + asal.width / 2, y: asal.y - 60 })
+  await page.mouse.up()
+  await expect(page.locator('#cnt')).toHaveText('0 ATP')
+  await expect(atp1).toHaveAccessibleName('ATP 1')
+  await expect.poll(async () => Math.round((await atp1.boundingBox())!.y)).toBe(Math.round(asal.y))
+
+  // ATP di luar zona yang dilepas di luar zona tetap di luar; ketuk tetap berfungsi
+  await page.waitForTimeout(400)
+  await seret(page, asal, { x: asal.x + asal.width / 2, y: asal.y - 60 })
+  await page.mouse.up()
+  await expect(page.locator('#cnt')).toHaveText('0 ATP')
+  await atp1.click()
+  await expect(page.locator('#cnt')).toHaveText('1 ATP')
 })

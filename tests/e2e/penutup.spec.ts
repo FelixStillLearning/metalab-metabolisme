@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test'
+import { latarMemenuhiLayar } from './bantu/latar.js'
 
 async function siapkan(page: Page) {
   await page.addInitScript(() => {
@@ -18,6 +19,7 @@ test('peta penutup: glikolisis selesai, asam piruvat menuju mitokondria, lalu ke
   // Mulai sendiri tanpa sampul
   await expect(page.getByRole('button', { name: 'Mulai episode' })).toHaveCount(0)
   await expect(page.locator('[data-simpul]')).toHaveCount(4)
+  await latarMemenuhiLayar(page, 'peta-penutup')
   await expect(page.locator('[data-simpul="1"]')).toHaveAttribute('data-status', 'selesai')
   await expect(page.locator('[data-simpul="2"]')).toHaveAttribute('data-status', 'menyala')
   await expect(page.locator('[data-simpul="3"]')).toHaveAttribute('data-status', 'belum')

@@ -276,12 +276,12 @@ export async function comic(
 }
 
 // Letupan H02 di belakang objek yang terbelah
-export function burstBehind(p: Panggung, g: Objek) {
+export function burstBehind(p: Panggung, g: Objek, sisi = 480) {
   if (tenangAktif()) return
   const burst = obj(g._x, g._y, p.world)
   burst.dataset.effect = 'split-burst'
   p.world.insertBefore(burst, g)
-  el('image', { href: gambarLetupan, x: -240, y: -240, width: 480, height: 480 }, burst)
+  el('image', { href: gambarLetupan, x: -sisi / 2, y: -sisi / 2, width: sisi, height: sisi }, burst)
   hide(burst)
   burst._s = 0.5
   burst._r = -8
@@ -310,3 +310,22 @@ export function kinetik(p: Panggung, x: number, y: number, t: string, size: numb
 
 export const camTo = (p: Panggung, x: number, y: number, s: number, ms = 1400) =>
   to(p.cam, { x: 800 - x * s, y: 450 - y * s, s }, ms, 'kamera')
+
+// Latar lebar: sumber 1672x941 diperlebar 293 px di tiap sisi (2258x1527). Bagian tengahnya tepat
+// menutup adegan 1600x900; sisanya ditampilkan .pemutar-latar di bilah layar yang tidak 16:9.
+const LATAR = {
+  x: (-293 * 1600) / 1672,
+  y: (-293 * 900) / 941,
+  width: (2258 * 1600) / 1672,
+  height: (1527 * 900) / 941,
+  preserveAspectRatio: 'none',
+}
+
+export async function pasangLatar(p: Panggung, href: string, nama: string) {
+  const latar = obj(0, 0, p.latar)
+  latar.dataset.latar = nama
+  el('image', { href, ...LATAR }, latar)
+  hide(latar)
+  usePemutar.setState({ latar: href })
+  await to(latar, { o: 1 }, 600)
+}

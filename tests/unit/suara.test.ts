@@ -12,11 +12,12 @@ vi.mock('howler', () => ({
       stop = stop
     },
   ),
-  Howler: { mute: vi.fn() },
+  Howler: { mute: vi.fn(), volume: vi.fn() },
 }))
 
 beforeEach(() => {
   musik(false)
+  usePengaturan.getState().aturVolume(0.5)
   usePengaturan.getState().aturSuara(true)
   usePengaturan.getState().atur('efek', true)
   usePengaturan.getState().atur('musik', true)
@@ -61,6 +62,11 @@ test('slot memutar berkasnya sendiri', () => {
   expect(Howl).toHaveBeenLastCalledWith({ src: ['/audio/getar.ogg', '/audio/getar.mp3'] })
 })
 
+test('POP episode memakai berkasnya sendiri, bukan pop Beranda', () => {
+  bunyi('muncul')
+  expect(Howl).toHaveBeenLastCalledWith({ src: ['/audio/muncul.ogg', '/audio/muncul.mp3'] })
+})
+
 test('efek suara mati: slot diam', () => {
   usePengaturan.getState().atur('efek', false)
   bunyi('tepat')
@@ -97,4 +103,43 @@ test('musik tidak dimulai saat musik mati atau semua suara bisu', () => {
   vi.clearAllMocks()
   musik(true)
   expect(play).not.toHaveBeenCalled()
+})
+
+test('efek gerak dan tempel memakai berkas episode, tidak menumpuk, dan mengikuti efek/bisu', () => {
+  const efek = ['geser', 'tempel', 'kertas-getar', 'kertas-lepas', 'kertas-kait'] as const
+  for (const nama of efek) {
+    bunyi(nama)
+    expect(Howl).toHaveBeenLastCalledWith({ src: [`/audio/${nama}.ogg`, `/audio/${nama}.mp3`] })
+  }
+  expect(stop).toHaveBeenCalledTimes(efek.length)
+  expect(play).toHaveBeenCalledTimes(efek.length)
+  bunyi('geser')
+  expect(stop).toHaveBeenCalledTimes(efek.length + 1)
+  expect(play).toHaveBeenCalledTimes(efek.length + 1)
+  vi.clearAllMocks()
+  usePengaturan.getState().atur('efek', false)
+  bunyi('geser')
+  bunyi('tempel')
+  expect(play).not.toHaveBeenCalled()
+  usePengaturan.getState().atur('efek', true)
+  usePengaturan.getState().aturSuara(false)
+  bunyi('geser')
+  bunyi('tempel')
+  expect(play).not.toHaveBeenCalled()
+})
+
+test('volume utama mengubah audio aktif tanpa memulai ulang musik atau melepas bisu', () => {
+  musik(true)
+  vi.clearAllMocks()
+  usePengaturan.getState().aturVolume(0.75)
+  expect(Howler.volume).toHaveBeenLastCalledWith(0.75)
+  expect(play).not.toHaveBeenCalled()
+  expect(stop).not.toHaveBeenCalled()
+  usePengaturan.getState().aturSuara(false)
+  usePengaturan.getState().aturVolume(0.25)
+  expect(Howler.mute).toHaveBeenLastCalledWith(true)
+  expect(Howler.volume).toHaveBeenLastCalledWith(0.25)
+  usePengaturan.getState().aturSuara(true)
+  expect(Howler.mute).toHaveBeenLastCalledWith(false)
+  expect(usePengaturan.getState().volume).toBe(0.25)
 })

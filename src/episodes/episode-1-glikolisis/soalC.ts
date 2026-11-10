@@ -37,36 +37,43 @@ export async function soalC(
   penanda: Objek[],
 ): Promise<[Separuh, Separuh]> {
   usePemutar.setState({ bab: 2 })
-  await say(p, 'e1-c-01')
+  // Panah dan judul tahap soal b dipudarkan sebelum tebakan (prototype: saat Amati) karena
+  // bingkai zona dan kartu menimpanya. Glukosa bergeser ke kanan bawah: di atasnya ada
+  // petunjuk, di kirinya maskot.
+  for (const m of penanda) void to(m, { o: 0 }, 180).then(() => m.remove())
+  bunyi('geser')
+  await Promise.all([to(glu, { x: 480, y: 500 }, 700), say(p, 'e1-c-01')])
 
   const reasons = ALASAN_C
-
   const P = await mintaTebak(p.signal, {
     judul: 'Berapa ATP yang dibutuhkan untuk memecah glukosa?',
     reasons,
     right: 2,
-    zone: { x: 300, y: 430, w: 380, h: 390, name: 'glukosa' },
+    // Bagian dalam bingkai G02 (8,2% tiap sisi) memuat judul zona, baris ATP, cincin, dan label
+    zone: { x: 480, y: 475, w: 380, h: 490, name: 'glukosa' },
     supply: [
-      [620, 580],
-      [740, 580],
-      [860, 580],
+      [820, 370],
+      [820, 480],
+      [820, 590],
     ],
-    slot: (i, n) => [300 + (i - (n - 1) / 2) * 120, 285],
+    slot: (i, n) => [480 + (i - (n - 1) / 2) * 100, 335],
   })
 
   useJawaban.getState().catatPoe('c', { tebakan: P.g, alasan: P.r })
   tampilkanAmati(P.g, 'ATP')
 
-  // Animasi Amati: Investasi energi. Panah dan judul tahap soal b dipudarkan seperti prototype.
-  for (const m of penanda) void to(m, { o: 0 }, 180).then(() => m.remove())
+  // Animasi Amati: Investasi energi
+  bunyi('geser')
   await Promise.all([camTo(p, 800, 450, 1, 700), to(glu, { x: 800, y: 535, s: 1.25 }, 700)])
 
   const atps = P.from.map(([x, y], i) => carrier(p, x, y, 'ATP', i ? -1 : 1))
-  bunyi('melesat')
+  bunyi('geser')
   await Promise.all(atps.map((a, i) => arrive(p, a, i ? 1370 : 230, i > 1 ? 790 : 675)))
 
   await say(p, P.g === 1 ? 'e1-c-atp-1' : P.g === 2 ? 'e1-c-atp-2' : 'e1-c-atp-3')
 
+  // Pembawa yang sudah dipakai (dan ATP sisa) tetap terlihat selama Amati
+  const sisa: Pembawa[] = []
   const give = async (a: Pembawa, side: number) => {
     await to(a, { y: 660 }, 300)
     const ph = a.ps.pop()!
@@ -78,7 +85,7 @@ export async function soalC(
     relabel(a, 'ADP')
     const targetX = glu._x + side * 155 * glu._s
 
-    bunyi('muncul')
+    bunyi('geser')
     await arc(ph, targetX, glu._y, 150, 700)
 
     const half = glu.halves[side < 0 ? 0 : 1]
@@ -95,15 +102,19 @@ export async function soalC(
       {},
       { bayangan: true },
     )
-    half.insertBefore(bond, half.firstChild)
+    // Bayangan ikut dipindah ke belakang; bila tertinggal, ia menimpa atom C dan P
+    half.prepend(bond.bayangan!, bond)
     ph.bond = bond
     half.p1 = ph
 
-    bunyi('klik')
+    bunyi('tempel')
     await comic(p, 'KLIK', targetX + side * 25, glu._y - 130, 'var(--color-fosfat)', p.world)
 
     speedLines(p, a, side)
-    void to(a, { x: side < 0 ? 170 : 1430, y: 800, o: 0.8 }, 700, 'busur')
+    // Prototype: ke (170 | 1430, 800), kini tertutup maskot yang diperbesar; berhenti di atasnya
+    sisa.push(a)
+    bunyi('geser')
+    void to(a, { x: side < 0 ? 250 : 1350, y: 420, o: 0.8 }, 700, 'busur')
   }
 
   await give(atps[0], -1)
@@ -117,7 +128,7 @@ export async function soalC(
     await shake(p, glu)
     await say(p, 'e1-c-04')
     const b = carrier(p, 1680, 750, 'ATP', -1)
-    bunyi('melesat')
+    bunyi('geser')
     await arrive(p, b, 1370, 675)
     await give(b, 1)
   } else {
@@ -127,8 +138,9 @@ export async function soalC(
       tandaiAmati('salah', 'ATP ketiga tidak terpakai')
       bunyi('belum-tepat')
       await shake(p, atps[2])
-      bunyi('jatuh')
-      await to(atps[2], { y: 860, o: 0.3 }, 600)
+      bunyi('geser')
+      sisa.push(atps[2])
+      await to(atps[2], { x: 1350, y: 310, o: 0.4 }, 600)
     } else {
       tandaiAmati('benar')
     }
@@ -146,7 +158,8 @@ export async function soalC(
 
   bunyi('belah')
   burstBehind(p, glu)
-  await comic(p, 'KRAAK!', glu._x, 310, 'var(--color-hot)', p.world)
+  // Tidak ditunggu, seperti prototype: glukosa terbelah bersamaan dengan letupan dan KRAAK!
+  void comic(p, 'KRAAK!', glu._x, 310, 'var(--color-hot)', p.world)
 
   glu.cross.remove()
   glu.label.remove()
@@ -175,6 +188,13 @@ export async function soalC(
   await say(p, 'e1-c-07', { pendamping: '08-menunjuk' })
   await countCarbons(p, [m1, m2])
 
+  // ADP dan ATP sisa keluar ke samping: kartu Jelaskan akan menimpanya
+  bunyi('geser')
+  for (const a of sisa)
+    void to(a, { x: a._x < 800 ? -250 : 1850, o: 0 }, 600, 'busur').then(() => a.remove())
+  // Pendamping dari kalimat hitung karbon pamit: di HP ia tertutup kartu.
+  usePemutar.setState({ pendamping: null })
+
   // Tahap Jelaskan
   const x = await mintaJelaskan(p.signal, {
     g: P.g,
@@ -197,6 +217,7 @@ export async function soalC(
     .catat('c', 'Glukosa diberi 2 fosfat lalu terbelah menjadi 2 PGAL; memakai 2 ATP')
   tutupPoe()
 
+  bunyi('geser')
   await Promise.all([to(m1, { x: 875, y: 290, s: 1 }, 800), to(m2, { x: 725, y: 565, s: 1 }, 800)])
 
   return [m1, m2]

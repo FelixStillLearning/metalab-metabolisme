@@ -3,7 +3,10 @@ import { usePengaturan } from '../stores/pengaturan'
 
 export type NamaSuara =
   | 'melesat'
+  | 'geser'
+  | 'tempel'
   | 'mendarat'
+  | 'muncul'
   | 'maskot'
   | 'mulai'
   | 'buka-peta'
@@ -13,6 +16,9 @@ export type NamaSuara =
   | 'tepat'
   | 'belum-tepat'
   | 'klik'
+  | 'kertas-getar'
+  | 'kertas-lepas'
+  | 'kertas-kait'
   | 'getar'
   | 'belah'
   | 'atp'
@@ -26,8 +32,10 @@ const termuat = new Map<NamaSuara, Howl>()
 
 // Bisu juga berlaku untuk audio yang sedang berjalan atau masih menunggu dimuat.
 Howler.mute(!usePengaturan.getState().suaraAktif)
-const berhentiMemantau = usePengaturan.subscribe(({ suaraAktif }) => {
+Howler.volume(usePengaturan.getState().volume)
+const berhentiMemantau = usePengaturan.subscribe(({ suaraAktif, volume }) => {
   Howler.mute(!suaraAktif)
+  Howler.volume(volume)
   aturMusik()
 })
 import.meta.hot?.dispose(berhentiMemantau)
@@ -49,19 +57,29 @@ export function siapkan(...nama: NamaSuara[]) {
 
 export function putar(nama: NamaSuara) {
   if (!usePengaturan.getState().suaraAktif) return
-  ambil(nama).play()
+  const suara = ambil(nama)
+  // Gerak serentak berbagi satu suara agar swish dan tempel tidak menumpuk.
+  if (nama === 'geser' || nama === 'tempel' || nama.startsWith('kertas-')) suara.stop()
+  suara.play()
 }
 
 // Browser menolak suara sebelum halaman pernah disentuh, jadi suara otomatis hanya diputar sesudahnya
 export const bolehBersuaraSendiri = () => navigator.userActivation?.hasBeenActive ?? false
 
 export type SlotSuara =
+  | 'mulai'
+  | 'kembali'
   | 'ketuk'
   | 'tepat'
   | 'belum-tepat'
   | 'muncul'
   | 'melesat'
+  | 'geser'
+  | 'tempel'
   | 'klik'
+  | 'kertas-getar'
+  | 'kertas-lepas'
+  | 'kertas-kait'
   | 'getar'
   | 'belah'
   | 'atp'
@@ -71,12 +89,20 @@ export type SlotSuara =
 
 // Momen di adegan memanggil nama slot; berkasnya cukup diganti di sini
 const BERKAS_SLOT: Record<SlotSuara, NamaSuara> = {
+  mulai: 'mulai',
+  kembali: 'kembali',
   ketuk: 'ketuk',
   tepat: 'tepat',
   'belum-tepat': 'belum-tepat',
-  muncul: 'mendarat',
+  // Pop episode sendiri; 'mendarat' tetap milik animasi sel Beranda
+  muncul: 'muncul',
   melesat: 'melesat',
+  geser: 'geser',
+  tempel: 'tempel',
   klik: 'klik',
+  'kertas-getar': 'kertas-getar',
+  'kertas-lepas': 'kertas-lepas',
+  'kertas-kait': 'kertas-kait',
   getar: 'getar',
   belah: 'belah',
   atp: 'atp',

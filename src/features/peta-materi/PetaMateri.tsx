@@ -14,7 +14,8 @@ import latarHp from '../../assets/images/latar-peta-hp.webp'
 import latar from '../../assets/images/latar-peta.webp'
 import maskot from '../../assets/images/maskot-mitokondria-ramah.webp'
 import TombolSuara from '../../components/TombolSuara'
-import { putar, siapkan } from '../../lib/suara'
+import PengaturVolume from '../../components/PengaturVolume'
+import { bunyi, putar, siapkan } from '../../lib/suara'
 import './peta-materi.css'
 
 const EPISODE = [
@@ -47,7 +48,7 @@ function PetaMateri() {
     putar(buka ? 'buka-peta' : 'tutup-peta')
   }
 
-  useEffect(() => siapkan('buka-peta', 'tutup-peta', 'kembali'), [])
+  useEffect(() => siapkan('buka-peta', 'tutup-peta', 'kembali', 'melesat'), [])
 
   // Kembali ke awal setelah akordeon selesai agar kartu Pengantar tetap terlihat di kiri.
   useEffect(() => {
@@ -74,6 +75,7 @@ function PetaMateri() {
         </h1>
         <div className="flex items-center gap-3">
           <TombolSuara />
+          <PengaturVolume />
           <Link
             to="/"
             onClick={() => putar('kembali')}
@@ -99,7 +101,15 @@ function PetaMateri() {
             Pengantar
           </h2>
           <p className="text-muted">Episode 0</p>
-          <p className="mt-auto font-bold text-muted">Belum tersedia</p>
+          <Link
+            to="/episode/0"
+            className="peta-buka tombol-utama mt-auto inline-flex min-h-11 min-w-11 items-center justify-center gap-2 px-3 py-2 font-head font-extrabold"
+            aria-label="Buka Pengantar"
+            onClick={() => bunyi('melesat')}
+          >
+            <span className="peta-buka-teks">Buka</span>
+            <ArrowRight aria-hidden="true" className="size-4" />
+          </Link>
         </section>
 
         <Collapsible.Root open={terbuka} onOpenChange={ubah} className="peta-aerob">
@@ -154,10 +164,11 @@ function PetaMateri() {
                     <img src={ikon} alt="" width={240} height={240} className="peta-ikon" />
                     <h3 className="peta-nama">{judul}</h3>
                     <p className="text-muted">{tempat}</p>
-                    {i === 0 ? (
+                    {i < 2 ? (
                       <Link
-                        to="/episode/1"
-                        aria-label="Buka Glikolisis"
+                        to={`/episode/${i + 1}`}
+                        aria-label={`Buka ${judul}`}
+                        onClick={() => bunyi('melesat')}
                         className="tombol-utama mt-auto inline-flex min-h-12 items-center gap-2 px-5 pt-2 pb-3 font-head font-extrabold transition-transform duration-(--durasi-ui) ease-pose hover:-translate-y-0.5 active:translate-y-0.5"
                       >
                         Buka <ArrowRight aria-hidden="true" className="size-4" />

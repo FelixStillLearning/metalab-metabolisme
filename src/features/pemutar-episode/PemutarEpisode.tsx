@@ -1,19 +1,24 @@
 import { gsap } from 'gsap'
 import { ArrowLeft, Pause, Play, Settings } from 'lucide-react'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { useReducedMotion } from 'motion/react'
 import { Link } from 'react-router'
-import ikonPutarHp from '../../assets/svg/ui-putar-hp.svg?raw'
+import logo from '../../assets/images/logo-metalab.webp'
+import organelMitokondria from '../../assets/images/organel-mitokondria.webp'
+import ikonPutarHp from '../../assets/images/ui-putar-hp.webp'
 import TombolSuara from '../../components/TombolSuara'
-import { musik } from '../../lib/suara'
+import PengaturVolume from '../../components/PengaturVolume'
+import { bunyi, musik } from '../../lib/suara'
 import { usePemutar } from '../../stores/pemutar'
 import { usePengaturan } from '../../stores/pengaturan'
 import Gelembung from './Gelembung'
+import PetunjukInteraksi from './PetunjukInteraksi'
 import { disc, el } from './kertas'
 import { jedaSemua, kendali, obj, type Objek, type Panggung } from './mesin'
 import PanelPengaturan from './PanelPengaturan'
 import LengkapiAdegan from './LengkapiAdegan'
 import PilihanAdegan from './PilihanAdegan'
-import PoeAdegan from './PoeAdegan'
+import PoeAdegan, { HasilTebakan } from './PoeAdegan'
 import './pemutar-episode.css'
 
 export type Bab = { k: string; t: string; poe?: boolean }
@@ -70,6 +75,10 @@ function PemutarEpisode({
   const [panelBuka, setPanelBuka] = useState(false)
   const babSekarang = usePemutar((s) => s.bab)
   const dijeda = usePemutar((s) => s.dijeda)
+  const latarLebar = usePemutar((s) => s.latar)
+  const tenang = usePengaturan((s) => s.tenang)
+  const gerakDikurangi = useReducedMotion()
+  const diam = tenang ?? gerakDikurangi
   const svg = useRef<SVGSVGElement>(null)
   const latar = useRef<SVGGElement>(null)
   const fx = useRef<SVGGElement>(null)
@@ -92,12 +101,14 @@ function PemutarEpisode({
     pengendali.current = kendali
     usePemutar.setState({
       kalimat: '',
+      petunjuk: '',
       pose: '01-ramah',
       pendamping: null,
       bab: -1,
       pilihan: null,
       lengkapi: null,
       poe: null,
+      latar: null,
     })
     const s = svg.current!
     const g = latar.current!
@@ -115,16 +126,6 @@ function PemutarEpisode({
       sudahMulai.current = false
     }
   }, [])
-
-  // Narasi yang sedang berjalan ikut berhenti saat narasi atau semua suara dimatikan
-  useEffect(
-    () =>
-      usePengaturan.subscribe((s, lama) => {
-        if ((lama.narasi && !s.narasi) || (lama.suaraAktif && !s.suaraAktif))
-          window.speechSynthesis?.cancel()
-      }),
-    [],
-  )
 
   // HP diputar ke tegak di tengah episode: dijeda, dan tidak lanjut sendiri saat miring lagi
   useEffect(() => {
@@ -176,6 +177,7 @@ function PemutarEpisode({
     if (sudahMulai.current) return
     sudahMulai.current = true
     setMulai(true)
+    if (!otomatis && !langsung) bunyi('mulai')
     musik(true)
     // Episode dipakai miring: di perangkat sentuh minta layar penuh lalu kunci mendatar
     if (matchMedia('(pointer: coarse)').matches) {
@@ -220,14 +222,17 @@ function PemutarEpisode({
   )
   const babIni = bab[babSekarang]
   const kembali = (
-    <Link to="/peta-materi" className="pemutar-kembali">
+    <Link to="/peta-materi" className="pemutar-kembali" onClick={() => bunyi('kembali')}>
       <ArrowLeft aria-hidden="true" />
       Peta materi
     </Link>
   )
 
   return (
-    <div className="pemutar" data-dijeda={dijeda || undefined}>
+    <div className="pemutar" data-dijeda={dijeda || undefined} data-tenang={diam || undefined}>
+      {latarLebar && (
+        <div className="pemutar-latar" style={{ backgroundImage: `url(${latarLebar})` }} />
+      )}
       <div className="pemutar-panggung" data-panggung>
         <svg ref={svg} viewBox="0 0 1600 900" role="img" aria-label={`Animasi episode ${judul}`}>
           <g ref={latar} data-lapisan="latar" />
@@ -240,27 +245,44 @@ function PemutarEpisode({
         {children}
         {!mulai && (
           <div className="pemutar-sampul">
+            <img
+              src={organelMitokondria}
+              alt=""
+              aria-hidden="true"
+              className="pemutar-sampul-dekorasi-kanan"
+            />
             <div className="pemutar-sampul-gambar">
               <img src={gambarSampul} alt="" />
             </div>
             <div className="pemutar-sampul-isi">
+              <img
+                src={logo}
+                alt="MetaLab"
+                className="pemutar-sampul-logo"
+                width={280}
+                height={56}
+              />
               <span className="pemutar-label">{label}</span>
               <h1>{judul}</h1>
               <p>{ringkasan}</p>
-              <button
-                type="button"
-                className="tombol-utama"
-                disabled={mulai}
-                onClick={mulaiEpisode}
-              >
-                Mulai episode
-              </button>
-              {kembali}
+              <div className="pemutar-sampul-aksi">
+                <button
+                  type="button"
+                  className="tombol-utama"
+                  disabled={mulai}
+                  onClick={mulaiEpisode}
+                >
+                  Mulai episode
+                </button>
+                {kembali}
+              </div>
             </div>
           </div>
         )}
       </div>
 
+      <PetunjukInteraksi />
+      <HasilTebakan />
       <div className="pemutar-bilah">
         <button
           type="button"
@@ -271,6 +293,7 @@ function PemutarEpisode({
           {dijeda ? <Play aria-hidden="true" /> : <Pause aria-hidden="true" />}
         </button>
         <TombolSuara className="pemutar-ib" />
+        <PengaturVolume className="pemutar-ib" />
         <span className="pemutar-posisi" aria-live="polite">
           {babIni ? (
             <>
@@ -313,7 +336,13 @@ function PemutarEpisode({
       />
 
       <div className="pemutar-putar-hp">
-        <span className="pemutar-ikon-putar" dangerouslySetInnerHTML={{ __html: ikonPutarHp }} />
+        <img
+          className="pemutar-ikon-putar"
+          src={ikonPutarHp}
+          alt="Putar HP"
+          width={400}
+          height={320}
+        />
         <h2>Putar HP-mu</h2>
         <p>Episode {judul.toLowerCase()} lebih nyaman dilihat dalam posisi miring.</p>
         {kembali}

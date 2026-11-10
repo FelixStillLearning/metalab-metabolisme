@@ -8,6 +8,7 @@ class UtteranceTiruan {
   voice: unknown
   lang = ''
   rate = 1
+  volume = 1
   text: string
   constructor(teks: string) {
     this.text = teks
@@ -37,6 +38,7 @@ beforeEach(() => {
   vi.stubGlobal('speechSynthesis', sintesis)
   vi.stubGlobal('SpeechSynthesisUtterance', UtteranceTiruan)
   Object.defineProperty(window, 'speechSynthesis', { value: sintesis, configurable: true })
+  usePengaturan.getState().aturVolume(0.5)
   usePengaturan.getState().aturSuara(true)
   usePengaturan.getState().atur('narasi', true)
   usePengaturan.getState().atur('pelan', false)
@@ -48,6 +50,7 @@ test('kalimat belum direkam dibacakan suara browser dengan lafal rumus', async (
   expect(sintesis.speak).toHaveBeenCalledOnce()
   const u = sintesis.speak.mock.calls[0][0] as UtteranceTiruan
   expect(u.text).toBe('NAD plus dan H2O, 4  kurang 2')
+  expect(u.volume).toBe(0.5)
   await Promise.resolve()
   expect(selesai).not.toHaveBeenCalled()
   u.onend!()
@@ -105,3 +108,31 @@ test('narasi baru tetap berbunyi setelah dibatalkan saat dijeda', async () => {
   ;(sintesis.speak.mock.calls[1][0] as UtteranceTiruan).onend!()
   await berikut
 })
+
+test('volume baru dipakai pada kalimat berikutnya tanpa membatalkan kalimat aktif', async () => {
+  const pertama = ucapkan('x', 'kalimat pertama')
+  const u = sintesis.speak.mock.calls[0][0] as UtteranceTiruan
+  usePengaturan.getState().aturVolume(0.75)
+  expect(sintesis.cancel).not.toHaveBeenCalled()
+  u.onend!()
+  await pertama
+  const kedua = ucapkan('y', 'kalimat berikutnya')
+  const berikut = sintesis.speak.mock.calls[1][0] as UtteranceTiruan
+  expect(berikut.volume).toBe(0.75)
+  berikut.onend!()
+  await kedua
+})
+
+test.each(['bisu', 'narasi', 'volume nol'])(
+  '%s menghentikan narasi aktif dan menyelesaikan janjinya',
+  async (cara) => {
+    const janji = ucapkan('x', 'halo')
+    if (cara === 'bisu') usePengaturan.getState().aturSuara(false)
+    else if (cara === 'narasi') usePengaturan.getState().atur('narasi', false)
+    else usePengaturan.getState().aturVolume(0)
+    await janji
+    expect(sintesis.cancel).toHaveBeenCalledOnce()
+    await ucapkan('y', 'tetap diam')
+    expect(sintesis.speak).toHaveBeenCalledOnce()
+  },
+)

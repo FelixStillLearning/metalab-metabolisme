@@ -157,3 +157,68 @@ test('mode otomatis: tebakan dan penjelasan langsung benar tanpa kartu', async (
   expect(x).toBe(1)
   expect(usePemutar.getState().poe).toBeNull()
 })
+
+test('POE zat memilih satu jenis, mengunci indeks termasuk nol, dan menjaga jeda/abort', async () => {
+  const controller = new AbortController()
+  const konfigurasi = {
+    judul: 'Pembawa?',
+    reasons: ['ADP', 'NAD⁺', 'FAD'],
+    right: 0,
+    zat: [{ teks: 'NAD⁺' }, { teks: 'FAD' }, { teks: 'ADP' }],
+    zone: { x: 400, y: 400, w: 300, h: 300, name: 'asetil' },
+    supply: [
+      [700, 300],
+      [700, 400],
+      [700, 500],
+    ] as [number, number][],
+    slot: (): [number, number] => [400, 400],
+  }
+  const janji = mintaTebak(controller.signal, konfigurasi)
+  const s = usePemutar.getState().poe as PoeTebakState
+  s.taruhToken(99)
+  expect((usePemutar.getState().poe as PoeTebakState).placed).toEqual([])
+  s.taruhToken(2)
+  s.taruhToken(0)
+  expect((usePemutar.getState().poe as PoeTebakState).placed).toEqual([0])
+  usePemutar.setState({ dijeda: true })
+  s.taruhToken(1)
+  s.pilihAlasan(1)
+  s.kunci()
+  expect((usePemutar.getState().poe as PoeTebakState).alasan).toBeNull()
+  usePemutar.setState({ dijeda: false })
+  s.pilihAlasan(1)
+  s.kunci()
+  expect(await janji).toMatchObject({ g: 0, r: 1 })
+  const batal = mintaTebak(controller.signal, konfigurasi)
+  controller.abort()
+  await expect(batal).rejects.toThrow('Adegan dihentikan')
+  expect(usePemutar.getState().poe).toBeNull()
+  kendali.otomatis = true
+  expect(await mintaTebak(new AbortController().signal, konfigurasi)).toEqual({
+    g: 0,
+    r: 1,
+    from: [[400, 400]],
+  })
+})
+
+test('Jelaskan zat memakai nama, dan lanjut belum tersedia sebelum alasan benar', async () => {
+  const controller = new AbortController()
+  const janji = mintaJelaskan(controller.signal, {
+    g: 2,
+    r: 0,
+    unit: '',
+    zat: ['NAD⁺', 'FAD', 'ADP'],
+    reasons: ['A', 'B', 'C'],
+    back: ['A', 'B', 'C'],
+    right: 0,
+    alasanBenar: 1,
+    hasil: 'NADH terbentuk',
+  })
+  const s = usePemutar.getState().poe as PoeJelaskanState
+  expect(s.verdictText).toContain('ADP belum tepat')
+  s.lanjut()
+  expect(usePemutar.getState().poe).not.toBeNull()
+  s.pilihExplain(1)
+  s.lanjut()
+  expect(await janji).toBe(1)
+})

@@ -1,5 +1,6 @@
 import { mintaLengkapi, type Rumpang } from '../../features/pemutar-episode/kalimat'
 import { hide, kinetik, to, type Objek, type Panggung } from '../../features/pemutar-episode/mesin'
+import { bunyi } from '../../lib/suara'
 import { useJawaban } from '../../stores/jawaban'
 import { usePemutar } from '../../stores/pemutar'
 import { say } from './naskah'
@@ -48,20 +49,24 @@ const RUMPANG: Rumpang[] = [
 // Soal h, Pengertian: lengkapi kalimat, lalu asam piruvat melanjutkan perjalanannya
 export async function soalH(p: Panggung, piruvat: Objek[]) {
   usePemutar.setState({ bab: 6 })
-  await say(p, 'e1-h-01')
-  await say(p, 'e1-h-02')
-  const kalimat = await mintaLengkapi(
-    p.signal,
-    'Lengkapi kalimat pengertian glikolisis',
-    POTONGAN,
-    RUMPANG,
-  )
+  p.fx.replaceChildren()
+  bunyi('muncul')
+  const [kalimat] = await Promise.all([
+    mintaLengkapi(p.signal, 'Lengkapi kalimat pengertian glikolisis', POTONGAN, RUMPANG),
+    say(p, 'e1-h-02', { pendamping: '08-menunjuk' }),
+  ])
   useJawaban.getState().catat('h', kalimat)
 
   p.fx.replaceChildren()
-  const k = hide(kinetik(p, 800, 200, 'GLIKOLISIS', 72, 'var(--color-paper)'))
+  const k = hide(kinetik(p, 800, 450, 'GLIKOLISIS', 72, 'var(--color-paper)'))
+  bunyi('muncul')
   await to(k, { o: 1 }, 600)
-  await say(p, 'e1-h-03')
+  await say(p, 'e1-h-03', { pendamping: '07-bangga' })
+  // Kedua piruvat kembali hanya untuk perjalanan ke mitokondria, setelah kartu selesai.
+  p.world.append(...piruvat)
+  bunyi('muncul')
+  await Promise.all(piruvat.map((r, i) => to(r, { x: 1300, y: 380 + i * 160, s: 1, o: 1 }, 500)))
+  bunyi('geser')
   await Promise.all(piruvat.map((r, i) => to(r, { x: 1700, y: 440 + i * 60 }, 1800)))
   await say(p, 'e1-h-04', { pendamping: '09-melambaikan' })
 }

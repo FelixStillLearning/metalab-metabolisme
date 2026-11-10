@@ -20,16 +20,18 @@ export async function soalAB(p: Panggung) {
   const g = glukosa(p, 800, 380)
   const pir = piruvat(p, 420, 560)
   const o2 = oksigen(p, 1180, 560)
+  bunyi('muncul')
   await Promise.all([g, pir, o2].map((m) => to(hide(m), { o: 1 }, 600)))
   await say(p, 'e1-a-01')
   await mintaPilihan(
     p.signal,
     {
-      judul: 'Ketuk molekulnya',
+      judul: 'Ketuk bahan awal glikolisis.',
+      // Kotak sorotan memuat atom dan label tiap molekul, dengan sela 25 satuan
       opsi: [
-        { teks: 'Glukosa (6 atom C)', posisi: [800, 420] },
-        { teks: 'Asam piruvat (3 atom C)', posisi: [420, 580] },
-        { teks: 'O₂ (2 atom O)', posisi: [1180, 580] },
+        { teks: 'Glukosa (6 atom C)', posisi: [800, 413], ukuran: [292, 332] },
+        { teks: 'Asam piruvat (3 atom C)', posisi: [420, 588], ukuran: [280, 184] },
+        { teks: 'O₂ (2 atom O)', posisi: [1180, 586], ukuran: [230, 192] },
       ],
     },
     0,
@@ -44,6 +46,7 @@ export async function soalAB(p: Panggung) {
     },
   )
   useJawaban.getState().catat('a', 'Glukosa (6 atom C)')
+  bunyi('geser')
   await Promise.all([to(pir, { o: 0, x: 200 }, 700), to(o2, { o: 0, x: 1400 }, 700)])
   pir.remove()
   o2.remove()
@@ -51,12 +54,14 @@ export async function soalAB(p: Panggung) {
   await to(g, { s: 1.25 }, 400)
   await to(g, { s: 1 }, 300)
   await say(p, 'e1-a-02')
+  bunyi('geser')
   await to(g, { x: 300, y: 440 }, 1100)
 
   usePemutar.setState({ bab: 1 })
   // Panah dan judul tahap dipudarkan di awal adegan c agar tidak menimpa molekul
   const penanda: Objek[] = [obj(0, 0, p.world)]
-  for (const d of ['M420 440 L660 440', 'M940 440 L1180 440']) {
+  // Prototype mulai di x 420, menempel atom C glukosa (x 400, jari-jari 21); diberi celah
+  for (const d of ['M450 440 L660 440', 'M940 440 L1180 440']) {
     el(
       'path',
       {
@@ -70,7 +75,9 @@ export async function soalAB(p: Panggung) {
       penanda[0],
     )
   }
+  bunyi('muncul')
   await say(p, 'e1-b-01')
+  bunyi('muncul')
   await mintaPilihan(
     p.signal,
     {
@@ -86,15 +93,16 @@ export async function soalAB(p: Panggung) {
     },
   )
   useJawaban.getState().catat('b', '2 tahap: investasi energi dan pembentukan energi')
+  // Judul tepat di atas titik tengah panahnya (prototype: y 260, jauh dari panah di y 440)
   for (const [x, judul] of [
-    [540, 'Investasi energi'],
+    [555, 'Investasi energi'],
     [1060, 'Pembentukan energi'],
   ] as const) {
-    const k = obj(x, 290, p.world)
+    const k = obj(x, 430, p.world)
     penanda.push(k)
     teks(k, 0, 0, judul, 26, 'var(--color-paper)')
-    bunyi('melesat')
-    await to(hide(k), { o: 1, y: 260 }, 700)
+    bunyi('geser')
+    await to(hide(k), { o: 1, y: 400 }, 700)
   }
   await say(p, 'e1-b-02')
   return { glu: g, penanda }

@@ -13,9 +13,18 @@ export type PoseMaskot =
 
 export type SoalPilihan = {
   judul: string
+  konfirmasi?: boolean
+  memeriksa?: boolean
+  pesan?: string
   // posisi dan ukuran dalam satuan adegan 1600x900; selesai = sasaran ketuk-semua yang sudah diketuk
-  opsi: { teks: string; posisi?: [number, number]; ukuran?: [number, number]; selesai?: boolean }[]
-  pilih: (index: number) => void
+  opsi: {
+    teks: string
+    gambar?: string
+    posisi?: [number, number]
+    ukuran?: [number, number]
+    selesai?: boolean
+  }[]
+  pilih: (index: number) => void | Promise<void>
 }
 
 // Lengkapi kalimat: rumpang ke-terisi.length sedang aktif, opsi = pilihan rumpang itu
@@ -37,6 +46,8 @@ export type PoeTebakState = {
   // cap = keterangan di bawah zona; nampan = zona memakai gambar nampan G01, bukan zona taruh G02
   zone: { x: number; y: number; w: number; h: number; name: string; cap?: string; nampan?: boolean }
   supply: [number, number][]
+  // Pilihan satu zat; tanpa ini token tetap dihitung sebagai ATP.
+  zat?: { teks: string; gambar?: string }[]
   slot: (i: number, n: number) => [number, number]
   // Posisi kiri-atas kartu dalam persen, seperti cardAt di prototype
   kartu?: [number, number]
@@ -75,6 +86,7 @@ export type PoeState = PoeTebakState | PoeAmatiState | PoeJelaskanState
 
 type Pemutar = {
   kalimat: string
+  petunjuk: string
   pose: PoseMaskot
   pendamping: PoseMaskot | null
   // -1 = pembuka
@@ -83,11 +95,14 @@ type Pemutar = {
   pilihan: SoalPilihan | null
   lengkapi: SoalLengkapi | null
   poe: PoeState | null
+  // Latar lebar di belakang panggung, mengisi bilah layar yang tidak 16:9
+  latar: string | null
 }
 
 // Keadaan sesaat pemutar episode; sengaja tidak disimpan
 export const usePemutar = create<Pemutar>()(() => ({
   kalimat: '',
+  petunjuk: '',
   pose: '01-ramah',
   pendamping: null,
   bab: -1,
@@ -95,4 +110,5 @@ export const usePemutar = create<Pemutar>()(() => ({
   pilihan: null,
   lengkapi: null,
   poe: null,
+  latar: null,
 }))

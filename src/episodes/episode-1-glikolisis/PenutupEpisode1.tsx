@@ -4,14 +4,21 @@
 import { useState } from 'react'
 import { Link } from 'react-router'
 import gambarBintang from '../../assets/images/efek-bintang-sorot.webp'
-import gambarLatar from '../../assets/images/latar-peta-penutup.webp'
+import gambarLatar from '../../assets/images/latar-peta-penutup-lebar.webp'
 import gambarMitokondria from '../../assets/images/organel-mitokondria.webp'
 import simpulBelum from '../../assets/images/ui-simpul-tahap.webp'
 import simpulMenyala from '../../assets/images/ui-simpul-tahap-menyala.webp'
 import simpulSelesai from '../../assets/images/ui-simpul-tahap-selesai.webp'
 import PemutarEpisode from '../../features/pemutar-episode/PemutarEpisode'
 import { el, label } from '../../features/pemutar-episode/kertas'
-import { hide, obj, to, wait, type Panggung } from '../../features/pemutar-episode/mesin'
+import {
+  hide,
+  obj,
+  pasangLatar,
+  to,
+  wait,
+  type Panggung,
+} from '../../features/pemutar-episode/mesin'
 import { bunyi } from '../../lib/suara'
 import { usePemutar } from '../../stores/pemutar'
 import { BAB } from './bab'
@@ -33,11 +40,7 @@ const MITOKONDRIA = [602, 222] as const
 
 async function penutup(p: Panggung) {
   usePemutar.setState({ bab: BAB.length })
-  const latar = obj(0, 0, p.latar)
-  latar.dataset.latar = 'peta-penutup'
-  el('image', { href: gambarLatar, width: 1600, height: 900 }, latar)
-  hide(latar)
-  await to(latar, { o: 1 }, 600)
+  await pasangLatar(p, gambarLatar, 'peta-penutup')
 
   // Bintang sorot dibuat lebih dulu agar berada di belakang simpul glikolisis
   const bintang = obj(TAHAP[0].x, Y, p.world)
@@ -79,6 +82,7 @@ async function penutup(p: Panggung) {
     r._s = 0.2
     return Object.assign(r, { sisi })
   })
+  bunyi('muncul')
   await Promise.all([
     to(mito, { o: 1, s: 1 }, 600),
     ...pir.map((r) => to(r, { o: 1, s: 0.55, x: TAHAP[0].x + r.sisi * 70, y: 190 }, 600)),
@@ -87,12 +91,13 @@ async function penutup(p: Panggung) {
     say(p, 'e1-penutup-02'),
     (async () => {
       await wait(p, 400)
-      bunyi('melesat')
+      bunyi('geser')
       await Promise.all(
         pir.map((r) =>
           to(r, { x: MITOKONDRIA[0] + r.sisi * 62, y: MITOKONDRIA[1] + 8, s: 0.5 }, 1600, 'busur'),
         ),
       )
+      bunyi('tempel')
     })(),
   ])
   await say(p, 'e1-penutup-03', { pendamping: '09-melambaikan' })
@@ -112,7 +117,10 @@ function PenutupEpisode1() {
     >
       {selesai && (
         <div className="pemutar-akhir">
-          <Link to="/peta-materi" className="tombol-utama">
+          <Link to="/episode/2" className="tombol-utama" onClick={() => bunyi('melesat')}>
+            Lanjut ke Episode 2
+          </Link>
+          <Link to="/peta-materi" className="tombol-utama" onClick={() => bunyi('kembali')}>
             Ke peta materi
           </Link>
         </div>
