@@ -1,8 +1,16 @@
 .episode-2 .tok-zat {
-  width: max(52px, 7cqw);
-  min-height: 44px;
+  width: max(78px, 8cqw);
+  height: max(60px, 5.8cqw);
+  padding: 6px;
+  border: 3px dashed var(--color-ink);
+  border-radius: 12px;
+  background: rgb(245 241 232 / 0.35);
   color: var(--color-ink);
   font: 700 max(14px, 1.3cqw) / 1 var(--font-body);
+}
+.episode-2 .tok-zat[aria-pressed='true'] {
+  border-style: solid;
+  background: var(--color-accent);
 }
 .episode-2 .tok-zat span {
   display: block;
