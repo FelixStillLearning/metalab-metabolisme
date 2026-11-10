@@ -134,7 +134,7 @@ async function tempatkan(m: Piruvat, x: number, y: number, s = 1, ms = 700) {
 }
 
 function konteksAerob(p: Panggung) {
-  const g = obj(1180, 410, p.fx)
+  const g = obj(1280, 410, p.fx)
   g.dataset.objek = 'konteks-aerob'
   const isi = el('g', { class: 'e2-konteks-isi' }, g)
   cut(
