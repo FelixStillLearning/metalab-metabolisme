@@ -378,9 +378,30 @@ async function oksidasi(p: Panggung, molekul: Piruvat[]) {
   usePemutar.setState({ bab: 3 })
   const panduan = hide(jalur(p, 'Gugus asetil', 'Pembawa elektron', 430, 850))
   label(p.fx, 450, 210, '2 · Oksidasi → NADH', 24).dataset.objek = 'judul-tahap'
+  const petunjuk = obj(0, 0, p.world)
+  petunjuk.dataset.objek = 'petunjuk-elektron'
+  label(petunjuk, 710, 280, 'Elektron → pembawa ?', 24)
+  for (const y of [400, 590]) {
+    el(
+      'path',
+      {
+        d: `M510 ${y} H790`,
+        fill: 'none',
+        stroke: 'var(--color-paper)',
+        'stroke-width': 5,
+        'stroke-dasharray': '10 12',
+      },
+      petunjuk,
+    )
+    elektron(petunjuk, 630, y)
+    elektron(petunjuk, 690, y)
+  }
+  bunyi('muncul')
+  await to(hide(petunjuk), { o: 1 }, 450)
   await say(p, 'oksidasi', '04-penasaran')
   const nadh: ReturnType<typeof badge>[] = []
   await poe(p, 'b·2', async (pilihan) => {
+    petunjuk.remove()
     p.fx.replaceChildren()
     await to(panduan, { o: 1 }, 300)
     await Promise.all(
