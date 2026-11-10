@@ -516,7 +516,7 @@ async function hasil(p: Panggung, molekul: Piruvat[], koas: Objek[], nadh: Objek
       to(m.karboksil, { x: 1000, y: 340 + i * 200, o: 1 }, 600),
     ]),
   )
-  const counter = label(p.fx, 800, 680, 'Karbon terhitung: 0 dari 6', 28)
+  const counter = label(p.fx, 800, 720, 'Karbon terhitung: 0 dari 6', 28)
   const count = counter.querySelector('text')!
   await say(p, 'karbon', '08-menunjuk')
   let karbon = 0
