@@ -1,31 +1,59 @@
 import roda from '../../assets/images/interaksi-roda-krebs.webp'
 import atomO from '../../assets/images/molekul-atom-o.webp'
 import koa from '../../assets/images/molekul-koa.webp'
-import { carbon, el, label, strip, type Titik } from '../../features/pemutar-episode/kertas'
+import {
+  carbon,
+  el,
+  label as labelKertas,
+  strip,
+  type Titik,
+} from '../../features/pemutar-episode/kertas'
 import { obj, to, type Panggung } from '../../features/pemutar-episode/mesin'
 
+export function label(parent: Element, x: number, y: number, value: string, size = 22) {
+  const g = labelKertas(parent, x, y, value, size)
+  g.setAttribute('transform', `translate(${x} ${y})`)
+  return g
+}
 export const posisi = (i: number): [number, number] => {
   const a = -Math.PI / 2 + (i * Math.PI) / 4
-  return [500 + Math.cos(a) * 189, 480 + Math.sin(a) * 189]
+  return [500 + Math.cos(a) * 120, 450 + Math.sin(a) * 120]
+}
+export const posisiSamping = (i: number): [number, number] => {
+  const a = -Math.PI / 2 + (i * Math.PI) / 4
+  return [500 + Math.cos(a) * 215, 450 + Math.sin(a) * 215]
 }
 export function rodaKrebs(p: Panggung) {
-  const g = obj(500, 480, p.world)
+  const g = obj(500, 450, p.world)
   g.dataset.objek = 'roda-krebs'
-  el('image', { href: roda, x: -252, y: -252, width: 504, height: 504 }, g)
-  const sorot = el(
-    'circle',
-    { cx: 0, cy: -189, r: 50, fill: 'none', stroke: 'var(--color-accent)', 'stroke-width': 9 },
-    g,
-  )
+  el('image', { href: roda, x: -160, y: -160, width: 320, height: 320 }, g)
   return {
     g,
     aktif: (i: number) => {
-      const [x, y] = posisi(i)
-      sorot.setAttribute('cx', String(x - 500))
-      sorot.setAttribute('cy', String(y - 480))
       g.dataset.tahap = String(i + 1)
     },
   }
+}
+export function simpanTahap(
+  p: Panggung,
+  m: ReturnType<typeof rangka>,
+  tahap: number,
+  nama: string,
+) {
+  const [x, y] = posisiSamping(tahap - 1)
+  const g = m.g.cloneNode(true) as SVGGElement
+  g.removeAttribute('data-detail-reaksi')
+  g.removeAttribute('data-molecule')
+  g.removeAttribute('data-karbon')
+  g.removeAttribute('data-tahap')
+  g.dataset.modelTahap = String(tahap)
+  g.setAttribute('transform', `translate(${x} ${y}) scale(0.38)`)
+  for (const c of g.querySelectorAll('[data-carbon]')) c.removeAttribute('data-carbon')
+  for (const t of g.querySelectorAll('text'))
+    if (!['C'].includes(t.textContent || '')) t.parentElement?.remove()
+  p.world.append(g)
+  const judul = label(p.world, x, y + (tahap <= 2 || tahap === 8 ? -55 : 50), nama, 18)
+  judul.dataset.namaTahap = String(tahap)
 }
 export function gambar(parent: Element, href: string, x: number, y: number, w = 160, h = 80) {
   const g = obj(x, y, parent)
@@ -205,7 +233,9 @@ export type Roda = ReturnType<typeof rodaKrebs>
 export function asetilKertas(p: Panggung, x: number, y: number) {
   const m = rangka(p, 2, 'Asetil KoA', x, y)
   strip(m.ikatan, 25, 12, 90, 12, 8)
-  gambar(m.g, koa, 130, 12, 110, 55)
+  const badan = obj(-60, 0, m.g)
+  badan.append(m.ikatan, ...m.atom)
+  gambar(badan, koa, 130, 12, 110, 55)
   m.judul.remove()
   m.hitung.remove()
   const judul = label(m.g, 0, 130, 'Asetil KoA · 2 C', 24)

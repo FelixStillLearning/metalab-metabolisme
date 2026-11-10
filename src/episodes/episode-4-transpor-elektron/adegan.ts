@@ -1,5 +1,6 @@
 import krista from '../../assets/images/latar-krista-lebar.webp'
 import mito from '../../assets/images/mitokondria-zoom.webp'
+import panelZoom from '../../assets/images/organel-panel-zoom.webp'
 import nad from '../../assets/images/pembawa-nad.webp'
 import nadh from '../../assets/images/pembawa-nadh.webp'
 import fad from '../../assets/images/pembawa-fad.webp'
@@ -22,6 +23,7 @@ import {
   obj,
   pasangLatar,
   to,
+  wait,
   type Panggung,
   type Objek,
 } from '../../features/pemutar-episode/mesin'
@@ -59,11 +61,27 @@ async function pembuka(p: Panggung) {
     'pembuka',
     'NADH dan FADH₂ dari tiga tahap sebelumnya membawa elektron menuju membran dalam mitokondria, yang berlipat membentuk krista.',
   )
+  // Lipatan membran dalam pada sumber 1774 × 887, berbeda dari jangkar matriks E2/E3.
+  const x = 800 + ((1010 - 887) * 1200) / 1774
+  const y = 450 + ((580 - 443.5) * 600) / 887
+  const panel = hide(gambar(p.fx, panelZoom, x, y, 440, 440))
+  panel.dataset.objek = 'zoom-krista'
+  bunyi('muncul')
+  await to(panel, { o: 1 }, 300)
   bunyi('geser')
-  await camTo(p, 850, 430, 4.2, 1800)
-  await pasangLatar(p, krista, 'krista')
+  await Promise.all([
+    to(panel, { x: 800, y: 450, s: 4.9 }, 3000, 'kamera'),
+    camTo(p, x, y, 4.2, 3000),
+    (async () => {
+      await wait(p, 1000)
+      await pasangLatar(p, krista, 'krista')
+      await to(g, { o: 0 }, 1400)
+    })(),
+  ])
   g.remove()
   await to(p.cam, { x: 0, y: 0, s: 1 }, 0)
+  await to(panel, { o: 0 }, 350)
+  panel.remove()
 }
 async function kumpulkan(p: Panggung) {
   bab('g')

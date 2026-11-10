@@ -11,10 +11,8 @@ import nad from '../../assets/images/pembawa-nad.webp'
 import nadh from '../../assets/images/pembawa-nadh.webp'
 import fad from '../../assets/images/pembawa-fad.webp'
 import fadh2 from '../../assets/images/pembawa-fadh2.webp'
-import { label } from '../../features/pemutar-episode/kertas'
 import {
   arc,
-  arrive,
   burstBehind,
   comic,
   camTo,
@@ -42,6 +40,9 @@ import { elektron, glukosa } from '../episode-1-glikolisis/molekul'
 import { BAB, POE, POTONGAN, RUMPANG, TAHAP, ZAT, total, type PoeE3 } from './isi'
 import {
   asetilKertas,
+  label,
+  simpanTahap,
+  posisiSamping,
   gambar,
   lepasCo2,
   posisi,
@@ -169,20 +170,26 @@ async function bahan(p: Panggung) {
       ),
   )
   p.world.replaceChildren()
-  const a = rangka(p, 2, 'Gugus asetil', 320, 410)
-  const b = rangka(p, 4, 'Oksaloasetat', 1080, 410)
+  const a = rangka(p, 2, 'Gugus asetil', 500, 410)
+  const b = rangka(p, 4, 'Oksaloasetat', 1100, 410)
   a.g.dataset.objek = 'asetil-bergabung'
   b.g.dataset.objek = 'oksaloasetat-bergabung'
   const air = gambar(p.world, h2o, 800, 580, 100, 100)
-  const k = gambar(p.world, koa, 320, 590)
+  const k = gambar(a.g, koa, 130, 12, 110, 55)
+  a.judul.remove()
+  b.judul.remove()
   bunyi('geser')
   await Promise.all([
-    to(a.g, { x: 380 }, 800),
-    to(b.g, { x: 600 }, 800),
-    to(air, { x: 500, y: 460, o: 0 }, 800),
+    to(a.g, { x: 670 }, 1000),
+    to(b.g, { x: 880 }, 1000),
+    to(air, { x: 800, y: 460, o: 0 }, 1000),
   ])
   air.remove()
-  const sitrat = rangka(p, 6, 'Sitrat', 500, 460)
+  p.world.append(k)
+  await to(k, { x: a.g._x + 130, y: 422 }, 0)
+  a.judul.remove()
+  b.judul.remove()
+  const sitrat = rangka(p, 6, 'Sitrat', 800, 460)
   sitrat.atom.forEach((c) => c.remove())
   sitrat.ikatan.replaceChildren()
   sitrat.atom.splice(0, 6, ...a.atom, ...b.atom)
@@ -197,10 +204,11 @@ async function bahan(p: Panggung) {
   sitrat.g.dataset.objek = 'sitrat-ikhtisar'
   burstBehind(p, sitrat.g)
   bunyi('tempel')
+  await comic(p, 'KLIK', 800, 650, 'var(--color-paper)')
+  bunyi('geser')
   speedLines(p, k, 1)
-  await arc(k, 850, 520, 100, 850)
+  await to(k, { x: 1110, y: 540 }, 900)
   label(k, 0, 70, 'KoA dilepas', 24)
-  await comic(p, 'KLIK', 800, 260, 'var(--color-paper)')
   await say(
     p,
     'gabung',
@@ -213,6 +221,7 @@ async function bahan(p: Panggung) {
     'delapan-tahap',
     'Sitrat enam karbon akan berubah melalui beberapa reaksi hingga oksaloasetat terbentuk kembali. Ada berapa tahap pada siklus ini?',
   )
+  sitrat.g.dataset.tanyaTahap = ''
   await mintaPilihan(
     p.signal,
     {
@@ -236,13 +245,13 @@ async function poe(p: Panggung, k: PoeE3, amati: () => Promise<void>) {
     reasons: isi.alasan,
     right: 1,
     zat: isi.zat.map((teks) => ({ teks })),
-    zone: { x: 500, y: 480, w: 280, h: 280, name: 'roda siklus Krebs' },
+    zone: { x: 500, y: 450, w: 180, h: 180, name: 'roda siklus Krebs' },
     supply: [
       [850, 300],
       [850, 460],
       [850, 620],
     ],
-    slot: () => [500, 590],
+    slot: () => [500, 450],
   })
   tampilkanAmati(isi.zat[pilihan.g])
   await amati()
@@ -264,41 +273,41 @@ async function poe(p: Panggung, k: PoeE3, amati: () => Promise<void>) {
 async function pembawa(p: Panggung, tahap: number, hasil: 'NADH' | 'FADH₂' | 'ATP') {
   const awal = hasil === 'NADH' ? nad : hasil === 'FADH₂' ? fad : adp
   const akhir = hasil === 'NADH' ? nadh : hasil === 'FADH₂' ? fadh2 : atp
-  const g = gambar(p.world, awal, 950, 400)
+  const g = gambar(p.world, awal, 1080, 650)
+  g.dataset.detailReaksi = ''
   if (hasil === 'ATP') {
-    const fosfat = obj(780, 320, p.world)
+    const fosfat = obj(880, 650, p.world)
     label(fosfat, 0, 0, 'P', 28)
     bunyi('geser')
-    await arc(fosfat, 950, 400, 70, 800)
+    await to(fosfat, { x: 1080 }, 850)
     fosfat.remove()
   } else {
-    const es = [-1, 1].map((s) => elektron(p.world, 520, 430 + s * 20))
+    const es = [-1, 1].map((s) => elektron(p.world, 1050 + s * 24, 460))
     bunyi('geser')
-    es.forEach((e) => speedLines(p, e, 1))
-    await Promise.all(es.map((e, i) => arc(e, 950, 400, 65 + i * 35, 850)))
+    await Promise.all(es.map((e) => to(e, { x: 1080, y: 650 }, 850)))
     es.forEach((e) => e.remove())
   }
   g.querySelector('image')!.setAttribute('href', akhir)
   g.dataset.hasil = hasil
   g.dataset.tahap = String(tahap)
   bunyi(hasil === 'ATP' ? 'atp' : 'tempel')
-  burstBehind(p, g, 220)
-  await comic(p, hasil === 'ATP' ? 'TING!' : 'ZAP!', 1120, 400, 'var(--color-paper)')
-  await arrive(p, g, 1100, 530)
-  label(g, 0, 65, `${hasil} · tahap ${tahap}`, 24)
+  burstBehind(p, g, 140)
+  await comic(p, hasil === 'ATP' ? 'TING!' : 'ZAP!', 1280, 650, 'var(--color-paper)')
+  label(g, 0, 60, hasil, 22)
   return g
 }
 
 async function putar(p: Panggung, roda: Roda) {
   let m: Rangka | null = null
-  const labelPutaran = label(p.fx, 1100, 210, 'SATU PUTARAN · SATU ASETIL KoA', 24)
-  const tahapJudul = label(p.fx, 1100, 310, '4 · α-ketoglutarat', 26)
+  const labelPutaran = label(p.fx, 1100, 170, 'SATU PUTARAN · SATU ASETIL KoA', 24)
+  const tahapJudul = label(p.fx, 1100, 250, '4 · α-ketoglutarat', 26)
   for (const [i, t] of TAHAP.entries()) {
     roda.aktif(i)
     tahapJudul.querySelector('text')!.textContent = `${i + 1} · ${t.nama}`
     if (!m) {
-      m = rangka(p, 6, t.nama)
-      await to(m.g, { s: 0.85 }, 0)
+      m = rangka(p, 6, t.nama, 1050, 410)
+      m.judul.style.display = 'none'
+      m.g.dataset.detailReaksi = ''
     }
     const lepas = i === 2 || i === 3 ? await lepasCo2(p, m, i + 1) : null
     await m.susun(t.nama, i + 1)
@@ -306,24 +315,24 @@ async function putar(p: Panggung, roda: Roda) {
       burstBehind(p, m.g)
       bunyi('belah')
       speedLines(p, lepas, 1)
-      await arc(lepas, 850, 280 + (i - 2) * 240, 110, 1000)
-      await comic(p, 'POP!', 740, 370, 'var(--color-paper)')
+      lepas.dataset.detailReaksi = ''
+      await to(lepas, { x: 1420, y: 370 + (i - 2) * 220 }, 1000)
+      await comic(p, 'POP!', 1260, 400, 'var(--color-paper)')
     } else {
       bunyi('geser')
-      await to(m.g, { s: 1.06 }, 260)
-      await to(m.g, { s: 1 }, 260)
+      await wait(p, 260)
     }
     let air: ReturnType<typeof gambar> | null = null
     let koenzim: ReturnType<typeof gambar> | null = null
     if (t.air) {
-      air = gambar(p.world, h2o, 950, 400, 100, 100)
+      air = gambar(p.world, h2o, 880, 570, 100, 100)
       bunyi('geser')
-      await to(air, { x: 560, y: 465, o: 0 }, 600)
+      await to(air, { x: 1050, y: 460, o: 0 }, 600)
     }
     if (i === 0 || i === 4) {
-      koenzim = gambar(p.world, koa, 580, 570, 100, 50)
+      koenzim = gambar(p.world, koa, 1050, 482, 100, 50)
       bunyi('geser')
-      await to(koenzim, { x: 1120, y: 600 }, 600)
+      await to(koenzim, { x: 1280, y: 560 }, 750)
       label(koenzim, 0, 60, 'KoA dilepas', 22)
     }
     const b = t.hasil ? await pembawa(p, i + 1, t.hasil) : null
@@ -337,6 +346,7 @@ async function putar(p: Panggung, roda: Roda) {
       'Air ditambahkan ke fumarat sehingga terbentuk malat. Karbon tetap empat.',
       'Malat menjadi oksaloasetat kembali, disertai pembentukan NADH. Empat karbon siap mengikat gugus asetil berikutnya.',
     ][i]
+    simpanTahap(p, m, i + 1, t.nama)
     await say(p, `tahap-${i + 1}`, `Tahap ${i + 1}. ${kelanjutan}`)
     air?.remove()
     koenzim?.remove()
@@ -352,7 +362,6 @@ async function putar(p: Panggung, roda: Roda) {
   return m!
 }
 async function tempatkan(p: Panggung, roda: Roda) {
-  let jumlah = 0
   for (const z of ZAT) {
     bab(z.k)
     const href = { 'H₂O': h2o, ATP: atp, NADH: nadh, 'FADH₂': fadh2 }[z.nama]
@@ -386,9 +395,8 @@ async function tempatkan(p: Panggung, roda: Roda) {
         g.dataset.penandaTahap = String(i + 1)
         const [x, y] = posisi(i)
         await arc(g, x, y, 90, 650)
-        const n = jumlah++
-        await arc(g, 940 + (n % 2) * 330, 400 + Math.floor(n / 2) * 95, 50, 650)
-        label(g, 115, 0, `Tahap ${i + 1}`, 20)
+        const [tx, ty] = posisiSamping(i)
+        await to(g, { x: tx, y: ty }, 650)
         bunyi('tempel')
       },
       {
@@ -468,9 +476,11 @@ export async function episode(p: Panggung) {
   const roda = rodaKrebs(p)
   bunyi('muncul')
   await to(hide(roda.g), { o: 1 }, 700)
-  const pratinjau = rangka(p, 6, 'Sitrat')
+  const pratinjau = rangka(p, 6, 'Sitrat', ...posisiSamping(0))
   await pratinjau.susun('Sitrat', 1)
-  await to(pratinjau.g, { s: 0.65, y: 460 }, 0)
+  pratinjau.judul.style.display = 'none'
+  pratinjau.hitung.style.display = 'none'
+  await to(pratinjau.g, { s: 0.38 }, 0)
   await say(
     p,
     'roda',
@@ -480,9 +490,13 @@ export async function episode(p: Panggung) {
   await poe(p, 'i·1', async () => {
     pratinjau.g.remove()
     m = await putar(p, roda)
+    p.world.querySelectorAll<SVGElement>('[data-detail-reaksi]').forEach((g) => {
+      g.style.display = 'none'
+    })
   })
   m!.g.remove()
   p.world.querySelectorAll('[data-molecule="co2"]').forEach((n) => n.remove())
+  p.world.querySelectorAll('[data-model-tahap], [data-nama-tahap]').forEach((g) => g.remove())
   await tempatkan(p, roda)
   const penanda = [...p.fx.querySelectorAll('[data-penanda-tahap]')]
   await Promise.all(penanda.map((g) => to(g as Parameters<typeof to>[0], { o: 0 }, 400)))

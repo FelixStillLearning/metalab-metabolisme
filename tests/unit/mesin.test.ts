@@ -2,6 +2,7 @@ import { gsap } from 'gsap'
 import { afterEach, beforeAll, beforeEach, expect, test } from 'vitest'
 import {
   durasi,
+  burstBehind,
   jedaSemua,
   kendali,
   obj,
@@ -175,4 +176,14 @@ test('wait ditolak saat abort', async () => {
   const janji = wait(p, 1000)
   kendaliAbort.abort()
   await expect(janji).rejects.toMatchObject({ name: 'AbortError' })
+})
+
+test('letupan tetap lokal meskipun pemanggil meminta latar besar', async () => {
+  kendali.cepat = 0.08
+  const p = panggung()
+  const g = obj(800, 450, p.world)
+  burstBehind(p, g, 480)
+  const gambar = p.world.querySelector('[data-effect="split-burst"] image')!
+  expect(Number(gambar.getAttribute('width'))).toBeLessThanOrEqual(180)
+  await wait(p, 2000)
 })

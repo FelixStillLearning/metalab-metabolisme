@@ -176,3 +176,40 @@
     padding: 5px 4px;
   }
 }
+
+.episode-3 .pemutar-pilih-molekul[aria-label='Ketuk substrat siklus Krebs.'] .pemutar-sasaran:hover,
+.episode-3
+  .pemutar-pilih-molekul[aria-label='Ketuk substrat siklus Krebs.']
+  .pemutar-sasaran:focus-visible,
+.episode-3 .pemutar-pilih-molekul[aria-label='Ketuk pengikat gugus asetil.'] .pemutar-sasaran:hover,
+.episode-3
+  .pemutar-pilih-molekul[aria-label='Ketuk pengikat gugus asetil.']
+  .pemutar-sasaran:focus-visible {
+  outline: none;
+  border-color: var(--color-ink);
+  background: rgb(245 241 232 / 0.15);
+}
+.episode-3 .pemutar-panggung:has([data-tanya-tahap]) .pemutar-soal {
+  top: 20%;
+  left: 50%;
+  right: auto;
+  bottom: auto;
+  width: 48%;
+  transform: translateX(-50%);
+}
+
+@media (max-width: 760px), (max-height: 500px) {
+  .episode-3 .pemutar-panggung:has([data-tanya-tahap]) .pemutar-soal {
+    top: 12%;
+    width: 60%;
+    padding: 10px 14px;
+  }
+  .episode-3 .pemutar-panggung:has([data-tanya-tahap]) .pemutar-soal h2 {
+    font-size: 14px;
+    margin-bottom: 5px;
+  }
+  .episode-3 .pemutar-panggung:has([data-tanya-tahap]) .pemutar-pilihan {
+    padding: 5px 10px;
+    min-height: 30px;
+  }
+}

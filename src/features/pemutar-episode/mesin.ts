@@ -276,8 +276,9 @@ export async function comic(
 }
 
 // Letupan H02 di belakang objek yang terbelah
-export function burstBehind(p: Panggung, g: Objek, sisi = 480) {
+export function burstBehind(p: Panggung, g: Objek, sisi = 160) {
   if (tenangAktif()) return
+  sisi = Math.min(sisi, 180)
   const burst = obj(g._x, g._y, p.world)
   burst.dataset.effect = 'split-burst'
   p.world.insertBefore(burst, g)
