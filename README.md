@@ -8,11 +8,11 @@ Judul kegiatan: Rancang Bangun Media Pembelajaran Interaktif Berbasis Web pada M
 
 ## Status
 
-Tahap Assembly (MDLC). Kerangka proyek, token gaya, router, beranda, serta tampilan dan navigasi peta materi sudah tersedia. Panel Respirasi Aerob menampilkan empat episode; tautan Glikolisis membuka halaman sementara yang dapat kembali ke peta. Materi lain ditandai belum tersedia, dan progres siswa belum disimpan.
+Tahap Assembly (MDLC). Beranda, peta materi, dan Episode 0–4 sudah diimplementasikan, termasuk animasi, aktivitas POE, Lembar Hasil, refleksi, serta cetak. Semua episode respirasi aerob dapat dibuka dari peta.
 
-Pengerjaan berikutnya: Episode 1, Glikolisis (Aktivitas 1.7).
+Episode 4 mencakup transpor elektron dan perbandingan empat tahap (Aktivitas 1.10–1.11). Perhitungan mengikuti buku: 34 ATP dari transpor elektron dan 38 ATP total respirasi aerob. Tabel perbandingan masih memerlukan validasi guru.
 
-Episode lain dikerjakan setelah Episode 1 selesai diuji.
+Pengujian perangkat fisik serta validasi guru dan siswa masih diperlukan sebelum rilis.
 
 ## Isi media
 
