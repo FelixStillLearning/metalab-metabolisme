@@ -338,8 +338,9 @@ async function tempatkan(p: Panggung, roda: Roda) {
       async (i) => {
         roda.aktif(i)
         const g = gambar(p.fx, href, 1100, 350, 100, 50)
+        g.dataset.penandaTahap = String(i + 1)
         const [x, y] = posisi(i)
-        await arc(g, 500 + (x - 500) * 0.66, 480 + (y - 480) * 0.66, 90, 650)
+        await arc(g, 500 + (x - 500) * 0.48, 480 + (y - 480) * 0.48, 90, 650)
         bunyi('tempel')
       },
       {

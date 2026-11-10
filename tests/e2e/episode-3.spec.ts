@@ -107,6 +107,20 @@ test('E3 lengkap: delapan tahap, dua POE, zat, hasil/cetak dan replay terpisah',
   await page.screenshot({ path: info.outputPath('oksaloasetat-kembali.png') })
   await jelaskan(page, 'i·1')
   await tempatkan(page)
+  await expect(page.locator('#poe-tebak-judul')).toHaveText(POE['i·2'].judul)
+  const penanda = page.locator('[data-penanda-tahap]')
+  await expect(penanda).toHaveCount(7)
+  const rodaBox = (await page.locator('[data-objek="roda-krebs"]').boundingBox())!
+  for (const marker of await penanda.all()) {
+    const box = (await marker.boundingBox())!
+    const cx = rodaBox.x + rodaBox.width / 2
+    const cy = rodaBox.y + rodaBox.height / 2
+    expect(Math.abs(box.x + box.width / 2 - cx) + box.width / 2).toBeLessThan(rodaBox.width * 0.28)
+    expect(Math.abs(box.y + box.height / 2 - cy) + box.height / 2).toBeLessThan(
+      rodaBox.height * 0.28,
+    )
+  }
+  await page.screenshot({ path: info.outputPath('penanda-tahap.png') })
   await tebak(page, 'i·2', 2, true)
   await expect(page.locator('[data-putaran="1"]')).toContainText('3 NADH', { timeout: 15000 })
   await expect(page.locator('[data-putaran="2"]')).toContainText('6 NADH', { timeout: 15000 })
