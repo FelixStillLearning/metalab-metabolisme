@@ -164,7 +164,7 @@ function PetaMateri() {
                     <img src={ikon} alt="" width={240} height={240} className="peta-ikon" />
                     <h3 className="peta-nama">{judul}</h3>
                     <p className="text-muted">{tempat}</p>
-                    {i < 2 ? (
+                    {i < 3 ? (
                       <Link
                         to={`/episode/${i + 1}`}
                         aria-label={`Buka ${judul}`}

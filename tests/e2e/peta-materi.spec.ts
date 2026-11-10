@@ -39,8 +39,8 @@ test('empat episode baru muncul setelah kartu aerob dibuka, bisa ditutup dengan 
   ]) {
     await expect(daftar.getByRole('heading', { name: nama, exact: true })).toBeVisible()
   }
-  await expect(daftar.getByRole('link')).toHaveCount(2)
-  await expect(daftar.getByText('Belum tersedia', { exact: true })).toHaveCount(2)
+  await expect(daftar.getByRole('link')).toHaveCount(3)
+  await expect(daftar.getByText('Belum tersedia', { exact: true })).toHaveCount(1)
   await expect(page.getByText(/Aktivitas/)).toHaveCount(0)
   await page.getByRole('button', { name: 'Tutup episode', exact: true }).focus()
   await page.keyboard.press('Space')

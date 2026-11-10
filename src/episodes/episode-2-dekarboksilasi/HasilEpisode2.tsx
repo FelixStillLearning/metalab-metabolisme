@@ -142,7 +142,7 @@ export default function HasilEpisode2() {
           akhir: isi.alasan[p.penjelasan!],
         })),
       }}
-      rute={{ episode: '/episode/2', lanjut: '/peta-materi' }}
+      rute={{ episode: '/episode/2', lanjut: '/episode/3' }}
       narasi={{
         id: 'e2-hasil',
         teks: 'Ini bagan dekarboksilasimu. Bandingkan tebakan awal dengan hasil pengamatan dan jelaskan ke mana keenam karbon berpindah.',

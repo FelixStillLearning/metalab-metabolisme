@@ -1,0 +1,134 @@
+.episode-3 .tok-zat {
+  width: max(100px, 9cqw);
+  min-height: 44px;
+  color: var(--color-ink);
+  font: 700 max(14px, 1.3cqw) / 1.15 var(--font-body);
+}
+.episode-3 .tok-zat span {
+  display: block;
+  padding: 10px;
+  background: var(--color-paper);
+  box-shadow: var(--shadow-kertas-sm);
+}
+.episode-3 .poe-steps {
+  top: 5%;
+}
+.episode-3 .poe-card-explain {
+  left: auto;
+  right: 2%;
+  top: 24%;
+  bottom: auto;
+  width: 36%;
+  max-height: 64%;
+  transform: none;
+  overflow-y: auto;
+}
+.e3-bagan {
+  min-height: 0;
+  overflow: auto;
+}
+.e3-ringkasan {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  margin: 0;
+}
+.e3-ringkasan > img {
+  width: 35%;
+  flex: none;
+}
+.e3-ringkasan p {
+  margin-top: 10px;
+}
+.e3-tabel {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 16px;
+}
+.e3-tabel caption {
+  font-weight: 700;
+  padding: 12px;
+}
+.e3-tabel th,
+.e3-tabel td {
+  padding: 8px;
+  border: 1px solid var(--color-muted);
+  text-align: left;
+}
+.e3-tabel td img {
+  width: 90px;
+  height: 48px;
+  object-fit: contain;
+  display: block;
+}
+.e3-jawaban {
+  list-style: none;
+  display: grid;
+  gap: 16px;
+  padding: 16px;
+  font-size: clamp(16px, 1.15vw, 20px);
+}
+.e3-jawaban p {
+  margin: 4px 0 0;
+}
+@media (max-width: 760px), (max-height: 500px) {
+  .e3-bagan {
+    overflow: visible;
+  }
+  .episode-3 .poe-steps {
+    top: 3%;
+  }
+  .episode-3 .poe-card {
+    width: 39%;
+  }
+  .episode-3 .poe-card-explain {
+    right: 1%;
+    top: 12%;
+    width: 41%;
+    max-height: 87%;
+  }
+  .episode-3 .tok-zat {
+    width: 64px;
+  }
+  .episode-3 .tok-zat span {
+    padding: 8px 6px;
+  }
+  .e3-tabel {
+    font-size: 14px;
+  }
+  .e3-tabel th,
+  .e3-tabel td {
+    padding: 5px;
+  }
+}
+@media print {
+  .e3-tabel {
+    font-size: 10pt;
+  }
+  .e3-tabel tr {
+    break-inside: avoid;
+  }
+  .e3-tabel td img {
+    width: 55px;
+    height: 30px;
+  }
+}
+
+.episode-3 .pemutar-panggung:has([data-objek='sitrat-ikhtisar']) .pemutar-soal {
+  left: auto;
+  right: 2%;
+  top: 24%;
+  bottom: auto;
+  width: 36%;
+  transform: none;
+}
+@media (max-width: 760px), (max-height: 500px) {
+  .episode-3 .pemutar-panggung:has([data-objek='sitrat-ikhtisar']) .pemutar-soal {
+    right: 1%;
+    top: 20%;
+    width: 41%;
+    max-height: 70%;
+    overflow: auto;
+  }
+}
