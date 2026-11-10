@@ -282,7 +282,7 @@ async function pembawa(p: Panggung, tahap: number, hasil: 'NADH' | 'FADH₂' | '
   g.dataset.hasil = hasil
   g.dataset.tahap = String(tahap)
   bunyi(hasil === 'ATP' ? 'atp' : 'tempel')
-  burstBehind(p, g)
+  burstBehind(p, g, 220)
   await comic(p, hasil === 'ATP' ? 'TING!' : 'ZAP!', 1120, 400, 'var(--color-paper)')
   await arrive(p, g, 1100, 530)
   label(g, 0, 65, `${hasil} · tahap ${tahap}`, 24)
