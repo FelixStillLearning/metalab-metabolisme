@@ -1,8 +1,8 @@
 // Narasi utama Episode 1, disalin dari naskah narasi versi 1 (ID sama dengan nama berkas rekaman).
 // Kalimat yang berubah dicatat juga di riwayat naskah agar rekaman ikut diperbarui.
-import { kendali, wait, type Panggung } from '../../features/pemutar-episode/mesin'
-import { ucapkan } from '../../lib/narasi'
-import { usePemutar, type PoseMaskot } from '../../stores/pemutar'
+import type { Panggung } from '../../features/pemutar-episode/mesin'
+import { ucapKalimat } from '../../features/pemutar-episode/ucapKalimat'
+import type { PoseMaskot } from '../../stores/pemutar'
 
 export const NASKAH = {
   'e1-pembuka-01': {
@@ -135,10 +135,5 @@ export async function say(
   id: IdNaskah,
   { tambah = 0, pendamping }: { tambah?: number; pendamping?: PoseMaskot } = {},
 ) {
-  const { teks, pose } = NASKAH[id]
-  usePemutar.setState({ kalimat: teks, pose, pendamping: pendamping ?? null })
-  await Promise.all([
-    kendali.otomatis ? undefined : ucapkan(id, teks, { signal: p.signal }),
-    wait(p, Math.max(1600, teks.length * 55) + tambah, Infinity),
-  ])
+  await ucapKalimat(p, id, NASKAH[id], { tambah, pendamping })
 }

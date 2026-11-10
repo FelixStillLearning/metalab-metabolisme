@@ -216,6 +216,11 @@
     font-size: 28px;
   }
 
+  .peta-materi .peta-jalur:has(.peta-laci:not([hidden])) .peta-samping:has(.peta-buka) > p,
+  .peta-materi .peta-jalur:has(.peta-laci:not([hidden])) .peta-buka-teks {
+    display: none;
+  }
+
   .peta-materi .peta-jalur:has(.peta-laci:not([hidden])) .peta-samping :is(h2, p) {
     writing-mode: vertical-rl;
   }

@@ -3,7 +3,6 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { ucapkan } from '../../lib/narasi'
 import { bolehBersuaraSendiri, bunyi } from '../../lib/suara'
-import { useJawaban } from '../../stores/jawaban'
 import IdentitasSiswa from '../identitas-siswa/IdentitasSiswa'
 import TombolSuara from '../../components/TombolSuara'
 import PengaturVolume from '../../components/PengaturVolume'
@@ -15,6 +14,9 @@ import './lembar-hasil.css'
 export type PasanganPoe = { k: string; q: string; tebakan: number; nyata: number; alasan: string }
 
 type Props = {
+  label: string
+  penjelasan: string
+  simpanPenjelasan: (teks: string) => void
   judul: string
   lead: string
   // Bagan episode; bagian ber-data-step muncul berurutan menurut --i
@@ -25,6 +27,7 @@ type Props = {
     judul: string
     jawaban: { k: string; bagian: string; isi: string }[]
     poe: { k: string; tebakan: number; awal: string; akhir: string }[]
+    tabel?: ReactNode
   }
   rute: { episode: string; lanjut: string }
   narasi: { id: string; teks: string }
@@ -32,10 +35,20 @@ type Props = {
 
 // Lembar Hasil seperti sheet() prototype: bagan milik siswa, tebakan POE berpasangan,
 // penjelasan bebas, dan lembar cetak untuk guru. Hanya dibaca dari hasil tersimpan.
-function LembarHasil({ judul, lead, bagan, poe, pertanyaan, cetak, rute, narasi }: Props) {
+function LembarHasil({
+  label,
+  penjelasan: tersimpan,
+  simpanPenjelasan,
+  judul,
+  lead,
+  bagan,
+  poe,
+  pertanyaan,
+  cetak,
+  rute,
+  narasi,
+}: Props) {
   const { nama, kelas } = useSiswa()
-  const tersimpan = useJawaban((s) => s.penjelasan)
-  const simpanPenjelasan = useJawaban((s) => s.simpanPenjelasan)
   const [isi, setIsi] = useState(tersimpan)
   const [pesan, setPesan] = useState('')
   const navigate = useNavigate()
@@ -63,7 +76,7 @@ function LembarHasil({ judul, lead, bagan, poe, pertanyaan, cetak, rute, narasi 
       <div className="hasil" data-tenang={tenangAktif() || undefined}>
         <header className="hasil-kepala">
           <div className="hasil-atas">
-            <p className="hasil-episode">Episode 1 · Glikolisis</p>
+            <p className="hasil-episode">{label}</p>
             <div className="flex gap-2">
               <TombolSuara />
               <PengaturVolume />
@@ -84,35 +97,37 @@ function LembarHasil({ judul, lead, bagan, poe, pertanyaan, cetak, rute, narasi 
         </header>
         <div className="hasil-bagan">{bagan}</div>
         <div className="hasil-sisi">
-          <section>
-            <h2>Tebakanmu sebelum menonton (tidak dinilai)</h2>
-            {poe.map(({ k, q, tebakan, nyata, alasan }) => {
-              const sama = tebakan === nyata
-              return (
-                <div key={k} className="pair" data-poe={k}>
-                  <span className="q">
-                    Soal {k} · {q}
-                  </span>
-                  <span className={`n guess${sama ? ' same' : ''}`}>
-                    {sama ? tebakan : <s>{tebakan}</s>}
-                    <small>tebakanmu</small>
-                  </span>
-                  {!sama && (
-                    <>
-                      <span className="arr" aria-hidden="true">
-                        →
-                      </span>
-                      <span className="n real">
-                        {nyata}
-                        <small>yang terjadi</small>
-                      </span>
-                    </>
-                  )}
-                  <span className="why">Alasanmu setelah menonton: {alasan}</span>
-                </div>
-              )
-            })}
-          </section>
+          {poe.length > 0 && (
+            <section>
+              <h2>Tebakanmu sebelum menonton (tidak dinilai)</h2>
+              {poe.map(({ k, q, tebakan, nyata, alasan }) => {
+                const sama = tebakan === nyata
+                return (
+                  <div key={k} className="pair" data-poe={k}>
+                    <span className="q">
+                      Soal {k} · {q}
+                    </span>
+                    <span className={`n guess${sama ? ' same' : ''}`}>
+                      {sama ? tebakan : <s>{tebakan}</s>}
+                      <small>tebakanmu</small>
+                    </span>
+                    {!sama && (
+                      <>
+                        <span className="arr" aria-hidden="true">
+                          →
+                        </span>
+                        <span className="n real">
+                          {nyata}
+                          <small>yang terjadi</small>
+                        </span>
+                      </>
+                    )}
+                    <span className="why">Alasanmu setelah menonton: {alasan}</span>
+                  </div>
+                )
+              })}
+            </section>
+          )}
           <div>
             <h2>
               <label htmlFor="hasil-penjelasan">{pertanyaan}</label>
@@ -191,33 +206,38 @@ function LembarHasil({ judul, lead, bagan, poe, pertanyaan, cetak, rute, narasi 
             ))}
           </tbody>
         </table>
-        <h3>Catatan POE (tidak dinilai)</h3>
-        <table>
-          <colgroup>
-            <col style={{ width: '8%' }} />
-            <col style={{ width: '12%' }} />
-            <col style={{ width: '40%' }} />
-            <col />
-          </colgroup>
-          <thead>
-            <tr>
-              <th>Soal</th>
-              <th>Tebakan</th>
-              <th>Alasan awal</th>
-              <th>Alasan setelah menonton</th>
-            </tr>
-          </thead>
-          <tbody>
-            {cetak.poe.map(({ k, tebakan, awal, akhir }) => (
-              <tr key={k}>
-                <td>{k}</td>
-                <td>{tebakan}</td>
-                <td>{awal}</td>
-                <td>{akhir}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        {cetak.tabel}
+        {cetak.poe.length > 0 && (
+          <>
+            <h3>Catatan POE (tidak dinilai)</h3>
+            <table>
+              <colgroup>
+                <col style={{ width: '8%' }} />
+                <col style={{ width: '12%' }} />
+                <col style={{ width: '40%' }} />
+                <col />
+              </colgroup>
+              <thead>
+                <tr>
+                  <th>Soal</th>
+                  <th>Tebakan</th>
+                  <th>Alasan awal</th>
+                  <th>Alasan setelah menonton</th>
+                </tr>
+              </thead>
+              <tbody>
+                {cetak.poe.map(({ k, tebakan, awal, akhir }) => (
+                  <tr key={k}>
+                    <td>{k}</td>
+                    <td>{tebakan}</td>
+                    <td>{awal}</td>
+                    <td>{akhir}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </>
+        )}
         <h3>Penjelasan siswa</h3>
         <p className="hasil-cetak-penjelasan">{isi.trim() || '-'}</p>
       </div>

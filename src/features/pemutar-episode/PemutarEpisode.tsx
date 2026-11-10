@@ -101,6 +101,7 @@ function PemutarEpisode({
     pengendali.current = kendali
     usePemutar.setState({
       kalimat: '',
+      petunjuk: '',
       pose: '01-ramah',
       pendamping: null,
       bab: -1,

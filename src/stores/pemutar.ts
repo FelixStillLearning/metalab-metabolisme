@@ -14,7 +14,13 @@ export type PoseMaskot =
 export type SoalPilihan = {
   judul: string
   // posisi dan ukuran dalam satuan adegan 1600x900; selesai = sasaran ketuk-semua yang sudah diketuk
-  opsi: { teks: string; posisi?: [number, number]; ukuran?: [number, number]; selesai?: boolean }[]
+  opsi: {
+    teks: string
+    gambar?: string
+    posisi?: [number, number]
+    ukuran?: [number, number]
+    selesai?: boolean
+  }[]
   pilih: (index: number) => void
 }
 
@@ -75,6 +81,7 @@ export type PoeState = PoeTebakState | PoeAmatiState | PoeJelaskanState
 
 type Pemutar = {
   kalimat: string
+  petunjuk: string
   pose: PoseMaskot
   pendamping: PoseMaskot | null
   // -1 = pembuka
@@ -90,6 +97,7 @@ type Pemutar = {
 // Keadaan sesaat pemutar episode; sengaja tidak disimpan
 export const usePemutar = create<Pemutar>()(() => ({
   kalimat: '',
+  petunjuk: '',
   pose: '01-ramah',
   pendamping: null,
   bab: -1,

@@ -20,7 +20,7 @@ function PilihanAdegan() {
     >
       {!molekul && <h2>{pilihan.judul}</h2>}
       <div className="pemutar-opsi">
-        {pilihan.opsi.map(({ teks, posisi, ukuran, selesai }, i) =>
+        {pilihan.opsi.map(({ teks, gambar, posisi, ukuran, selesai }, i) =>
           selesai ? null : (
             <button
               key={teks}
@@ -46,6 +46,7 @@ function PilihanAdegan() {
                 pilihan.pilih(i)
               }}
             >
+              {gambar && <img src={gambar} alt="" />}
               {posisi ? <span className="sr-only">{teks}</span> : teks}
             </button>
           ),

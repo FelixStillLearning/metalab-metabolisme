@@ -101,7 +101,15 @@ function PetaMateri() {
             Pengantar
           </h2>
           <p className="text-muted">Episode 0</p>
-          <p className="mt-auto font-bold text-muted">Belum tersedia</p>
+          <Link
+            to="/episode/0"
+            className="peta-buka tombol-utama mt-auto inline-flex min-h-11 min-w-11 items-center justify-center gap-2 px-3 py-2 font-head font-extrabold"
+            aria-label="Buka Pengantar"
+            onClick={() => bunyi('melesat')}
+          >
+            <span className="peta-buka-teks">Buka</span>
+            <ArrowRight aria-hidden="true" className="size-4" />
+          </Link>
         </section>
 
         <Collapsible.Root open={terbuka} onOpenChange={ubah} className="peta-aerob">

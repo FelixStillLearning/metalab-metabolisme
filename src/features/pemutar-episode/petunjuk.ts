@@ -2,9 +2,11 @@ import type { usePemutar } from '../../stores/pemutar'
 
 export function petunjukInteraksi({
   pilihan,
+  petunjuk,
   lengkapi,
   poe,
 }: ReturnType<typeof usePemutar.getState>) {
+  if (petunjuk) return petunjuk
   if (pilihan) {
     if (pilihan.opsi.every((o) => o.selesai)) return ''
     return pilihan.opsi[0]?.posisi ? pilihan.judul : 'Pilih salah satu jawaban di kartu.'

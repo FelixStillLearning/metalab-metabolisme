@@ -220,6 +220,8 @@ function Bagan({ hasil }: { hasil: Jawaban }) {
 }
 
 function HasilEpisode1() {
+  const penjelasan = useJawaban((s) => s.penjelasan)
+  const simpanPenjelasan = useJawaban((s) => s.simpanPenjelasan)
   const hasil = useJawaban((s) => s.hasil)
   const hasilPoe = useJawaban((s) => s.hasilPoe)
   if (!hasil) return <Navigate to="/episode/1" replace />
@@ -229,6 +231,9 @@ function HasilEpisode1() {
   ].filter((x) => x.p)
   return (
     <LembarHasil
+      label="Episode 1 · Glikolisis"
+      penjelasan={penjelasan}
+      simpanPenjelasan={simpanPenjelasan}
       judul="Bagan glikolisismu"
       lead="Jawabanmu dari Episode 1 ditampilkan pada bagan glikolisis."
       bagan={<Bagan hasil={hasil} />}
