@@ -65,6 +65,8 @@ export async function jalankanEpisode0(p: Panggung) {
   useJawabanE0.getState().mulai()
   siapkan('muncul', 'geser', 'tempel')
   await pasangLatar(p, latar, 'pengantar')
+  // Tampilkan reaksi pertama sejak narasi pembuka dimulai agar panggung tidak kosong.
+  useAdeganE0.setState({ soal: 0, terjawab: false })
   await katakan(
     p,
     'e0-pembuka-01',

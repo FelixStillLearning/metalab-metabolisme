@@ -152,7 +152,7 @@ export default function PapanReaksi() {
               ? a
                 ? 'Fotosintesis · Anabolisme'
                 : 'Respirasi aerob · Katabolisme'
-              : '? Pilih nama reaksi'}
+              : '(Pilih nama reaksi)'}
           </b>
         </div>
       </header>
@@ -173,7 +173,7 @@ export default function PapanReaksi() {
             <small>{a ? 'Energi masuk' : 'Energi keluar'}</small>
             <div>
               <img src={energi ? (a ? cahaya : atp) : kosong} alt="" />
-              <b>{energi ? (a ? 'Cahaya (foton)' : 'Energi kimia · ATP') : '? Pilih energi'}</b>
+              <b>{energi ? (a ? 'Cahaya (foton)' : 'Energi kimia · ATP') : ' (Pilih energi)'}</b>
             </div>
             {!a && energi && <img className="e0-simbol-kimia" src={kimia} alt="" />}
           </div>
@@ -205,13 +205,12 @@ export default function PapanReaksi() {
             ? a
               ? 'Sederhana → kompleks · Endergonik'
               : 'Kompleks → sederhana · Eksergonik'
-            : '? Pilih perubahan senyawa'}
+            : ' (Pilih perubahan senyawa)'}
         </b>
         {perubahan && (
           <span>Dengan bantuan enzim · {a ? 'memerlukan energi' : 'melepas energi ATP'}</span>
         )}
       </div>
-      <small className="e0-catatan-atom">Model glukosa: rangka 6 C · rumus C₆H₁₂O₆</small>
       <span className="sr-only">{SOAL[soal].t}. Jumlah atom tiap sisi: 6 C, 12 H, 18 O.</span>
     </section>
   )
