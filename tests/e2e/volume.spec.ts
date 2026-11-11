@@ -54,9 +54,12 @@ test('volume yang sama tersedia di peta, episode, hasil, dan penutup', async ({ 
       : ['peta-materi', 'episode/1', 'episode/1/hasil', 'episode/1/penutup']
   for (const tujuan of rute) {
     await page.goto(`/#/${tujuan}`)
-    await page.getByRole('button', { name: 'Atur volume', exact: true }).click()
+    const episode = tujuan === 'episode/1' || tujuan === 'episode/1/penutup'
+    await page
+      .getByRole('button', { name: episode ? 'Pengaturan' : 'Atur volume', exact: true })
+      .click()
     await expect(volume).toHaveValue('72')
-    const kotak = (await page.locator('.volume-panel').boundingBox())!
+    const kotak = (await page.locator(episode ? '.pemutar-volume' : '.volume-panel').boundingBox())!
     expect(kotak.y).toBeGreaterThanOrEqual(0)
     expect(kotak.y + kotak.height).toBeLessThanOrEqual(page.viewportSize()!.height)
     await page.keyboard.press('Escape')
@@ -66,4 +69,23 @@ test('volume yang sama tersedia di peta, episode, hasil, dan penutup', async ({ 
     () => JSON.parse(localStorage.getItem('metalab-pengaturan')!).state,
   )
   expect(pengaturan.volume).toBe(0.72)
+})
+
+test('volume episode diatur langsung dalam pengaturan dan tersimpan setelah reload', async ({
+  page,
+}, info) => {
+  test.skip(info.project.name === 'hp-tegak', 'Episode dimainkan miring')
+  await page.goto('/#/episode/1')
+  await expect(
+    page.locator('.pemutar-bilah').getByRole('button', { name: 'Atur volume' }),
+  ).toHaveCount(0)
+  await page.getByRole('button', { name: 'Pengaturan', exact: true }).click()
+  const panel = page.getByRole('dialog', { name: 'Pengaturan' })
+  const volume = panel.getByRole('slider', { name: /^Volume utama/ })
+  await expect(volume).toBeInViewport()
+  await volume.fill('37')
+  await expect(panel.getByText('37%', { exact: true })).toBeVisible()
+  await page.reload()
+  await page.getByRole('button', { name: 'Pengaturan', exact: true }).click()
+  await expect(volume).toHaveValue('37')
 })

@@ -1451,7 +1451,7 @@
     font-size: 10px;
   }
   .pemutar-saklar {
-    min-height: 32px;
+    min-height: 28px;
     padding: 2px 0;
     font-size: 10px;
   }
@@ -1490,6 +1490,36 @@
   }
   .pemutar-panel kbd {
     padding: 0 2px;
+    font-size: 9px;
+  }
+}
+
+.pemutar-volume {
+  margin-top: 12px;
+  font-size: 13px;
+}
+.pemutar-volume label {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  font-weight: 700;
+}
+.pemutar-volume input {
+  display: block;
+  width: 100%;
+  min-height: 24px;
+  accent-color: var(--color-atp);
+  cursor: pointer;
+}
+.pemutar-volume p {
+  font-size: 11px;
+}
+@media (max-height: 500px) and (orientation: landscape) {
+  .pemutar-volume {
+    margin-top: 4px;
+    font-size: 10px;
+  }
+  .pemutar-volume p {
     font-size: 9px;
   }
 }

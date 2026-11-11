@@ -2,6 +2,7 @@ import { Maximize, X } from 'lucide-react'
 import { useEffect, type RefObject } from 'react'
 import { tenangAktif, usePengaturan, type KunciSaklar } from '../../stores/pengaturan'
 import type { Bab, StatusBab } from './PemutarEpisode'
+import { VolumeSuara } from '../../components/PengaturVolume'
 
 // [kunci, label, tombol pintas]
 const SAKLAR: [KunciSaklar, string, string?][] = [
@@ -74,6 +75,9 @@ function PanelPengaturan({ buka, tutup, layarPenuh, bab, status, saklarPertama }
             />
           </label>
         ))}
+        <div className="pemutar-volume">
+          <VolumeSuara />
+        </div>
       </div>
       <button type="button" className="pemutar-tombol-panel" onClick={layarPenuh}>
         <Maximize aria-hidden="true" className="size-[18px]" />

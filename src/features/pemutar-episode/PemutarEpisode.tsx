@@ -7,7 +7,6 @@ import logo from '../../assets/images/logo-metalab.webp'
 import organelMitokondria from '../../assets/images/organel-mitokondria.webp'
 import ikonPutarHp from '../../assets/images/ui-putar-hp.webp'
 import TombolSuara from '../../components/TombolSuara'
-import PengaturVolume from '../../components/PengaturVolume'
 import { bunyi, musik } from '../../lib/suara'
 import { usePemutar } from '../../stores/pemutar'
 import { usePengaturan } from '../../stores/pengaturan'
@@ -293,7 +292,6 @@ function PemutarEpisode({
           {dijeda ? <Play aria-hidden="true" /> : <Pause aria-hidden="true" />}
         </button>
         <TombolSuara className="pemutar-ib" />
-        <PengaturVolume className="pemutar-ib" />
         <span className="pemutar-posisi" aria-live="polite">
           {babIni ? (
             <>
