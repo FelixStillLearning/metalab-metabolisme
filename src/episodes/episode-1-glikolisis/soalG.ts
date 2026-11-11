@@ -85,15 +85,15 @@ export async function soalG(p: Panggung, piruvat: Objek[]) {
   usePemutar.setState({ bab: 5 })
   p.fx.replaceChildren()
   for (const r of piruvat) r.remove()
-  await say(p, 'e1-g-01')
 
   bunyi('muncul')
   const chips = ITEM.map(([id, label, , isi], i) => {
     const c = chip(p, 325 + i * 190, 550, id, label, isi)
-    void to(hide(c), { o: 1 }, 400)
+    hide(c)
     return c
   })
   const tray = kinetik(p, 800, 260, 'HASIL GLIKOLISIS', 34, 'var(--color-paper)')
+  await Promise.all([say(p, 'e1-g-01'), ...chips.map((c) => to(c, { o: 1 }, 400))])
   let got = 0
 
   await mintaKetukSemua(
