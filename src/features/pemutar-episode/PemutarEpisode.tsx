@@ -237,7 +237,7 @@ function PemutarEpisode({
           <g ref={latar} data-lapisan="latar" />
           <g ref={fx} data-lapisan="fx" />
         </svg>
-        <Gelembung />
+        <Gelembung mulai={mulai} />
         <PilihanAdegan />
         <LengkapiAdegan />
         <PoeAdegan />

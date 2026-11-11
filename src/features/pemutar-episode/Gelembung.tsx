@@ -26,7 +26,7 @@ const gambarPose = (pose: PoseMaskot) => POSE[pose] ?? POSE['05-menjelaskan']
 // Narator di kiri gelembung kalimat; pendamping mitokondria di kanan.
 // Saat siswa diberi tugas keduanya mengecil agar tidak menutupi pilihan di adegan.
 // Wadah aria-live selalu ada agar kalimat pertama juga dibacakan pembaca layar.
-function Gelembung() {
+function Gelembung({ mulai }: { mulai: boolean }) {
   const state = usePemutar()
   const { kalimat, pose, pendamping } = state
   const petunjuk = petunjukInteraksi(state)
@@ -43,7 +43,8 @@ function Gelembung() {
     <div
       className="pemutar-narator"
       aria-live="polite"
-      hidden={!petunjuk && !tampilSubtitle}
+      hidden={!mulai && !petunjuk && !kalimat}
+      data-mulai={mulai || undefined}
       data-tugas={!!petunjuk || undefined}
     >
       <img
