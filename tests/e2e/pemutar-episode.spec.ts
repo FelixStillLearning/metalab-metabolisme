@@ -200,3 +200,61 @@ test('menutup pengaturan setelah HP diputar tetap menjeda episode', async ({ pag
   await page.getByRole('button', { name: 'Lanjut (spasi)' }).click()
   await expect(gelembung(page)).toHaveText(KALIMAT_2)
 })
+
+test('viewport memenuhi layar dan pemutar menjaga area aman notch', async ({ page }) => {
+  await expect(page.locator('meta[name="viewport"]')).toHaveAttribute(
+    'content',
+    /viewport-fit=cover/,
+  )
+  await page.setViewportSize({ width: 844, height: 390 })
+  for (const sisi of ['kiri', 'kanan']) {
+    await page.locator('.pemutar').evaluate((el, sisi) => {
+      const gaya = (el as HTMLElement).style
+      gaya.setProperty('--aman-kiri', sisi === 'kiri' ? '44px' : '0px')
+      gaya.setProperty('--aman-kanan', sisi === 'kanan' ? '44px' : '0px')
+      gaya.setProperty('--aman-bawah', '21px')
+    }, sisi)
+    const panggung = (await page.locator('[data-panggung]').boundingBox())!
+    const bilah = (await page.locator('.pemutar-bilah').boundingBox())!
+    const kiri = sisi === 'kiri' ? 44 : 0
+    const kanan = sisi === 'kanan' ? 800 : 844
+    expect(panggung.x).toBeGreaterThanOrEqual(kiri)
+    expect(panggung.x + panggung.width).toBeLessThanOrEqual(kanan)
+    expect(panggung.y + panggung.height).toBeLessThanOrEqual(369)
+    expect(bilah.x).toBeGreaterThanOrEqual(kiri)
+    expect(bilah.x + bilah.width).toBeLessThanOrEqual(kanan)
+    expect(Math.abs(panggung.width / panggung.height - 16 / 9)).toBeLessThan(0.01)
+  }
+})
+
+test('pengaturan HP miring terbaca penuh tanpa menggulir pada setiap episode', async ({
+  page,
+}, info) => {
+  test.skip(info.project.name !== 'hp-miring', 'Khusus panel HP miring')
+  for (const [width, height] of [
+    [667, 375],
+    [800, 360],
+    [932, 430],
+  ]) {
+    await page.setViewportSize({ width, height })
+    for (const episode of [0, 1, 2, 3, 4]) {
+      await page.goto(`/#/episode/${episode}`)
+      await page.getByRole('button', { name: 'Pengaturan', exact: true }).click()
+      const panel = page.getByRole('dialog', { name: 'Pengaturan' })
+      await expect(panel.getByRole('switch')).toHaveCount(6)
+      const ukuran = await panel.evaluate((el) => ({
+        tinggi: el.clientHeight,
+        isi: el.scrollHeight,
+        lebar: el.clientWidth,
+        isiLebar: el.scrollWidth,
+      }))
+      expect((await panel.boundingBox())!.width).toBeLessThanOrEqual(width / 2)
+      expect(ukuran.isi, `episode ${episode}, ${width}`).toBeLessThanOrEqual(ukuran.tinggi)
+      expect(ukuran.isiLebar).toBeLessThanOrEqual(ukuran.lebar)
+      for (const item of await panel.locator('label, li, button').all())
+        await expect(item).toBeInViewport({ ratio: 1 })
+      if (episode === 0) await page.screenshot({ path: info.outputPath(`pengaturan-${width}.png`) })
+      await panel.getByRole('button', { name: 'Tutup pengaturan' }).click()
+    }
+  }
+})

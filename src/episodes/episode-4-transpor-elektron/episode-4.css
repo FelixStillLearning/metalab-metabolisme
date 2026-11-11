@@ -189,14 +189,23 @@
     padding: 8px 6px;
   }
   .episode-4:has([data-tabel]) .pemutar-soal {
-    bottom: 15%;
-    padding: 8px 14px;
+    width: 84%;
+    bottom: 20%;
+    border-width: 10px;
+    border-style: solid;
+    border-color: transparent;
+    border-image-width: 12px;
+    padding: 4px 8px;
     max-height: 42%;
     overflow: auto;
   }
   .episode-4:has([data-tabel]) .pemutar-soal h2 {
-    font-size: 14px;
-    margin-bottom: 6px;
+    font-size: 12px;
+    margin-bottom: 4px;
+  }
+  .episode-4:has([data-tabel]) .pemutar-opsi > button {
+    font-size: 12px;
+    padding: 6px 10px;
   }
   .e4-diagram {
     font-size: 16px;

@@ -3,9 +3,14 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router'
 import { afterEach, expect, test, vi } from 'vitest'
 import PetaMateri from '../../src/features/peta-materi/PetaMateri'
-import { bunyi, putar } from '../../src/lib/suara'
+import { bunyi, musik, putar } from '../../src/lib/suara'
 
-vi.mock('../../src/lib/suara', () => ({ bunyi: vi.fn(), putar: vi.fn(), siapkan: vi.fn() }))
+vi.mock('../../src/lib/suara', () => ({
+  bunyi: vi.fn(),
+  putar: vi.fn(),
+  siapkan: vi.fn(),
+  musik: vi.fn(),
+}))
 afterEach(cleanup)
 
 test('suara peta hanya dipicu interaksi buka, tutup, dan kembali', async () => {
@@ -36,4 +41,15 @@ test('membuka episode dari peta memutar suara masuk', async () => {
   vi.mocked(bunyi).mockClear()
   await user.click(screen.getByRole('link', { name: 'Buka Glikolisis' }))
   expect(bunyi).toHaveBeenCalledExactlyOnceWith('melesat')
+})
+
+test('peta memakai musik menu dan menghentikannya saat halaman ditutup', () => {
+  const { unmount } = render(
+    <MemoryRouter>
+      <PetaMateri />
+    </MemoryRouter>,
+  )
+  expect(musik).toHaveBeenCalledExactlyOnceWith(true, 'musik-menu')
+  unmount()
+  expect(musik).toHaveBeenLastCalledWith(false)
 })

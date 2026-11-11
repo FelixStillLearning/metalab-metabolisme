@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router'
 import { afterEach, expect, test, vi } from 'vitest'
 import PemutarEpisode from '../../src/features/pemutar-episode/PemutarEpisode'
-import { bunyi } from '../../src/lib/suara'
+import { bunyi, musik } from '../../src/lib/suara'
 
 vi.mock('../../src/lib/suara', () => ({ bunyi: vi.fn(), musik: vi.fn(), putar: vi.fn() }))
 afterEach(cleanup)
@@ -22,11 +22,13 @@ const sampul = () =>
     </MemoryRouter>,
   )
 
-test('sampul tidak bersuara sendiri; mulai episode memutar suara mulai', async () => {
+test('musik mulai sejak sampul dan tidak dimulai ulang saat episode berjalan', async () => {
   sampul()
   expect(bunyi).not.toHaveBeenCalled()
+  expect(musik).toHaveBeenCalledExactlyOnceWith(true)
   await userEvent.click(screen.getByRole('button', { name: 'Mulai episode' }))
   expect(bunyi).toHaveBeenCalledExactlyOnceWith('mulai')
+  expect(musik).toHaveBeenCalledExactlyOnceWith(true)
 })
 
 test('tombol peta materi di sampul memutar suara kembali', async () => {

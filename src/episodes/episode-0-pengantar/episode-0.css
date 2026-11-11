@@ -327,7 +327,7 @@
 }
 .e0-umpan-balik {
   margin: 6px auto 0;
-  padding: 6px 12px;
+  padding: 12px 20px;
   border-image: url('../../assets/images/interaksi-kartu-soal.webp') 100 fill / 10px stretch;
   color: var(--color-ink);
   min-height: 1.3em;
@@ -432,11 +432,11 @@
     padding: 10px 18px;
   }
   .episode-0 .pemutar-soal h2 {
-    font-size: 15px;
-    margin-bottom: 5px;
+    font-size: 13px;
+    margin-bottom: 4px;
   }
   .episode-0 .pemutar-pilihan {
-    font-size: 13px;
+    font-size: 12px;
     padding: 5px 12px;
     gap: 5px;
   }
@@ -452,7 +452,7 @@
   }
   .episode-0 .pemutar-panduan-kartu {
     font-size: 11px;
-    padding: 6px 10px;
+    padding: 12px 20px;
     gap: 5px;
   }
   .episode-0 .pemutar-panduan-ikon {
@@ -474,11 +474,11 @@
   .episode-0 .pemutar-gelembung,
   .episode-0 .pemutar-narator[data-tugas] .pemutar-gelembung {
     font-size: 12px;
-    padding: 6px 16px;
+    padding: 10px 26px;
   }
   .e0-reaksi {
-    top: 17%;
-    height: 39%;
+    top: 14%;
+    height: 35%;
     inset-inline: 3%;
     gap: 3px;
     grid-template-rows: 24px minmax(0, 1fr) 16px 12px;
@@ -533,6 +533,7 @@
     height: 22px;
   }
   .e0-panah-model {
+    display: none;
     font-size: 30px;
   }
   .e0-persamaan {
@@ -564,32 +565,33 @@
     font-size: 10px;
   }
   .e0-pilah-kepala {
-    top: 17%;
+    top: 12%;
   }
   .e0-pilah-kepala h2 {
-    font-size: 18px;
+    font-size: 16px;
   }
   .e0-pilah-kepala p {
-    font-size: 12px;
+    font-size: 10px;
     margin-top: 0;
   }
   .e0-zona {
-    top: 28%;
-    height: 30%;
+    top: 27%;
+    height: 31%;
     width: 32%;
     padding: 0;
   }
   .e0-zona h3 {
-    font-size: 15px;
+    font-size: 14px;
   }
   .e0-zona p,
   .e0-zona small {
     display: none;
   }
   .e0-sel {
-    padding: 6px 14px;
-    min-height: 44px;
-    font-size: 11px;
+    padding: 9px 18px;
+    min-height: 40px;
+    border-image-width: 8px 16px;
+    font-size: 9.5px;
   }
   .e0-dek {
     top: 59%;
@@ -617,7 +619,10 @@
     font-size: 14px;
   }
   .e0-umpan-balik {
-    font-size: 12px;
+    margin-top: 4px;
+    padding: 10px 18px;
+    border-image-width: 8px;
+    font-size: 10px;
   }
 }
 @media (max-width: 760px), (max-height: 500px) {
@@ -732,8 +737,8 @@
 }
 @media (max-height: 500px) and (orientation: landscape) {
   .episode-0 .pemutar-soal {
-    bottom: 14%;
-    padding: 8px 14px;
+    bottom: 16.5%;
+    padding: 14px 22px;
   }
   .episode-0 .pemutar-konfirmasi {
     gap: 5px;
@@ -747,7 +752,8 @@
     font-size: 13px;
   }
   .episode-0 .pemutar-status-pilihan {
-    font-size: 11px;
+    font-size: 10px;
+    min-height: 2.6em;
     margin-top: 4px;
   }
 }
@@ -757,7 +763,7 @@
     top: 22%;
   }
   .episode-0 .pemutar-soal {
-    bottom: 12%;
+    bottom: 13%;
   }
 }
 
@@ -850,7 +856,8 @@
     display: none;
   }
   .e0-pilah-kepala {
-    padding: 5px 12px;
+    padding: 10px 20px;
+    border-image-width: 12px;
   }
 }
 

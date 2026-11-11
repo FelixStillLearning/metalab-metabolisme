@@ -453,17 +453,17 @@ async function hitung(p: Panggung) {
 function teksSel(parent: Element, x: number, y: number, teks: string) {
   const t = el(
     'text',
-    { 'text-anchor': 'middle', 'font-size': 28, 'font-weight': 700, fill: 'var(--color-ink)' },
+    { 'text-anchor': 'middle', 'font-size': 24, 'font-weight': 700, fill: 'var(--color-ink)' },
     parent,
   )
   const kata = teks.split(' ')
   const baris: string[] = ['']
   for (const k of kata) {
-    if ((baris.at(-1)! + ' ' + k).length > 20) baris.push(k)
+    if ((baris.at(-1)! + ' ' + k).length > 18) baris.push(k)
     else baris[baris.length - 1] += (baris.at(-1) ? ' ' : '') + k
   }
   baris.forEach((b, i) => {
-    el('tspan', { x, y: y + i * 34 }, t).textContent = b
+    el('tspan', { x, y: y + i * 30 }, t).textContent = b
   })
 }
 async function tabel(p: Panggung) {

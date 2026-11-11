@@ -57,9 +57,11 @@ async function selesaikan15(page: Page, keyboard = false) {
       await expect(page.locator('.e0-molekul clipPath rect')).toHaveCount(4)
       const kiri = (await page.locator('.e0-zat-sisi').first().boundingBox())!
       const kanan = (await page.locator('.e0-zat-sisi').last().boundingBox())!
-      const panah = (await page.locator('.e0-panah-model').boundingBox())!
-      expect(panah.x).toBeGreaterThanOrEqual(kiri.x + kiri.width)
-      expect(panah.x + panah.width).toBeLessThanOrEqual(kanan.x)
+      const panah = await page.locator('.e0-panah-model').boundingBox()
+      if (page.viewportSize()!.height > 500) {
+        expect(panah!.x).toBeGreaterThanOrEqual(kiri.x + kiri.width)
+        expect(panah!.x + panah!.width).toBeLessThanOrEqual(kanan.x)
+      } else expect(panah).toBeNull()
       const rumusKiri = (await page.locator('.e0-persamaan > span').first().boundingBox())!
       const rumusKanan = (await page.locator('.e0-persamaan > span').last().boundingBox())!
       expect(rumusKanan.x - rumusKiri.x - rumusKiri.width).toBeLessThan(100)
@@ -103,6 +105,51 @@ async function selesaikan16(page: Page, keyboard = false) {
       })
       if (r.k === 'tempat' && sisi === 0)
         await page.screenshot({ path: test.info().outputPath('1.6-tempat.png') })
+      for (const selector of [
+        '.e0-pilah-kepala',
+        '.e0-sel',
+        '.e0-kartu-ciri:visible',
+        '.e0-umpan-balik',
+      ]) {
+        for (const el of await page.locator(selector).all()) {
+          const jarak = await el.evaluate((node) => {
+            const kotak = node.getBoundingClientRect()
+            const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT)
+            let jarak = Infinity
+            while (walker.nextNode()) {
+              if (!walker.currentNode.textContent?.trim()) continue
+              if (walker.currentNode.parentElement?.closest('button')) continue
+              const range = document.createRange()
+              range.selectNodeContents(walker.currentNode)
+              for (const r of range.getClientRects())
+                jarak = Math.min(
+                  jarak,
+                  r.left - kotak.left,
+                  kotak.right - r.right,
+                  r.top - kotak.top,
+                  kotak.bottom - r.bottom,
+                )
+            }
+            return jarak
+          })
+          expect(jarak, `${selector} ${r.k}`).toBeGreaterThanOrEqual(8)
+        }
+      }
+      if (!pc) {
+        for (const [sisi, nama] of [
+          [0, 'anabolisme'],
+          [1, 'katabolisme'],
+        ] as const) {
+          const judul = (await page.locator(`[data-sisi="${sisi}"] h3`).boundingBox())!
+          const sel = (await page.locator(`[data-sisi="${sisi}"] .e0-sel`).boundingBox())!
+          for (const atom of await page.locator(`[data-rangka="${nama}"] [data-carbon]`).all()) {
+            const kotak = (await atom.boundingBox())!
+            expect(kotak.y).toBeGreaterThanOrEqual(judul.y + judul.height)
+            expect(kotak.y + kotak.height).toBeLessThanOrEqual(sel.y)
+          }
+        }
+      }
+      if (sisi === 1) await page.screenshot({ path: test.info().outputPath(`tabel-${r.k}.png`) })
       const box = (await tombol.boundingBox())!
       expect(box.width).toBeGreaterThanOrEqual(44)
       expect(box.height).toBeGreaterThanOrEqual(44)
@@ -451,4 +498,68 @@ test('satu cue jawaban, kartu terbang mengikuti jeda, bersih saat keluar, mode t
   await kiri.click({ timeout: 15000 })
   await expect(terbang).toHaveCount(0)
   await expect(page.locator('[data-riwayat="0"]')).toContainText(TABEL[0].sel[0])
+})
+
+test('kontrol ringkas dan teks kartu serta bubble tetap di dalam kertas', async ({
+  page,
+}, info) => {
+  test.skip(info.project.name !== 'desktop', 'Empat ukuran layar diuji dalam satu alur')
+  test.setTimeout(45000)
+  await siapkan(page)
+  await page.setViewportSize({ width: 667, height: 375 })
+  await page.goto('/')
+  await page.goto('/#/episode/0?cepat')
+  await page.getByRole('button', { name: 'Mulai episode' }).click()
+  for (const soal of SOAL.slice(0, 2)) {
+    await page.getByRole('button', { name: soal.opsi[soal.benar], exact: true }).click()
+    await page.getByRole('button', { name: 'Jawab', exact: true }).click()
+  }
+  const opsi = page.getByRole('button', { name: SOAL[2].opsi[0], exact: true })
+  await expect(opsi).toBeVisible({ timeout: 20000 })
+  await expect(page.locator('[data-gelembung]')).toHaveText(SOAL[2].tanya)
+  await opsi.click()
+  for (const [width, height] of [
+    [667, 375],
+    [800, 360],
+    [932, 430],
+    [1440, 900],
+  ]) {
+    await page.setViewportSize({ width, height })
+    const bilah = (await page.locator('.pemutar-bilah').boundingBox())!
+    expect(bilah.height).toBeLessThanOrEqual(height <= 500 ? 32 : 44)
+    for (const tombol of await page.locator('.pemutar-bilah > button').all()) {
+      const r = (await tombol.boundingBox())!
+      expect(r.width).toBeGreaterThanOrEqual(height <= 500 ? 32 : 44)
+      expect(r.height).toBeGreaterThanOrEqual(height <= 500 ? 32 : 44)
+    }
+    const kartu = (await page.locator('.pemutar-soal').boundingBox())!
+    const bagan = (await page.locator('.e0-reaksi').boundingBox())!
+    const bubble = (await page.locator('.pemutar-gelembung').boundingBox())!
+    expect(bagan.y + bagan.height).toBeLessThanOrEqual(kartu.y)
+    expect(kartu.y + kartu.height).toBeLessThanOrEqual(bubble.y)
+    for (const selector of ['.pemutar-soal', '.pemutar-gelembung', '.pemutar-panduan-kartu']) {
+      const hasil = await page.locator(selector).evaluate((el) => {
+        const kotak = el.getBoundingClientRect()
+        const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT)
+        let jarak = Infinity
+        while (walker.nextNode()) {
+          if (!walker.currentNode.textContent?.trim()) continue
+          const range = document.createRange()
+          range.selectNodeContents(walker.currentNode)
+          for (const r of range.getClientRects()) {
+            jarak = Math.min(
+              jarak,
+              r.left - kotak.left,
+              kotak.right - r.right,
+              r.top - kotak.top,
+              kotak.bottom - r.bottom,
+            )
+          }
+        }
+        return jarak
+      })
+      expect(hasil, `${selector} ${width}`).toBeGreaterThanOrEqual(8)
+    }
+    await page.screenshot({ path: info.outputPath(`kartu-ringkas-${width}.png`) })
+  }
 })

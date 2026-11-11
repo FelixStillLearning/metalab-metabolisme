@@ -201,16 +201,21 @@
 @media (max-width: 760px), (max-height: 500px) {
   .episode-3 .pemutar-panggung:has([data-tanya-tahap]) .pemutar-soal {
     top: 12%;
-    width: 60%;
-    padding: 10px 14px;
+    left: auto;
+    right: 1%;
+    width: 41%;
+    transform: none;
+    padding: 14px 18px;
+    border-image-width: 10px;
   }
   .episode-3 .pemutar-panggung:has([data-tanya-tahap]) .pemutar-soal h2 {
-    font-size: 14px;
+    font-size: 12px;
     margin-bottom: 5px;
   }
   .episode-3 .pemutar-panggung:has([data-tanya-tahap]) .pemutar-pilihan {
-    padding: 5px 10px;
-    min-height: 30px;
+    padding: 5px 6px;
+    min-height: 32px;
+    font-size: 12px;
   }
 }
 

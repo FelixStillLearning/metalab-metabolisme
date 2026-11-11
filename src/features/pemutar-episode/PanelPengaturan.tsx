@@ -2,6 +2,7 @@ import { Maximize, X } from 'lucide-react'
 import { useEffect, type RefObject } from 'react'
 import { tenangAktif, usePengaturan, type KunciSaklar } from '../../stores/pengaturan'
 import type { Bab, StatusBab } from './PemutarEpisode'
+import { VolumeSuara } from '../../components/PengaturVolume'
 
 // [kunci, label, tombol pintas]
 const SAKLAR: [KunciSaklar, string, string?][] = [
@@ -58,38 +59,45 @@ function PanelPengaturan({ buka, tutup, layarPenuh, bab, status, saklarPertama }
         </button>
       </div>
       <p className="pemutar-catatan">Video berhenti selama panel ini terbuka.</p>
-      {SAKLAR.map(([kunci, label, pintas], i) => (
-        <label key={kunci} className="pemutar-saklar">
-          <span>
-            {label}
-            {pintas && <kbd aria-hidden="true">{pintas.toUpperCase()}</kbd>}
-          </span>
-          <input
-            ref={i === 0 ? saklarPertama : undefined}
-            type="checkbox"
-            role="switch"
-            checked={nilai(kunci)}
-            onChange={() => balik(kunci)}
-          />
-        </label>
-      ))}
+      <div className="pemutar-saklar-daftar">
+        {SAKLAR.map(([kunci, label, pintas], i) => (
+          <label key={kunci} className="pemutar-saklar">
+            <span>
+              {label}
+              {pintas && <kbd aria-hidden="true">{pintas.toUpperCase()}</kbd>}
+            </span>
+            <input
+              ref={i === 0 ? saklarPertama : undefined}
+              type="checkbox"
+              role="switch"
+              checked={nilai(kunci)}
+              onChange={() => balik(kunci)}
+            />
+          </label>
+        ))}
+        <div className="pemutar-volume">
+          <VolumeSuara />
+        </div>
+      </div>
       <button type="button" className="pemutar-tombol-panel" onClick={layarPenuh}>
         <Maximize aria-hidden="true" className="size-[18px]" />
         Layar penuh <kbd aria-hidden="true">F</kbd>
       </button>
-      <h3>Soal di episode ini</h3>
-      <ol className="pemutar-daftar-bab">
-        {bab.map((b, j) => (
-          <li key={b.k} data-s={status[j]}>
-            <b>{b.k}</b>
-            <span>
-              {b.t}
-              {b.poe && <em>POE</em>}
-            </span>
-            <small>{status[j]}</small>
-          </li>
-        ))}
-      </ol>
+      <section className="pemutar-bab-panel">
+        <h3>Soal di episode ini</h3>
+        <ol className="pemutar-daftar-bab">
+          {bab.map((b, j) => (
+            <li key={b.k} data-s={status[j]}>
+              <b>{b.k}</b>
+              <span>
+                {b.t}
+                {b.poe && <em>POE</em>}
+              </span>
+              <small>{status[j]}</small>
+            </li>
+          ))}
+        </ol>
+      </section>
     </aside>
   )
 }

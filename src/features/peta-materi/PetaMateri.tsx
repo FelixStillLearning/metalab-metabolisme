@@ -15,7 +15,8 @@ import latar from '../../assets/images/latar-peta.webp'
 import maskot from '../../assets/images/maskot-mitokondria-ramah.webp'
 import TombolSuara from '../../components/TombolSuara'
 import PengaturVolume from '../../components/PengaturVolume'
-import { bunyi, putar, siapkan } from '../../lib/suara'
+import TombolLayarPenuh from '../../components/TombolLayarPenuh'
+import { bunyi, musik, putar, siapkan } from '../../lib/suara'
 import './peta-materi.css'
 
 const EPISODE = [
@@ -40,6 +41,10 @@ const urutan = (i: number) => ({ '--i': i }) as CSSProperties
 
 function PetaMateri() {
   const [terbuka, setTerbuka] = useState(false)
+  useEffect(() => {
+    musik(true, 'musik-menu')
+    return () => musik(false)
+  }, [])
   const tombolAerob = useRef<HTMLButtonElement>(null)
   const laci = useRef<HTMLDivElement>(null)
 
@@ -76,6 +81,7 @@ function PetaMateri() {
         <div className="flex items-center gap-3">
           <TombolSuara />
           <PengaturVolume />
+          <TombolLayarPenuh />
           <Link
             to="/"
             onClick={() => putar('kembali')}

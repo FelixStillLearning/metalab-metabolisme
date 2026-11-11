@@ -7,7 +7,6 @@ import logo from '../../assets/images/logo-metalab.webp'
 import organelMitokondria from '../../assets/images/organel-mitokondria.webp'
 import ikonPutarHp from '../../assets/images/ui-putar-hp.webp'
 import TombolSuara from '../../components/TombolSuara'
-import PengaturVolume from '../../components/PengaturVolume'
 import { bunyi, musik } from '../../lib/suara'
 import { usePemutar } from '../../stores/pemutar'
 import { usePengaturan } from '../../stores/pengaturan'
@@ -114,6 +113,7 @@ function PemutarEpisode({
     const g = latar.current!
     for (const [x, y, r] of PARTIKEL)
       disc(g, x, y, r, 'var(--color-paper)', { opacity: 0.65 }, { bayangan: true })
+    musik(true)
     return () => {
       kendali.abort()
       // Gerak yang sedang berjalan ikut dihentikan; janjinya tidak pernah selesai, adegan sudah batal
@@ -178,7 +178,6 @@ function PemutarEpisode({
     sudahMulai.current = true
     setMulai(true)
     if (!otomatis && !langsung) bunyi('mulai')
-    musik(true)
     // Episode dipakai miring: di perangkat sentuh minta layar penuh lalu kunci mendatar
     if (matchMedia('(pointer: coarse)').matches) {
       document.documentElement
@@ -293,7 +292,6 @@ function PemutarEpisode({
           {dijeda ? <Play aria-hidden="true" /> : <Pause aria-hidden="true" />}
         </button>
         <TombolSuara className="pemutar-ib" />
-        <PengaturVolume className="pemutar-ib" />
         <span className="pemutar-posisi" aria-live="polite">
           {babIni ? (
             <>
