@@ -248,6 +248,7 @@ test('pengaturan HP miring terbaca penuh tanpa menggulir pada setiap episode', a
         lebar: el.clientWidth,
         isiLebar: el.scrollWidth,
       }))
+      expect((await panel.boundingBox())!.width).toBeLessThanOrEqual(width / 2)
       expect(ukuran.isi, `episode ${episode}, ${width}`).toBeLessThanOrEqual(ukuran.tinggi)
       expect(ukuran.isiLebar).toBeLessThanOrEqual(ukuran.lebar)
       for (const item of await panel.locator('label, li, button').all())

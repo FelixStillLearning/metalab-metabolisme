@@ -1414,11 +1414,11 @@
     top: var(--aman-atas);
     right: var(--aman-kanan);
     bottom: var(--aman-bawah);
-    width: min(760px, calc(100vw - var(--aman-kiri) - var(--aman-kanan)));
-    padding: 8px 16px;
+    width: calc((100vw - var(--aman-kiri) - var(--aman-kanan)) / 2);
+    padding: 6px 10px;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     grid-template-rows: auto auto 1fr auto;
-    column-gap: 24px;
+    column-gap: 10px;
   }
   .pemutar-panel:not([hidden]) {
     display: grid;
@@ -1427,25 +1427,25 @@
     grid-column: 1 / -1;
   }
   .pemutar-panel h2 {
-    font-size: 20px;
+    font-size: 16px;
   }
   .pemutar-catatan {
     margin: 0 0 4px;
-    font-size: 11px;
+    font-size: 10px;
   }
   .pemutar-saklar {
     min-height: 32px;
     padding: 2px 0;
-    font-size: 12px;
+    font-size: 10px;
   }
   .pemutar-saklar input {
-    width: 44px;
+    width: 32px;
     height: 24px;
   }
   .pemutar-tombol-panel {
     margin-top: 4px;
     padding: 6px;
-    font-size: 12px;
+    font-size: 10px;
   }
   .pemutar-bab-panel {
     grid-column: 2;
@@ -1453,18 +1453,26 @@
   }
   .pemutar-panel h3 {
     margin: 0 0 6px;
-    font-size: 12px;
+    font-size: 10px;
   }
   .pemutar-daftar-bab li {
-    grid-template-columns: 32px minmax(0, 1fr) auto;
+    grid-template-columns: 24px minmax(0, 1fr);
     gap: 4px;
     padding: 5px 0;
-    font-size: 11px;
+    font-size: 10px;
   }
   .pemutar-daftar-bab b {
-    font-size: 14px;
+    font-size: 11px;
   }
   .pemutar-daftar-bab small {
-    font-size: 10px;
+    grid-column: 2;
+    font-size: 9px;
+  }
+  .pemutar-daftar-bab small:empty {
+    display: none;
+  }
+  .pemutar-panel kbd {
+    padding: 0 2px;
+    font-size: 9px;
   }
 }
