@@ -13,6 +13,7 @@ import { bunyi, siapkan } from '../../lib/suara'
 import { useJawaban } from '../../stores/jawaban'
 import { usePemutar } from '../../stores/pemutar'
 import type { Panggung } from '../../features/pemutar-episode/mesin'
+import './episode-1.css'
 
 async function episode(p: Panggung) {
   siapkan('geser', 'tempel', 'muncul', 'atp', 'getar', 'belah', 'selesai')
@@ -34,18 +35,20 @@ function Episode1Glikolisis() {
   const navigate = useNavigate()
   const otomatis = (useLocation().state as { otomatis?: boolean } | null)?.otomatis === true
   return (
-    <PemutarEpisode
-      judul="Glikolisis"
-      label="Episode 1"
-      ringkasan="Ikuti perjalanan glukosa di dalam sel. Amati prosesnya dan jawab pertanyaan untuk mengetahui bagaimana energi terbentuk."
-      bab={[...BAB]}
-      gambarSampul={sel}
-      otomatis={otomatis}
-      jalankan={async (p) => {
-        await episode(p)
-        if (!p.signal.aborted) navigate('/episode/1/hasil')
-      }}
-    />
+    <div className="episode-1">
+      <PemutarEpisode
+        judul="Glikolisis"
+        label="Episode 1"
+        ringkasan="Ikuti perjalanan glukosa di dalam sel. Amati prosesnya dan jawab pertanyaan untuk mengetahui bagaimana energi terbentuk."
+        bab={[...BAB]}
+        gambarSampul={sel}
+        otomatis={otomatis}
+        jalankan={async (p) => {
+          await episode(p)
+          if (!p.signal.aborted) navigate('/episode/1/hasil')
+        }}
+      />
+    </div>
   )
 }
 
