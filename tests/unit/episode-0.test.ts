@@ -89,7 +89,8 @@ test('pemilahan menolak pengecoh, sisi salah, jeda, duplikasi dan callback setel
   expect(bunyi).toHaveBeenCalledExactlyOnceWith('tempel')
   expect(pilih(1, 1)).toBe(true)
   await janji
-  expect(usePilah.getState().soal).toBeNull()
+  expect(usePilah.getState().soal?.terpasang).toHaveLength(2)
+  usePilah.setState({ soal: null })
   const batal = mintaPilah(ctrl.signal, TABEL[0])
   const lama = usePilah.getState().soal!.pilih
   const ditolak = expect(batal).rejects.toMatchObject({ name: 'AbortError' })

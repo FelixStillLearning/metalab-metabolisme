@@ -9,6 +9,7 @@ type Soal = {
   baris: BarisPilah
   kartu: string[]
   terpasang: number[]
+  penempatan: Partial<Record<number, 0 | 1>>
   pesan: string
   pilih: (kartu: number, sisi: 0 | 1) => boolean
 }
@@ -22,11 +23,14 @@ export function mintaPilah(signal: AbortSignal, baris: BarisPilah) {
     const pasangan =
       baris.k === 'energi' || baris.k === 'oksigen' ? [...baris.sel].reverse() : [...baris.sel]
     const kartu = [...pasangan, ...(baris.pengecoh ? [baris.pengecoh] : [])]
-    const bersih = () => {
+    const lepasPendengar = () => {
       aktif = false
       signal.removeEventListener('abort', batal)
-      usePilah.setState({ soal: null })
       usePemutar.setState({ petunjuk: '' })
+    }
+    const bersih = () => {
+      lepasPendengar()
+      usePilah.setState({ soal: null })
     }
     const batal = () => {
       bersih()
@@ -43,6 +47,7 @@ export function mintaPilah(signal: AbortSignal, baris: BarisPilah) {
         baris,
         kartu,
         terpasang: [],
+        penempatan: {},
         pesan: '',
         pilih: (index, sisi) => {
           if (
@@ -70,10 +75,15 @@ export function mintaPilah(signal: AbortSignal, baris: BarisPilah) {
           terpasang.add(index)
           useJawabanE0.getState().catatSel(baris.k, sisi)
           usePilah.setState((s) => ({
-            soal: s.soal && { ...s.soal, terpasang: [...terpasang], pesan: '' },
+            soal: s.soal && {
+              ...s.soal,
+              terpasang: [...terpasang],
+              penempatan: { ...s.soal.penempatan, [index]: sisi },
+              pesan: '',
+            },
           }))
           if (terpasang.size === 2) {
-            bersih()
+            lepasPendengar()
             selesai()
           }
           return true

@@ -47,7 +47,7 @@ export default function PilahAdegan() {
   }, [index, melayang])
   if (tahap !== 6) return null
   const terisi = (sisi: 0 | 1) =>
-    soal?.terpasang.some((i) => soal.kartu[i] === soal.baris.sel[sisi])
+    soal ? Object.values(soal.penempatan).some((tujuan) => tujuan === sisi) : false
   const riwayat = (sisi: 0 | 1) =>
     TABEL.filter((_, i) => i < baris || (i === baris && (!soal || terisi(sisi))))
   const daftar = (sisi: 0 | 1) => (
