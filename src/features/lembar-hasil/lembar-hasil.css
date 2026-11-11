@@ -105,8 +105,8 @@
 
 .pair {
   display: grid;
-  grid-template-columns: auto auto auto 1fr;
-  align-items: end;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: start;
   column-gap: 0.8cqw;
   padding: 0.9cqw 0;
   border-top: 1px solid #0d252633;
@@ -120,7 +120,9 @@
 }
 
 .pair .n {
-  font: 800 2.7cqw/1 var(--font-body);
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font: 800 clamp(18px, 1.4cqw, 24px) / 1.25 var(--font-body);
 }
 
 .pair .n small {
@@ -138,6 +140,7 @@
 }
 
 .pair .n.guess.same {
+  grid-column: 1 / -1;
   color: var(--color-screen-3);
 }
 
@@ -146,13 +149,14 @@
 }
 
 .pair .arr {
-  padding-bottom: 1.2cqw;
-  font-size: 1.8cqw;
+  align-self: center;
+  font-size: clamp(16px, 1.1cqw, 20px);
   color: var(--color-muted);
 }
 
 .pair .why {
-  align-self: center;
+  grid-column: 1 / -1;
+  margin-top: 8px;
   font-size: max(13px, 0.95cqw);
 }
 
@@ -357,11 +361,11 @@
   }
 
   .pair .n {
-    font-size: 32px;
+    font-size: 20px;
   }
 
   .pair .arr {
-    font-size: 24px;
+    font-size: 18px;
   }
 
   .pair .n small,
