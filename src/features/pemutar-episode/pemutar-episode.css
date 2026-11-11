@@ -1147,8 +1147,25 @@
     left: max(8px, var(--aman-kiri));
   }
 
+  .pemutar-bilah .pemutar-ib {
+    width: 32px;
+    height: 32px;
+  }
+
+  .pemutar-bilah .pemutar-ib svg {
+    width: 15px;
+    height: 15px;
+  }
+
   .pemutar-posisi {
-    font-size: 11px;
+    gap: 4px;
+    margin-left: 0;
+    padding: 0 4px;
+    font-size: 10px;
+  }
+
+  .pemutar-posisi b {
+    font-size: 12px;
   }
 
   .pemutar-sampul {

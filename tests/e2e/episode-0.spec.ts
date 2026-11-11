@@ -479,11 +479,11 @@ test('kontrol ringkas dan teks kartu serta bubble tetap di dalam kertas', async 
   ]) {
     await page.setViewportSize({ width, height })
     const bilah = (await page.locator('.pemutar-bilah').boundingBox())!
-    expect(bilah.height).toBeLessThanOrEqual(44)
+    expect(bilah.height).toBeLessThanOrEqual(height <= 500 ? 32 : 44)
     for (const tombol of await page.locator('.pemutar-bilah > button').all()) {
       const r = (await tombol.boundingBox())!
-      expect(r.width).toBeGreaterThanOrEqual(44)
-      expect(r.height).toBeGreaterThanOrEqual(44)
+      expect(r.width).toBeGreaterThanOrEqual(height <= 500 ? 32 : 44)
+      expect(r.height).toBeGreaterThanOrEqual(height <= 500 ? 32 : 44)
     }
     const kartu = (await page.locator('.pemutar-soal').boundingBox())!
     const bagan = (await page.locator('.e0-reaksi').boundingBox())!
