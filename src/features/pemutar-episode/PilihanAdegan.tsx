@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { sasaranSeret } from './sasaranSeret'
+import { bunyi } from '../../lib/suara'
 import { usePemutar, type SoalPilihan } from '../../stores/pemutar'
 
 function SeretMolekul({
@@ -120,7 +121,10 @@ function PilihanAdegan() {
                 }
                 disabled={dijeda || pilihan.memeriksa}
                 onClick={() => {
-                  if (!posisi) setTerpilih({ opsi: pilihan.opsi, indeks: i })
+                  if (!posisi) {
+                    setTerpilih({ opsi: pilihan.opsi, indeks: i })
+                    if (pilihan.konfirmasi) bunyi('ketuk')
+                  }
                   if (!pilihan.konfirmasi) void pilihan.pilih(i)
                 }}
               >
