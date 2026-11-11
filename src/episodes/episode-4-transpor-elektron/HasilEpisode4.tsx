@@ -126,7 +126,7 @@ export default function HasilEpisode4() {
         })),
         tabel: <TabelPerbandingan />,
       }}
-      rute={{ episode: '/episode/4', lanjut: '/peta-materi' }}
+      rute={{ episode: '/episode/4', lanjut: '/episode/4/penutup' }}
       narasi={{
         id: 'e4-hasil',
         teks: 'Respirasi aerob selesai. Ini rantai elektronmu dan tabel perbandingan empat tahap. Jelaskan hubungan jalur elektron, aliran proton, dan pembentukan ATP.',
