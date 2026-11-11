@@ -231,10 +231,10 @@ async function bahan(p: Panggung) {
     1,
     () => pesan('Ikuti delapan reaksi terpisah dari sitrat sampai oksaloasetat terbentuk kembali.'),
   )
-  sitrat.g.remove()
+  await to(k, { o: 0 }, 300)
   k.remove()
-  p.world.replaceChildren()
   catat('c')
+  return sitrat
 }
 
 async function poe(p: Panggung, k: PoeE3, amati: () => Promise<void>) {
@@ -478,15 +478,20 @@ export async function episode(p: Panggung) {
   siapkan('muncul', 'geser', 'tempel', 'belah', 'atp', 'selesai')
   useJawabanE3.getState().mulai()
   await pembuka(p)
-  await bahan(p)
+  const pratinjau = await bahan(p)
   const roda = rodaKrebs(p)
-  bunyi('muncul')
-  await to(hide(roda.g), { o: 1 }, 700)
-  const pratinjau = rangka(p, 6, 'Sitrat', ...posisiSamping(0))
-  await pratinjau.susun('Sitrat', 1)
-  pratinjau.judul.style.display = 'none'
-  pratinjau.hitung.style.display = 'none'
-  await to(pratinjau.g, { s: 0.38 }, 0)
+  p.world.insertBefore(roda.g, pratinjau.g)
+  const keterangan = obj(0, 0, pratinjau.g)
+  keterangan.append(pratinjau.judul, pratinjau.hitung)
+  const [x, y] = posisiSamping(0)
+  bunyi('geser')
+  await Promise.all([
+    to(hide(roda.g), { o: 1 }, 1200),
+    to(pratinjau.g, { x, y, s: 0.38 }, 1600, 'kamera'),
+    to(keterangan, { o: 0 }, 450),
+  ])
+  keterangan.remove()
+  delete pratinjau.g.dataset.tanyaTahap
   await say(
     p,
     'roda',
