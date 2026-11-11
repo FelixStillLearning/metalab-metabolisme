@@ -49,3 +49,10 @@ Sumber memakai salinan lokal beserta catatan lisensi yang sudah tersedia. Versi 
 | `kertas-kait`        | Elektron diterima NAD⁺ dan KoA menempel | Sintesis prosedural proyek; tanpa sampel pihak ketiga |
 
 Mono 44,1 kHz; durasi masing-masing sekitar 480, 260, dan 160 ms. Filter 100–6.000 Hz, target −23 LUFS dan −6 dBTP; fade awal/akhir. Tidak mengganti berkas getar, belah, atau tempel episode sebelumnya. Semua mengikuti saklar efek, bisu dan volume utama.
+
+## Musik Beranda dan Peta Materi, 11 November 2026
+
+- `musik-opening`: berkas pengguna `edu_app_opening_theme.mp3`, untuk Beranda.
+- `musik-menu`: berkas pengguna `edu_bio_menu_theme.mp3`, untuk Peta Materi.
+
+MP3 disalin dari berkas yang diberikan pengguna; OGG dikonversi memakai Vorbis kualitas 4. Musik berulang selama halaman terbuka, mengikuti saklar musik, bisu, dan volume utama.

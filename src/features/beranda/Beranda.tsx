@@ -10,7 +10,7 @@ import latar from '../../assets/images/latar-beranda.webp'
 import logo from '../../assets/images/logo-metalab.webp'
 import maskot from '../../assets/images/maskot-ilmuwan-melambai.webp'
 import sel from '../../assets/images/sel-hewan.webp'
-import { bolehBersuaraSendiri, putar, type NamaSuara } from '../../lib/suara'
+import { bolehBersuaraSendiri, musik, putar, type NamaSuara } from '../../lib/suara'
 import TombolSuara from '../../components/TombolSuara'
 import PengaturVolume from '../../components/PengaturVolume'
 import TombolLayarPenuh from '../../components/TombolLayarPenuh'
@@ -60,6 +60,10 @@ function useSuaraMasuk(putaran: number) {
 // Ukuran di layar mendatar dibatasi tinggi layar juga, supaya HP miring 800x360 tetap muat tanpa menggulir.
 function Beranda() {
   const navigate = useNavigate()
+  useEffect(() => {
+    musik(true, 'musik-opening')
+    return () => musik(false)
+  }, [])
   // putaran: animasi masuk diputar ulang; ulangPop: letupan sel; ketukan: kalimat maskot
   const [putaran, setPutaran] = useState(0)
   const [ulangPop, setUlangPop] = useState(0)

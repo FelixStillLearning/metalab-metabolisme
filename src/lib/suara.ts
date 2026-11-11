@@ -25,7 +25,7 @@ export type NamaSuara =
   | 'kunci'
   | 'jatuh'
   | 'selesai'
-  | 'musik-latar'
+  | MusikLatar
 
 // Berkas dimuat saat pertama kali dibutuhkan; MP3 untuk browser yang tidak mendukung OGG (Safari lama)
 const termuat = new Map<NamaSuara, Howl>()
@@ -115,21 +115,23 @@ export function bunyi(slot: SlotSuara) {
   if (usePengaturan.getState().efek) putar(BERKAS_SLOT[slot])
 }
 
-// Musik latar episode: berbunyi selama diminta, saklar musik hidup, dan suara tidak dibisukan.
+type MusikLatar = 'musik-latar' | 'musik-opening' | 'musik-menu'
+
+// Musik latar halaman dan episode: berbunyi selama diminta, saklar musik hidup, dan suara tidak dibisukan.
 // Tetap berbunyi saat episode dijeda, seperti prototype.
-let musikDiminta = false
-let musikBerbunyi = false
+let musikDiminta: MusikLatar | null = null
+let musikBerbunyi: MusikLatar | null = null
 
 function aturMusik() {
   const { musik, suaraAktif } = usePengaturan.getState()
-  const nyala = musikDiminta && musik && suaraAktif
-  if (nyala === musikBerbunyi) return
-  musikBerbunyi = nyala
-  if (nyala) ambil('musik-latar', { loop: true, volume: 0.35 }).play()
-  else termuat.get('musik-latar')?.stop()
+  const lagu = musik && suaraAktif ? musikDiminta : null
+  if (lagu === musikBerbunyi) return
+  if (musikBerbunyi) termuat.get(musikBerbunyi)?.stop()
+  musikBerbunyi = lagu
+  if (lagu) ambil(lagu, { loop: true, volume: 0.35 }).play()
 }
 
-export function musik(nyala: boolean) {
-  musikDiminta = nyala
+export function musik(nyala: boolean, nama: MusikLatar = 'musik-latar') {
+  musikDiminta = nyala ? nama : null
   aturMusik()
 }

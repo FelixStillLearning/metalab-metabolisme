@@ -143,3 +143,32 @@ test('volume utama mengubah audio aktif tanpa memulai ulang musik atau melepas b
   expect(Howler.mute).toHaveBeenLastCalledWith(false)
   expect(usePengaturan.getState().volume).toBe(0.25)
 })
+
+test('musik halaman berganti tanpa tumpang tindih dan tetap mengikuti saklar musik', () => {
+  musik(true, 'musik-opening')
+  expect(Howl).toHaveBeenLastCalledWith({
+    src: ['/audio/musik-opening.ogg', '/audio/musik-opening.mp3'],
+    loop: true,
+    volume: 0.35,
+  })
+  vi.clearAllMocks()
+  musik(true, 'musik-opening')
+  expect(play).not.toHaveBeenCalled()
+  musik(true, 'musik-menu')
+  expect(stop).toHaveBeenCalledOnce()
+  expect(play).toHaveBeenCalledOnce()
+  expect(Howl).toHaveBeenLastCalledWith({
+    src: ['/audio/musik-menu.ogg', '/audio/musik-menu.mp3'],
+    loop: true,
+    volume: 0.35,
+  })
+  usePengaturan.getState().atur('musik', false)
+  expect(stop).toHaveBeenCalledTimes(2)
+  usePengaturan.getState().atur('musik', true)
+  expect(play).toHaveBeenCalledTimes(2)
+  musik(true)
+  expect(stop).toHaveBeenCalledTimes(3)
+  expect(play).toHaveBeenCalledTimes(3)
+  musik(false)
+  expect(stop).toHaveBeenCalledTimes(4)
+})
