@@ -47,7 +47,7 @@ async function jelaskan(page: Page, k: PoeE3) {
 async function tempatkan(page: Page) {
   for (const z of ZAT) {
     if (z.nama === 'ATP') {
-      await page.getByRole('button', { name: 'Tempatkan ATP', exact: true }).waitFor()
+      await page.getByRole('button', { name: 'Seret ATP ke tahap', exact: true }).waitFor()
       const roda = (await page.locator('[data-objek="roda-krebs"]').boundingBox())!
       for (const marker of await page.locator('[data-penanda-tahap]').all()) {
         const box = (await marker.boundingBox())!
@@ -57,7 +57,7 @@ async function tempatkan(page: Page) {
         expect(distance / roda.width).toBeCloseTo(215 / 320, 1)
       }
     }
-    await page.getByRole('button', { name: `Tempatkan ${z.nama}`, exact: true }).click()
+    await page.getByRole('button', { name: `Seret ${z.nama} ke tahap`, exact: true }).waitFor()
     const salah = [1, 2, 3, 4, 5, 6, 7, 8].find((n) => !(z.tahap as readonly number[]).includes(n))!
     await page.getByRole('button', { name: `${z.nama} ke tahap ${salah}`, exact: true }).click()
     await expect(page.locator('[data-gelembung]')).toContainText(z.pesan)
@@ -66,8 +66,14 @@ async function tempatkan(page: Page) {
       const r = (await b.boundingBox())!
       expect(r.height).toBeGreaterThanOrEqual(44)
       expect(r.width).toBeGreaterThanOrEqual(44)
-      await b.focus()
-      await page.keyboard.press('Enter')
+      const sumber = (await page
+        .getByRole('button', { name: `Seret ${z.nama} ke tahap`, exact: true })
+        .boundingBox())!
+      await page.mouse.move(sumber.x + sumber.width / 2, sumber.y + sumber.height / 2)
+      await page.mouse.down()
+      await page.mouse.move(r.x + r.width / 2, r.y + r.height / 2, { steps: 10 })
+      await page.mouse.up()
+      await expect(b).toHaveCount(0)
     }
   }
 }
@@ -217,7 +223,7 @@ for (const [karbon, putaran] of [
     expect(molekul.x + molekul.width).toBeLessThan(kartu.x)
     await page.screenshot({ path: info.outputPath('667-oksaloasetat.png') })
     await jelaskan(page, 'i·1')
-    await page.getByRole('button', { name: 'Tempatkan H₂O', exact: true }).click()
+    await page.getByRole('button', { name: 'Seret H₂O ke tahap', exact: true }).waitFor()
     for (const b of await page.getByRole('button', { name: /H₂O ke tahap/ }).all()) {
       const r = (await b.boundingBox())!
       expect(r.height).toBeGreaterThanOrEqual(44)
@@ -228,7 +234,7 @@ for (const [karbon, putaran] of [
     for (const n of [1, 7])
       await page.getByRole('button', { name: `H₂O ke tahap ${n}`, exact: true }).click()
     for (const z of ZAT.slice(1)) {
-      await page.getByRole('button', { name: `Tempatkan ${z.nama}`, exact: true }).click()
+      await page.getByRole('button', { name: `Seret ${z.nama} ke tahap`, exact: true }).waitFor()
       for (const n of z.tahap)
         await page.getByRole('button', { name: `${z.nama} ke tahap ${n}`, exact: true }).click()
     }

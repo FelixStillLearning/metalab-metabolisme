@@ -303,7 +303,7 @@ async function putar(p: Panggung, roda: Roda) {
   const labelPutaran = label(p.fx, 1100, 170, 'SATU PUTARAN · SATU ASETIL KoA', 24)
   const tahapJudul = label(p.fx, 1100, 250, '4 · α-ketoglutarat', 26)
   for (const [i, t] of TAHAP.entries()) {
-    roda.aktif(i)
+    await roda.aktif(i)
     tahapJudul.querySelector('text')!.textContent = `${i + 1} · ${t.nama}`
     if (!m) {
       m = rangka(p, 6, t.nama, 1050, 410)
@@ -311,6 +311,13 @@ async function putar(p: Panggung, roda: Roda) {
       m.g.dataset.detailReaksi = ''
     }
     const lepas = i === 2 || i === 3 ? await lepasCo2(p, m, i + 1) : null
+    const koaLepas = i === 4 ? m.koenzim : null
+    if (koaLepas) {
+      const x = m.g._x + koaLepas._x
+      const y = m.g._y + koaLepas._y
+      p.world.append(koaLepas)
+      await to(koaLepas, { x, y }, 0)
+    }
     await m.susun(t.nama, i + 1)
     simpanTahap(p, m, i + 1, t.nama)
     if (lepas) {
@@ -350,7 +357,7 @@ async function putar(p: Panggung, roda: Roda) {
       await wait(p, 450)
     }
     if (i === 0 || i === 4) {
-      koenzim = gambar(p.world, koa, 1050, 482, 100, 50)
+      koenzim = koaLepas ?? gambar(p.world, koa, 1050, 482, 100, 50)
       koenzim.dataset.objek = 'koa-keluar'
       const koaKeluar = koenzim
       await Promise.all([
@@ -362,8 +369,10 @@ async function putar(p: Panggung, roda: Roda) {
             : 'Koenzim A dilepas dari suksinil KoA saat suksinat terbentuk.',
         ),
         (async () => {
-          bunyi('muncul')
-          await to(hide(koaKeluar), { o: 1 }, 350)
+          if (!koaLepas) {
+            bunyi('muncul')
+            await to(hide(koaKeluar), { o: 1 }, 350)
+          }
           await wait(p, 350)
           bunyi('geser')
           await to(koaKeluar, { x: 1280, y: 560 }, 1200)
@@ -406,30 +415,18 @@ async function tempatkan(p: Panggung, roda: Roda) {
     await say(
       p,
       `zat-${z.k}`,
-      `Tempatkan ${z.nama} pada ${z.tahap.length === 1 ? 'tahap yang sesuai' : 'semua tahap yang sesuai'}. ${z.k === 'd' ? 'Seret air ke nomor tahap di roda, atau ketuk nomor tahapnya.' : 'Ketuk kartunya, lalu ketuk nomor tahap di roda.'}`,
+      `Tempatkan ${z.nama} pada ${z.tahap.length === 1 ? 'tahap yang sesuai' : 'semua tahap yang sesuai'}. Seret ${z.nama} ke nomor tahap di roda, atau ketuk nomor tahapnya.`,
     )
-    if (z.k !== 'd')
-      await mintaPilihan(
-        p.signal,
-        {
-          judul: `Ketuk kartu ${z.nama}.`,
-          opsi: [{ teks: `Tempatkan ${z.nama}`, posisi: [1100, 250], ukuran: [300, 200] }],
-        },
-        0,
-        () => {},
-      )
     await mintaKetukSemua(
       p.signal,
-      z.k === 'd'
-        ? 'Seret H₂O ke nomor tahap, atau ketuk nomor tahapnya.'
-        : `Ketuk tahap penempatan ${z.nama}.`,
+      `Seret ${z.nama} ke nomor tahap, atau ketuk nomor tahapnya.`,
       TAHAP.map((_, i) => ({
         teks: `${z.nama} ke tahap ${i + 1}`,
         posisi: posisi(i),
         ukuran: [78, 78],
       })),
       async (i) => {
-        roda.aktif(i)
+        await roda.aktif(i)
         const g = gambar(p.fx, href, 1100, 230, 100, 50)
         g.dataset.penandaTahap = String(i + 1)
         const [x, y] = posisi(i)
@@ -444,9 +441,7 @@ async function tempatkan(p: Panggung, roda: Roda) {
         ),
         salah: () => pesan(z.pesan),
       },
-      z.k === 'd'
-        ? { teks: 'Seret H₂O ke tahap', gambar: href, posisi: [1100, 230], ukuran: [180, 90] }
-        : undefined,
+      { teks: `Seret ${z.nama} ke tahap`, gambar: href, posisi: [1100, 230], ukuran: [180, 90] },
     )
     catat(z.k)
     await say(p, `zat-${z.k}-selesai`, z.pesan)
@@ -478,11 +473,13 @@ async function duaPutaran(p: Panggung, roda: Roda) {
     return m.g
   })
   for (let k = 0; k < 2; k++) {
+    lingkup.querySelector('text')!.textContent = `Putaran ${k + 1} mulai`
     bunyi('geser')
     await to(asetil[k], { x: 500, y: 480, o: 0 }, 800)
     for (let i = 0; i < 8; i++) {
-      roda.aktif(i)
-      await wait(p, 230)
+      await roda.aktif(i)
+      lingkup.querySelector('text')!.textContent = `Putaran ${k + 1} · tahap ${i + 1}`
+      await wait(p, 350)
     }
     bunyi('tempel')
     await Promise.all(panen.map((t) => to(t.g, { o: 1, s: 1.08 }, 300, 'letup')))

@@ -8,7 +8,7 @@ import {
   strip,
   type Titik,
 } from '../../features/pemutar-episode/kertas'
-import { obj, to, type Panggung } from '../../features/pemutar-episode/mesin'
+import { hide, obj, to, type Panggung } from '../../features/pemutar-episode/mesin'
 
 export function label(parent: Element, x: number, y: number, value: string, size = 22) {
   const g = labelKertas(parent, x, y, value, size)
@@ -49,6 +49,9 @@ export function rodaKrebs(p: Panggung) {
   const g = obj(500, 450, p.world)
   g.dataset.objek = 'roda-krebs'
   el('image', { href: roda, x: -160, y: -160, width: 320, height: 320 }, g)
+  const penanda = hide(obj(0, -75, g))
+  penanda.dataset.objek = 'penanda-roda'
+  el('circle', { r: 9, fill: '#ed8877', stroke: 'var(--color-ink)', 'stroke-width': 2 }, penanda)
   return {
     g,
     aktif: (i: number) => {
@@ -56,6 +59,8 @@ export function rodaKrebs(p: Panggung) {
       p.world.querySelectorAll<SVGElement>('[data-garis-tahap]').forEach((garis) => {
         garis.dataset.aktif = String(garis.dataset.garisTahap === String(i + 1))
       })
+      const a = -Math.PI / 2 + (i * Math.PI) / 4
+      return to(penanda, { x: Math.cos(a) * 75, y: Math.sin(a) * 75, o: 1 }, 350)
     },
   }
 }
@@ -216,13 +221,14 @@ export function rangka(p: Panggung, n: number, nama: string, x = 500, y = 485) {
   const hitung = label(g, 0, 130, `${n} C`, 26)
   const koenzim = gambar(g, koa, 0, 72, 100, 50)
   koenzim.style.display = 'none'
+  koenzim.dataset.objek = 'koa-terikat'
   function namaBaru(teks: string, tahap: number) {
     g.dataset.molecule = teks
     g.dataset.karbon = String(atom.length)
     g.dataset.tahap = String(tahap)
     judul.querySelector('text')!.textContent = teks
     hitung.querySelector('text')!.textContent = `${atom.length} C`
-    koenzim.style.display = tahap === 4 ? '' : 'none'
+    if (koenzim.parentNode === g) koenzim.style.display = tahap === 4 ? '' : 'none'
   }
   function sambung(pasangan: [number, number][]) {
     ikatan.replaceChildren()
@@ -240,7 +246,7 @@ export function rangka(p: Panggung, n: number, nama: string, x = 500, y = 485) {
   }
   namaBaru(nama, 0)
   sambung(atom.slice(1).map((_, i) => [i, i + 1]))
-  return { g, atom, ikatan, susun, judul, hitung }
+  return { g, atom, ikatan, susun, judul, hitung, koenzim }
 }
 export async function lepasCo2(p: Panggung, m: ReturnType<typeof rangka>, tahap: number) {
   const c = m.atom.pop()!

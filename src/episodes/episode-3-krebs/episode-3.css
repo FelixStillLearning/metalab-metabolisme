@@ -229,3 +229,8 @@
   stroke-width: 4;
   opacity: 1;
 }
+
+.episode-3 .pemutar-sasaran {
+  min-width: 44px;
+  min-height: 44px;
+}
