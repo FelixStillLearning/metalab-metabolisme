@@ -57,9 +57,11 @@ async function selesaikan15(page: Page, keyboard = false) {
       await expect(page.locator('.e0-molekul clipPath rect')).toHaveCount(4)
       const kiri = (await page.locator('.e0-zat-sisi').first().boundingBox())!
       const kanan = (await page.locator('.e0-zat-sisi').last().boundingBox())!
-      const panah = (await page.locator('.e0-panah-model').boundingBox())!
-      expect(panah.x).toBeGreaterThanOrEqual(kiri.x + kiri.width)
-      expect(panah.x + panah.width).toBeLessThanOrEqual(kanan.x)
+      const panah = await page.locator('.e0-panah-model').boundingBox()
+      if (page.viewportSize()!.height > 500) {
+        expect(panah!.x).toBeGreaterThanOrEqual(kiri.x + kiri.width)
+        expect(panah!.x + panah!.width).toBeLessThanOrEqual(kanan.x)
+      } else expect(panah).toBeNull()
       const rumusKiri = (await page.locator('.e0-persamaan > span').first().boundingBox())!
       const rumusKanan = (await page.locator('.e0-persamaan > span').last().boundingBox())!
       expect(rumusKanan.x - rumusKiri.x - rumusKiri.width).toBeLessThan(100)
@@ -103,6 +105,51 @@ async function selesaikan16(page: Page, keyboard = false) {
       })
       if (r.k === 'tempat' && sisi === 0)
         await page.screenshot({ path: test.info().outputPath('1.6-tempat.png') })
+      for (const selector of [
+        '.e0-pilah-kepala',
+        '.e0-sel',
+        '.e0-kartu-ciri:visible',
+        '.e0-umpan-balik',
+      ]) {
+        for (const el of await page.locator(selector).all()) {
+          const jarak = await el.evaluate((node) => {
+            const kotak = node.getBoundingClientRect()
+            const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT)
+            let jarak = Infinity
+            while (walker.nextNode()) {
+              if (!walker.currentNode.textContent?.trim()) continue
+              if (walker.currentNode.parentElement?.closest('button')) continue
+              const range = document.createRange()
+              range.selectNodeContents(walker.currentNode)
+              for (const r of range.getClientRects())
+                jarak = Math.min(
+                  jarak,
+                  r.left - kotak.left,
+                  kotak.right - r.right,
+                  r.top - kotak.top,
+                  kotak.bottom - r.bottom,
+                )
+            }
+            return jarak
+          })
+          expect(jarak, `${selector} ${r.k}`).toBeGreaterThanOrEqual(8)
+        }
+      }
+      if (!pc) {
+        for (const [sisi, nama] of [
+          [0, 'anabolisme'],
+          [1, 'katabolisme'],
+        ] as const) {
+          const judul = (await page.locator(`[data-sisi="${sisi}"] h3`).boundingBox())!
+          const sel = (await page.locator(`[data-sisi="${sisi}"] .e0-sel`).boundingBox())!
+          for (const atom of await page.locator(`[data-rangka="${nama}"] [data-carbon]`).all()) {
+            const kotak = (await atom.boundingBox())!
+            expect(kotak.y).toBeGreaterThanOrEqual(judul.y + judul.height)
+            expect(kotak.y + kotak.height).toBeLessThanOrEqual(sel.y)
+          }
+        }
+      }
+      if (sisi === 1) await page.screenshot({ path: test.info().outputPath(`tabel-${r.k}.png`) })
       const box = (await tombol.boundingBox())!
       expect(box.width).toBeGreaterThanOrEqual(44)
       expect(box.height).toBeGreaterThanOrEqual(44)
