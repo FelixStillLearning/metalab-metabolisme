@@ -41,8 +41,8 @@ async function bersihAnim(p: Panggung, g: number) {
   await Promise.all([
     to(lu, { o: 0 }, 300),
     to(lm, { o: 0 }, 300),
-    to(made[2], { x: 730, y: 550, s: 1.2 }, 700),
-    to(made[3], { x: 870, y: 550, s: 1.2 }, 700),
+    to(made[2], { x: 680, y: 460, s: 1.2 }, 700),
+    to(made[3], { x: 920, y: 460, s: 1.2 }, 700),
   ])
   const net = hide(kinetik(p, 800, 350, 'ATP BERSIH = 4 − 2 = 2', 44, 'var(--color-paper)'))
   if (g === 2) {

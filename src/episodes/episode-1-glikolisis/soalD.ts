@@ -44,8 +44,8 @@ export async function soalD(p: Panggung, [m1, m2]: [Separuh, Separuh]) {
   bunyi('geser')
   await Promise.all([
     camTo(p, 1000, 460, 1.15, 1100),
-    to(m1, { x: 1155 - geser }, 1100),
-    to(m2, { x: 1005 - geser }, 1100),
+    to(m1, { x: 1055 - geser }, 1100),
+    to(m2, { x: 905 - geser }, 1100),
   ])
   if (hp) {
     const [x, y] = keLayar(p, 1270, 125)
@@ -54,17 +54,17 @@ export async function soalD(p: Panggung, [m1, m2]: [Separuh, Separuh]) {
   }
   await say(p, 'e1-d-01')
 
-  // Dua elektron per PGAL, di samping PGAL atas (y 270) dan bawah (y 540)
+  // Dua elektron per PGAL, di antara PGAL dan NAD+ agar perpindahannya terlihat
   bunyi('muncul')
   const pasangan = [270, 540].map((y) =>
     [-18, 18].map((dy) => {
-      const e = hide(elektron(p.world, 860 - geser, y + dy))
-      void to(e, { o: 1, x: 1200 - geser }, 600)
+      const e = hide(elektron(p.world, 740 - geser, y + dy))
+      void to(e, { o: 1, x: 1300 - geser }, 600)
       return e
     }),
   )
   // NAD⁺ atas mulai di y 330 (prototype 250) agar tidak tertutup petunjuk ketuk di HP miring
-  const nads = [badge(p, 1250 - geser, 330, 'NAD⁺'), badge(p, 1250 - geser, 610, 'NAD⁺')]
+  const nads = [badge(p, 1400 - geser, 330, 'NAD⁺'), badge(p, 1400 - geser, 610, 'NAD⁺')]
   for (const n of nads) void to(hide(n), { o: 1 }, 500)
 
   await mintaKetukSemua(
@@ -80,8 +80,8 @@ export async function soalD(p: Panggung, [m1, m2]: [Separuh, Separuh]) {
       const es = pasangan[i]
       const y = es[0]._y + 18
       bunyi('geser')
-      await arc(n, 1300 - geser, y, 80, 600)
-      void comic(p, 'KLIK', 1300 - geser, y - 85, 'var(--color-nad)', p.world)
+      await arc(n, 1400 - geser, y, 80, 600)
+      void comic(p, 'KLIK', 1400 - geser, y - 85, 'var(--color-nad)', p.world)
       bunyi('tempel')
       // Kedua elektron ditangkap dan ikut menempel di NADH
       await Promise.all(
