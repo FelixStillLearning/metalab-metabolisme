@@ -71,7 +71,7 @@ function jalur(p: Panggung, dari: string, tujuan: string, x1: number, x2: number
       g,
     )
   label(g, x1, 215, dari, 22).dataset.judulJalur = 'asal'
-  label(g, x2, 215, tujuan, 22)
+  label(g, x2, 215, tujuan, 22).dataset.judulJalur = 'tujuan'
   el(
     'path',
     {
@@ -586,6 +586,7 @@ async function hasil(p: Panggung, molekul: Piruvat[], koas: Objek[], nadh: Objek
     ]),
   )
   const counter = label(p.fx, 800, 720, 'Karbon terhitung: 0 dari 6', 28)
+  counter.dataset.objek = 'hitung-karbon'
   const count = counter.querySelector('text')!
   await say(p, 'karbon', '08-menunjuk')
   let karbon = 0

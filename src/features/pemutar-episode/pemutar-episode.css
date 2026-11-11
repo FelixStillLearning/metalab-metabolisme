@@ -1045,15 +1045,27 @@
 
 @media (max-height: 500px) and (orientation: landscape) {
   .pemutar-soal {
-    padding: 14px 18px;
+    padding: 18px 22px;
+    border-image-width: 14px;
+  }
+
+  .card {
+    border-width: 12px;
+    border-style: solid;
+    border-color: transparent;
+    border-image-width: 14px;
   }
 
   .pemutar-soal h2 {
-    font-size: 16px;
+    font-size: 14px;
     margin-bottom: 6px;
   }
 
   .pemutar-lengkapi {
+    border-width: 10px;
+    border-style: solid;
+    border-color: transparent;
+    padding: 8px 12px;
     top: 100px;
     transform: translateX(-50%);
     /* Kedua sisi untuk maskot, bagian bawah untuk subtitle. */
@@ -1067,10 +1079,15 @@
     --pendamping: 104px;
   }
 
+  .pemutar-lengkapi h2 {
+    font-size: 13px;
+    margin-bottom: 4px;
+  }
+
   .pemutar-kalimat {
     margin-bottom: 8px;
-    font-size: 13px;
-    line-height: 1.5;
+    font-size: 11px;
+    line-height: 1.35;
   }
 
   .pemutar-lengkapi .pemutar-opsi {
@@ -1084,6 +1101,7 @@
   }
 
   .pemutar-lengkapi .pemutar-pilihan {
+    font-size: 12px;
     padding: 6px 10px;
   }
 }
@@ -1185,8 +1203,14 @@
     gap: 6px;
   }
 
+  .pemutar-sampul-gambar img {
+    max-height: 70cqh;
+    object-fit: contain;
+  }
+
   .pemutar-sampul p {
-    font-size: 15px;
+    font-size: 14px;
+    line-height: 1.4;
   }
 
   .pemutar-sampul h1 {
@@ -1200,11 +1224,19 @@
   }
 
   .pemutar-sampul-aksi {
+    flex-wrap: nowrap;
     gap: 8px;
     margin-top: 4px;
   }
 
+  .pemutar-sampul .tombol-utama {
+    min-height: 44px;
+    padding-inline: 1em;
+    font-size: 14px;
+  }
+
   .pemutar-sampul .pemutar-kembali {
+    min-height: 44px;
     padding: 0.35em 0.9em 0.45em;
     font-size: 13px;
   }
@@ -1297,18 +1329,18 @@
     /* Sisi kiri dan kanan untuk molekul hasil Amati (PGAL soal c) */
     width: 68%;
     max-height: calc(100% - 128px);
-    padding: 12px 16px;
-    gap: 8px;
+    padding: 6px;
+    gap: 6px;
     overflow-y: auto;
   }
 
   .card.bottom h3 {
-    font-size: 16px;
+    font-size: 14px;
   }
 
   .card.bottom p,
   .card.bottom .poe-verdict {
-    font-size: 14px;
+    font-size: 12px;
     line-height: 1.3;
   }
 
@@ -1319,8 +1351,9 @@
 
   .card.bottom .chip {
     flex: none;
-    font-size: 14px;
-    padding: 8px 12px;
+    min-height: 34px;
+    font-size: 11px;
+    padding: 6px 10px;
   }
 
   .card.bottom .poe-feedback {
@@ -1335,37 +1368,39 @@
     width: 41%;
     max-height: 87%;
     overscroll-behavior: contain;
-    padding: 8px 10px;
+    padding: 6px;
     gap: 5px;
     overflow-y: auto;
   }
 
   .poe-card h3 {
-    font-size: 14px;
+    font-size: 12px;
   }
 
   .poe-card p {
-    font-size: 12px;
+    font-size: 11px;
     line-height: 1.3;
   }
 
   .poe-card .poe-reasons {
-    gap: 6px;
-    max-height: 36cqh;
-    min-height: 44px;
-    overflow-y: auto;
+    gap: 4px;
+    min-height: 0;
+    flex: none;
     overscroll-behavior: contain;
     padding: 3px;
   }
 
   .poe-card .chip {
     flex: none;
-    font-size: 14px;
-    padding: 6px 8px;
+    min-height: 34px;
+    font-size: 11px;
+    padding: 6px 10px;
   }
 
-  .poe-card .poe-kunci {
-    font-size: 14px;
+  .poe-kunci,
+  .poe-lanjut {
+    min-height: 34px;
+    font-size: 11px;
     padding: 6px 12px;
   }
 }
@@ -1405,14 +1440,15 @@
 @media (max-height: 500px) and (orientation: landscape) {
   .pemutar-panduan {
     left: 8px;
-    top: 60px;
+    top: 48px;
     width: min(360px, calc(58vw - 20px));
   }
 
   .pemutar-panduan-kartu {
     gap: 8px;
-    padding: 6px 12px;
-    font-size: 13px;
+    padding: 10px 18px;
+    border-image-width: 10px;
+    font-size: 11.5px;
   }
   .pemutar-panduan-ikon {
     width: 18px;

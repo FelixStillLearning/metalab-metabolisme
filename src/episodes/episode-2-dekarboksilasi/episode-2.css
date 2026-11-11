@@ -85,3 +85,15 @@
     transform: translateY(-190px);
   }
 }
+
+@media (max-height: 500px) and (orientation: landscape) {
+  .episode-2 [data-jalur-reaksi] > [data-judul-jalur] {
+    translate: 0 80px;
+  }
+  .episode-2 [data-objek='petunjuk-elektron'] > g:first-child {
+    translate: 0 480px;
+  }
+  .episode-2 [data-objek='hitung-karbon'] {
+    translate: 0 -30px;
+  }
+}
