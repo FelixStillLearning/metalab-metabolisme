@@ -18,13 +18,6 @@
   border: 3px dashed var(--color-ink);
   border-radius: 12px;
 }
-
-.episode-4 .pemutar-panggung:has(.pemutar-soal) .pemutar-soal {
-  left: auto;
-  right: 2%;
-  width: 76%;
-  transform: none;
-}
 .episode-4 .tok-zat[aria-pressed='true'] {
   padding: 0;
   border: 0;
@@ -165,7 +158,7 @@
   }
   .episode-4 .pemutar-narator,
   .episode-4 .pemutar-narator[data-tugas] {
-    --maskot: 128px;
+    --maskot: 88px;
   }
   .episode-4 .pemutar-panduan {
     width: min(220px, 34vw);

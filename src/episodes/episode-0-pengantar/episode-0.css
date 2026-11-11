@@ -460,13 +460,13 @@
     height: 15px;
   }
   .episode-0 .pemutar-narator {
-    --maskot: 112px;
+    --maskot: 70px;
     left: 0;
     bottom: 1%;
     width: 100%;
   }
   .episode-0 .pemutar-narator[data-tugas] {
-    --maskot: 96px;
+    --maskot: 58px;
     bottom: 1%;
     left: 40%;
     width: 60%;

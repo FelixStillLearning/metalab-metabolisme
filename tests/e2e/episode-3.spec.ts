@@ -232,7 +232,7 @@ for (const [karbon, putaran] of [
     await page.screenshot({ path: info.outputPath('667-oksaloasetat.png') })
     await jelaskan(page, 'i·1')
     await page.getByRole('button', { name: 'Seret H₂O ke tahap', exact: true }).waitFor()
-    for (const b of await page.getByRole('button', { name: /^H₂O ke tahap \d+$/ }).all()) {
+    for (const b of await page.getByRole('button', { name: /H₂O ke tahap/ }).all()) {
       const r = (await b.boundingBox())!
       expect(r.height).toBeGreaterThanOrEqual(44)
       expect(r.y).toBeGreaterThanOrEqual(84)

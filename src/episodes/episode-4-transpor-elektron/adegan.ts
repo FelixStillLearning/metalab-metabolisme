@@ -284,7 +284,7 @@ async function jalur(p: Panggung, m: Membran, hs: Objek[]) {
 }
 async function oksigen(p: Panggung, m: Membran, gradien: Objek[]) {
   bab('i')
-  await Promise.all([to(m.g, { o: 0 }, 400), ...gradien.map((h) => to(h, { o: 0 }, 400))])
+  await Promise.all([to(m.g, { o: 0.12 }, 400), ...gradien.map((h) => to(h, { o: 0 }, 400))])
   label(p.fx, 800, 230, 'DI UJUNG RANTAI: OKSIGEN', 30)
   await say(
     p,
@@ -331,7 +331,7 @@ async function oksigen(p: Panggung, m: Membran, gradien: Objek[]) {
     h.dataset.hydrogen = ''
     return h
   })
-  label(p.fx, 800, 180, 'O₂ + 4 H⁺ + 4 e⁻ → 2 H₂O', 34)
+  label(p.fx, 800, 230, 'O₂ + 4 H⁺ + 4 e⁻ → 2 H₂O', 34)
   bunyi('geser')
   await Promise.all(es.map((e, i) => arc(e, os[Math.floor(i / 2)]._x, 480, 60, 900)))
   await Promise.all(es.map((e) => to(e, { o: 0 }, 200)))

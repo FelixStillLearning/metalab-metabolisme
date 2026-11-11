@@ -75,26 +75,21 @@ export function ucapkan(id: string, teks: string, opsi: { signal?: AbortSignal }
 
     const suara = suaraIndonesia()
     if (suara) return bicara(suara)
-    // Daftar suara dapat terisi bertahap; tunggu suara Indonesia meskipun suara lain sudah ada.
+    // Chrome mengisi daftar suara belakangan: bila masih kosong, tunggu sebentar sebelum menyerah
     const sintesis = window.speechSynthesis
-    if (!sintesis) return akhir()
+    if (!sintesis || sintesis.getVoices().length > 0) return akhir()
     const batal = () => {
       clearTimeout(timer)
       sintesis.removeEventListener('voiceschanged', coba)
       signal?.removeEventListener('abort', berhenti)
     }
     const coba = () => {
-      const siap = suaraIndonesia()
-      if (!siap) return
-      batal()
-      bicara(siap)
-    }
-    const timer = setTimeout(() => {
       batal()
       const siap = suaraIndonesia()
       if (siap) bicara(siap)
       else akhir()
-    }, 1500)
+    }
+    const timer = setTimeout(coba, 1500)
     sintesis.addEventListener('voiceschanged', coba)
     berhenti = () => {
       batal()

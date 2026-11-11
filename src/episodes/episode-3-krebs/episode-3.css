@@ -89,21 +89,7 @@
     max-height: 87%;
   }
   .e3-tabel {
-    font-size: 16px;
-    table-layout: fixed;
-    overflow-wrap: anywhere;
-  }
-  .e3-ringkasan {
-    flex-direction: column;
-    align-items: stretch;
-    padding: 8px;
-  }
-  .e3-ringkasan > img {
-    width: min(70%, 240px);
-    align-self: center;
-  }
-  .e3-tabel td img {
-    max-width: 100%;
+    font-size: 14px;
   }
   .e3-tabel th,
   .e3-tabel td {
@@ -172,7 +158,7 @@
 }
 @media (max-width: 760px), (max-height: 500px) {
   .episode-3 .pemutar-panggung:has(.pemutar-poe) .pemutar-narator {
-    --maskot: 128px;
+    --maskot: 70px;
   }
 }
 

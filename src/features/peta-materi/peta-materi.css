@@ -486,7 +486,7 @@
   /* HP tegak: maskot ikut alur, di bawah kartu terakhir; lebih kecil supaya gelembung muat dua
      baris dan tetap sejajar kepala */
   .peta-materi {
-    --maskot: 144px;
+    --maskot: 120px;
   }
 
   .peta-materi .peta-maskot {

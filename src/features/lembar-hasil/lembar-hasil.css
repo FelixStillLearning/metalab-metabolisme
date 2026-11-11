@@ -26,25 +26,7 @@
   grid-column: 2;
 }
 
-.hasil:has(.e3-bagan),
-.hasil:has(.e4-bagan) {
-  display: flex;
-  flex-direction: column;
-  aspect-ratio: auto;
-  width: min(100%, 1200px);
-  gap: 24px;
-  padding: 56px 48px 64px;
-  background: none;
-  border-image: url('../../assets/images/latar-hasil-hp.webp') 110 fill / 44px stretch;
-}
-
-.hasil:has(.e3-bagan) .hasil-aksi,
-.hasil:has(.e4-bagan) .hasil-aksi {
-  margin-top: 16px;
-}
-
 .hasil-bagan {
-  min-width: 0;
   grid-row: 1 / 3;
   grid-column: 1;
   display: grid;
@@ -61,7 +43,6 @@
 }
 
 .hasil-sisi {
-  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 1.3cqw;
@@ -304,9 +285,7 @@
 
 /* HP (tegak, juga miring): satu kolom yang digulir, latar B08 versi tegak */
 @media (max-width: 760px), (max-height: 500px) {
-  .hasil,
-  .hasil:has(.e3-bagan),
-  .hasil:has(.e4-bagan) {
+  .hasil {
     width: 100%;
     aspect-ratio: auto;
     display: flex;
@@ -319,11 +298,6 @@
 
   .hasil-bagan > svg {
     height: auto;
-  }
-
-  .hasil-bagan,
-  .hasil-sisi {
-    overflow-wrap: anywhere;
   }
 
   .hasil-lead {
