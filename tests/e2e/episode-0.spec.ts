@@ -408,14 +408,21 @@ test('satu cue jawaban, kartu terbang mengikuti jeda, bersih saat keluar, mode t
   await page.addInitScript(() => {
     const w = window as unknown as { jumlahBunyi: number }
     w.jumlahBunyi = 0
-    const start = AudioBufferSourceNode.prototype.start
-    AudioBufferSourceNode.prototype.start = function (...args) {
-      if (this.buffer && this.buffer.length > 1) w.jumlahBunyi++
-      return start.apply(this, args)
-    }
   })
   await page.goto('/#/episode/0?cepat')
   await page.evaluate(async () => {
+    const url = performance
+      .getEntriesByType('resource')
+      .find((r) => /\/howler\.js\?/.test(r.name))!.name
+    const modul = await import(url)
+    const Howl = modul.Howl ?? modul.default.Howl
+    const play = Howl.prototype.play
+    Howl.prototype.play = function (...args: unknown[]) {
+      // Howler memanggil play(id) lagi setelah audio selesai dimuat.
+      if (args.length === 0 && /\/tepat\./.test(this._src))
+        (window as unknown as { jumlahBunyi: number }).jumlahBunyi++
+      return play.apply(this, args)
+    }
     const { usePengaturan } = await import('/src/' + 'stores/pengaturan.ts')
     usePengaturan.setState({ suaraAktif: true, efek: true, musik: false, narasi: false })
   })

@@ -230,7 +230,7 @@ async function bahan(p: Panggung) {
   const kedua = piruvat(p, 1700, 530)
   const molekul = [pir, kedua]
   bunyi('geser')
-  await Promise.all(molekul.map((m, i) => tempatkan(m, 430, 330 + i * 200, 1.15, 900)))
+  await Promise.all(molekul.map((m, i) => tempatkan(m, 430, 330 + i * 140, 1.15, 900)))
   const jumlah = obj(430, 270, p.fx)
   jumlah.dataset.objek = 'jumlah-piruvat'
   label(jumlah, 0, 0, '2 piruvat · 6 C', 26)
@@ -301,9 +301,9 @@ async function poe(p: Panggung, k: PoeE2, amati: (pilihan: number) => Promise<vo
       name: k === 'c' ? 'karbon yang keluar' : 'gugus asetil',
     },
     supply: [
-      [850, 320],
-      [850, 440],
-      [850, 560],
+      [810, 320],
+      [810, 440],
+      [810, 560],
     ],
     slot: () => [410, 330],
   })

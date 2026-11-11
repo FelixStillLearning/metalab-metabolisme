@@ -64,11 +64,31 @@ test('narasi mati langsung selesai tanpa suara', async () => {
   expect(sintesis.speak).not.toHaveBeenCalled()
 })
 
-test('tanpa suara Indonesia hanya subtitle', async () => {
+test('tanpa suara Indonesia hanya subtitle setelah menunggu daftar suara', async () => {
+  vi.useFakeTimers()
   sintesis.getVoices.mockReturnValue([{ lang: 'en-US', name: 'English' }])
-  await ucapkan('x', 'halo')
+  const janji = ucapkan('x', 'halo')
+  await vi.advanceTimersByTimeAsync(1500)
+  await janji
   expect(sintesis.speak).not.toHaveBeenCalled()
+  vi.useRealTimers()
 })
+
+test.each(['e2-karboksil', 'e4-FADH2-II'])(
+  '%s menunggu suara Indonesia meskipun suara lain lebih dulu tersedia',
+  async (id) => {
+    sintesis.getVoices.mockReturnValue([{ lang: 'en-US', name: 'English' }])
+    const janji = ucapkan(id, 'Narasi reaksi')
+    const [, berubah] = sintesis.addEventListener.mock.calls[0]
+    berubah()
+    expect(sintesis.speak).not.toHaveBeenCalled()
+    sintesis.getVoices.mockReturnValue([{ lang: 'id-ID', name: 'Indonesian' }])
+    berubah()
+    expect(sintesis.speak).toHaveBeenCalledOnce()
+    ;(sintesis.speak.mock.calls[0][0] as UtteranceTiruan).onend!()
+    await janji
+  },
+)
 
 test('abort menghentikan narasi', async () => {
   const pengendali = new AbortController()

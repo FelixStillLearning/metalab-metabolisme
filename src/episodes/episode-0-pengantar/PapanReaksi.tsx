@@ -146,7 +146,7 @@ export default function PapanReaksi() {
           data-aktif={aktif(0) || undefined}
           data-terisi={nama || undefined}
         >
-          <small>Nama reaksi</small>
+          <small>Apa nama reaksi yang tepat?</small>
           <b>
             {nama
               ? a
@@ -170,7 +170,7 @@ export default function PapanReaksi() {
             data-aktif={aktif(1) || undefined}
             data-terisi={energi || undefined}
           >
-            <small>{a ? 'Energi masuk' : 'Energi keluar'}</small>
+            <small>{a ? 'Energi apa yang diperlukan?' : 'Energi apa yang dihasilkan?'}</small>
             <div>
               <img src={energi ? (a ? cahaya : atp) : kosong} alt="" />
               <b>{energi ? (a ? 'Cahaya (foton)' : 'Energi kimia · ATP') : '? Pilih energi'}</b>
@@ -199,7 +199,7 @@ export default function PapanReaksi() {
         data-aktif={aktif(2) || undefined}
         data-terisi={perubahan || undefined}
       >
-        <small>Perubahan senyawa</small>
+        <small>Bagaimana perubahan senyawanya?</small>
         <b>
           {perubahan
             ? a
@@ -211,7 +211,6 @@ export default function PapanReaksi() {
           <span>Dengan bantuan enzim · {a ? 'memerlukan energi' : 'melepas energi ATP'}</span>
         )}
       </div>
-      <small className="e0-catatan-atom">Model glukosa: rangka 6 C · rumus C₆H₁₂O₆</small>
       <span className="sr-only">{SOAL[soal].t}. Jumlah atom tiap sisi: 6 C, 12 H, 18 O.</span>
     </section>
   )

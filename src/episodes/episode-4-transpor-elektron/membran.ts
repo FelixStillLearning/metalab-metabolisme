@@ -20,7 +20,7 @@ export function gambar(parent: Element, href: string, x: number, y: number, w = 
 export function membran(p: Panggung) {
   const g = obj(0, 0, p.world)
   g.dataset.objek = 'rantai-elektron'
-  label(g, 720, 200, 'RUANG ANTARMEMBRAN', 30)
+  label(g, 720, 200, 'RUANG ANTARMEMBRAN', 40)
   label(g, 830, 705, 'MATRIKS', 28)
   const kompleks = (['I', 'II', 'III', 'IV'] as const).map((k, i) => {
     const c = gambar(

@@ -81,7 +81,7 @@ test('E2 alur penuh, dua POE, karbon, hasil/cetak, data terpisah dan replay', as
   await latarMemenuhiLayar(page, 'matriks')
   await page.screenshot({ path: info.outputPath('karboksil-tebak.png') })
   await tebak(page, 'c', 2)
-  await page.waitForFunction(() => document.querySelector('[data-word="LEPAS!"]'), null, {
+  await page.waitForFunction(() => document.querySelector('[data-word="KRAAK!"]'), null, {
     polling: 'raf',
   })
   await page.getByRole('button', { name: 'Jeda (spasi)' }).click()
@@ -201,7 +201,11 @@ test('E2 alur penuh, dua POE, karbon, hasil/cetak, data terpisah dan replay', as
   await page.setViewportSize(viewport)
   // Muat ulang hasil menghilangkan ?cepat; kecepatan tes dipulihkan sebelum replay.
   await page.evaluate(async () => {
-    const { kendali } = await import('/src/' + 'features/pemutar-episode/mesin.ts')
+    const modul = performance
+      .getEntriesByType('resource')
+      .find((r) => new URL(r.name).pathname === '/src/features/pemutar-episode/mesin.ts')
+    if (!modul) throw new Error('Mesin animasi aplikasi belum dimuat')
+    const { kendali } = await import(modul.name)
     kendali.cepat = 0.12
   })
   await page.getByRole('button', { name: 'Putar ulang tanpa jeda' }).click()
@@ -213,7 +217,7 @@ test('E2 alur penuh, dua POE, karbon, hasil/cetak, data terpisah dan replay', as
     () =>
       (window as unknown as { gerak: { kata: string[]; elektron: number; zoom: boolean } }).gerak,
   )
-  expect(gerak.kata).toEqual(expect.arrayContaining(['DRRRT', 'LEPAS!', 'NADH!', 'KLIK!', 'WUSH!']))
+  expect(gerak.kata).toEqual(expect.arrayContaining(['DRRRT', 'KRAAK!', 'NADH!', 'KLIK!', 'WUSH!']))
   expect(gerak.elektron).toBe(4)
   expect(gerak.zoom).toBe(true)
   expect(galat).toEqual([])
@@ -360,7 +364,7 @@ test('awal E2 tetap berilustrasi: enam karbon, konteks aerob, narasi baru dan ti
   await expect(page.locator('[data-carbon]')).toHaveCount(6)
   await expect(page.locator('[data-oxygen]')).toHaveCount(4)
   await expect(page.locator('[data-objek="konteks-aerob"]')).toContainText(
-    'Tidak dikonsumsi langsung',
+    'Piruvat → asetil KoA belum memakai O₂.',
   )
   await expect(page.locator('[data-objek="jumlah-piruvat"]')).toContainText('2 piruvat · 6 C')
   const ukur = async (nama: string) => {

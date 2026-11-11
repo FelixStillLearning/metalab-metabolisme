@@ -1242,8 +1242,8 @@
   }
 
   .pemutar-narator {
-    --maskot: 136px;
-    --pendamping: 88px;
+    --maskot: 152px;
+    --pendamping: 96px;
     left: 0;
     bottom: 2%;
     gap: 6px;
@@ -1252,14 +1252,14 @@
   }
 
   .pemutar-narator[data-tugas] {
-    --maskot: 112px;
-    --pendamping: 72px;
+    --maskot: 128px;
+    --pendamping: 80px;
   }
 
   .pemutar-gelembung {
     margin-bottom: 0;
     padding: 10px 2.1em 12px;
-    font-size: 13px;
+    font-size: 15px;
   }
 
   .pemutar-gelembung::after {

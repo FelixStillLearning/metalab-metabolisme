@@ -247,7 +247,7 @@ function Beranda() {
                 data-hiasan="maskot"
                 width={418}
                 height={418}
-                className="maskot h-auto w-[170px] landscape:w-[min(40dvh,380px)]"
+                className="maskot h-auto w-[190px] landscape:w-[min(40dvh,380px)]"
               />
               <button
                 type="button"
