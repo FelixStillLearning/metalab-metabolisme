@@ -574,12 +574,14 @@ export async function episode(p: Panggung) {
   p.world.replaceChildren()
   p.fx.replaceChildren()
   bab('j')
-  await say(
-    p,
-    'pengertian',
-    'Siklus Krebs berlangsung dalam suasana aerob. Oksigen tidak dikonsumsi langsung di sini, tetapi diperlukan pada transpor elektron untuk membantu menyediakan kembali NAD⁺ dan FAD. Lengkapi pengertiannya.',
-  )
-  await mintaLengkapi(p.signal, 'Lengkapi pengertian siklus Krebs', POTONGAN, RUMPANG)
+  await Promise.all([
+    mintaLengkapi(p.signal, 'Lengkapi pengertian siklus Krebs', POTONGAN, RUMPANG),
+    say(
+      p,
+      'pengertian',
+      'Siklus Krebs berlangsung dalam suasana aerob. Oksigen tidak dikonsumsi langsung di sini, tetapi diperlukan pada transpor elektron untuk membantu menyediakan kembali NAD⁺ dan FAD. Lengkapi pengertiannya.',
+    ),
+  ])
   catat('j')
   await say(
     p,
