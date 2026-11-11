@@ -370,20 +370,23 @@ async function tempatkan(p: Panggung, roda: Roda) {
     await say(
       p,
       `zat-${z.k}`,
-      `Tempatkan ${z.nama} pada ${z.tahap.length === 1 ? 'tahap yang sesuai' : 'semua tahap yang sesuai'}. Ketuk kartunya, lalu ketuk nomor tahap di roda.`,
+      `Tempatkan ${z.nama} pada ${z.tahap.length === 1 ? 'tahap yang sesuai' : 'semua tahap yang sesuai'}. ${z.k === 'd' ? 'Seret air ke nomor tahap di roda, atau ketuk nomor tahapnya.' : 'Ketuk kartunya, lalu ketuk nomor tahap di roda.'}`,
     )
-    await mintaPilihan(
-      p.signal,
-      {
-        judul: `Ketuk kartu ${z.nama}.`,
-        opsi: [{ teks: `Tempatkan ${z.nama}`, posisi: [1100, 250], ukuran: [300, 200] }],
-      },
-      0,
-      () => {},
-    )
+    if (z.k !== 'd')
+      await mintaPilihan(
+        p.signal,
+        {
+          judul: `Ketuk kartu ${z.nama}.`,
+          opsi: [{ teks: `Tempatkan ${z.nama}`, posisi: [1100, 250], ukuran: [300, 200] }],
+        },
+        0,
+        () => {},
+      )
     await mintaKetukSemua(
       p.signal,
-      `Ketuk tahap penempatan ${z.nama}.`,
+      z.k === 'd'
+        ? 'Seret H₂O ke nomor tahap, atau ketuk nomor tahapnya.'
+        : `Ketuk tahap penempatan ${z.nama}.`,
       TAHAP.map((_, i) => ({
         teks: `${z.nama} ke tahap ${i + 1}`,
         posisi: posisi(i),
@@ -405,6 +408,9 @@ async function tempatkan(p: Panggung, roda: Roda) {
         ),
         salah: () => pesan(z.pesan),
       },
+      z.k === 'd'
+        ? { teks: 'Seret H₂O ke tahap', gambar: href, posisi: [1100, 230], ukuran: [180, 90] }
+        : undefined,
     )
     catat(z.k)
     await say(p, `zat-${z.k}-selesai`, z.pesan)

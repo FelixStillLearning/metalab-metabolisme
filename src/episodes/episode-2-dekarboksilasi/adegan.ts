@@ -534,13 +534,13 @@ async function hasil(p: Panggung, molekul: Piruvat[], koas: Objek[], nadh: Objek
         [81, 61],
         [-79, 63],
       ],
-      'var(--color-screen-3)',
-      {},
+      '#ffffff',
+      { 'fill-opacity': 0.55 },
       1,
       { bayangan: true },
     )
     el('image', { href: item.gambar, x: -68, y: -46, width: 136, height: 64 }, g)
-    teks(g, 0, 46, item.teks, 20, 'var(--color-paper)')
+    teks(g, 0, 46, item.teks, 20, 'var(--color-ink)')
     hide(g)
     return g
   })

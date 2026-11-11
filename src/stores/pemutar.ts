@@ -13,6 +13,7 @@ export type PoseMaskot =
 
 export type SoalPilihan = {
   judul: string
+  seret?: { teks: string; gambar: string; posisi: [number, number]; ukuran: [number, number] }
   konfirmasi?: boolean
   memeriksa?: boolean
   pesan?: string
