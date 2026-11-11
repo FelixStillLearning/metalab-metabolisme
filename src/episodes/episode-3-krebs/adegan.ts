@@ -130,21 +130,27 @@ async function bahan(p: Panggung) {
   catat('a')
   p.world.replaceChildren()
   bab('b')
-  asetilKertas(p, 800, 260)
+  const a = asetilKertas(p, 800, 260)
+  const b = rangka(p, 4, 'Oksaloasetat', 400, 510)
+  a.g.dataset.objek = 'asetil-bergabung'
+  b.g.dataset.objek = 'oksaloasetat-bergabung'
+  b.judul.remove()
+  b.hitung.remove()
+  const infoA = obj(0, 0, a.g)
+  infoA.append(a.judul)
+  const infoB = obj(0, 0, b.g)
+  label(infoB, 0, 110, 'Oksaloasetat · 4 C', 24)
+  const pengecoh: ReturnType<typeof gambar>[] = []
   const pasangan = [
     ['Oksaloasetat (4 C)', ''],
     ['O₂', oksigen],
     ['NAD⁺', nad],
   ]
   for (const [i, [teks, href]] of pasangan.entries()) {
-    if (i === 0) {
-      const m = rangka(p, 4, 'Oksaloasetat', 400, 510)
-      m.judul.remove()
-      m.hitung.remove()
-      label(m.g, 0, 110, 'Oksaloasetat · 4 C', 24)
-    } else {
+    if (i !== 0) {
       const g = gambar(p.world, href, 400 + i * 400, 510, 190, 130)
       label(g, 0, 105, teks, 24)
+      pengecoh.push(g)
     }
   }
   await say(
@@ -170,51 +176,67 @@ async function bahan(p: Panggung) {
           : 'NAD⁺ menerima elektron. Pengikat gugus asetil memiliki empat karbon.',
       ),
   )
-  p.world.replaceChildren()
-  const a = rangka(p, 2, 'Gugus asetil', 500, 410)
-  const b = rangka(p, 4, 'Oksaloasetat', 1100, 410)
-  a.g.dataset.objek = 'asetil-bergabung'
-  b.g.dataset.objek = 'oksaloasetat-bergabung'
+  await Promise.all([
+    ...pengecoh.map((g) => to(g, { o: 0 }, 350)),
+    to(infoA, { o: 0 }, 350),
+    to(infoB, { o: 0 }, 350),
+  ])
+  pengecoh.forEach((g) => g.remove())
+  infoA.remove()
+  infoB.remove()
   const air = gambar(p.world, h2o, 800, 580, 100, 100)
-  const k = gambar(a.g, koa, 130, 12, 110, 55)
-  a.judul.remove()
-  b.judul.remove()
+  const k = a.lencana
   bunyi('geser')
   await Promise.all([
-    to(a.g, { x: 670 }, 1000),
-    to(b.g, { x: 880 }, 1000),
-    to(air, { x: 800, y: 460, o: 0 }, 1000),
+    to(a.g, { x: 730, y: 410 }, 1400, 'kamera'),
+    to(b.g, { x: 880, y: 410 }, 1400, 'kamera'),
+    to(air, { x: 800, y: 460, o: 0 }, 1400),
   ])
   air.remove()
+  const kx = a.g._x + a.badan._x + k._x
+  const ky = a.g._y + a.badan._y + k._y
   p.world.append(k)
-  await to(k, { x: a.g._x + 130, y: 422 }, 0)
-  a.judul.remove()
-  b.judul.remove()
+  await to(k, { x: kx, y: ky }, 0)
   const sitrat = rangka(p, 6, 'Sitrat', 800, 460)
   sitrat.atom.forEach((c) => c.remove())
   sitrat.ikatan.replaceChildren()
   sitrat.atom.splice(0, 6, ...a.atom, ...b.atom)
-  for (const asal of [a, b])
+  for (const asal of [a, b]) {
+    const dx = asal === a ? a.badan._x : 0
+    const dy = asal === a ? a.badan._y : 0
+    const bx = asal.g._x + dx
+    const by = asal.g._y + dy
+    p.world.append(asal.ikatan)
+    await to(asal.ikatan, { x: bx, y: by }, 0)
     for (const c of asal.atom) {
+      const x = bx + c._x - sitrat.g._x
+      const y = by + c._y - sitrat.g._y
       sitrat.g.append(c)
-      await to(c, { x: asal.g._x + c._x - sitrat.g._x, y: asal.g._y + c._y - sitrat.g._y }, 0)
+      await to(c, { x, y }, 0)
     }
+  }
   a.g.remove()
   b.g.remove()
-  await sitrat.susun('Sitrat', 1)
-  sitrat.g.dataset.objek = 'sitrat-ikhtisar'
-  burstBehind(p, sitrat.g)
-  bunyi('tempel')
-  await comic(p, 'KLIK', 800, 650, 'var(--color-paper)')
   bunyi('geser')
-  speedLines(p, k, 1)
-  await to(k, { x: 1110, y: 540 }, 900)
+  await Promise.all([
+    sitrat.susun('Sitrat', 1, 1300),
+    to(k, { x: 1110, y: 540 }, 1500, 'kamera'),
+    ...[a, b].map((asal) => to(asal.ikatan, { o: 0 }, 300)),
+  ])
+  a.ikatan.remove()
+  b.ikatan.remove()
   label(k, 0, 70, 'KoA dilepas', 24)
-  await say(
-    p,
-    'gabung',
-    'Dua karbon dari gugus asetil ditambah empat karbon oksaloasetat: enam karbon pada sitrat. Air ditambahkan dan koenzim A dilepas.',
-  )
+  sitrat.g.dataset.objek = 'sitrat-ikhtisar'
+  burstBehind(p, sitrat.g, 150)
+  bunyi('tempel')
+  await Promise.all([
+    comic(p, 'KLIK', 1030, 430, 'var(--color-paper)'),
+    say(
+      p,
+      'gabung',
+      'Dua karbon dari gugus asetil ditambah empat karbon oksaloasetat: enam karbon pada sitrat. Air ditambahkan dan koenzim A dilepas.',
+    ),
+  ])
   catat('b')
   bab('c')
   await say(

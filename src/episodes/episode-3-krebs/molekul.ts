@@ -234,15 +234,17 @@ export function rangka(p: Panggung, n: number, nama: string, x = 500, y = 485) {
     ikatan.replaceChildren()
     for (const [a, b] of pasangan) strip(ikatan, atom[a]._x, atom[a]._y, atom[b]._x, atom[b]._y, 8)
   }
-  async function susun(teks: string, tahap: number) {
+  async function susun(teks: string, tahap: number, ms = 780) {
     namaBaru(teks, tahap)
     const bentuk = BENTUK[tahap - 1]
-    await to(ikatan, { o: 0 }, 140)
+    await to(ikatan, { o: 0 }, ms * 0.18)
     await Promise.all(
-      atom.map((a, i) => to(a, { x: bentuk.titik[i][0], y: bentuk.titik[i][1] }, 460, 'pose')),
+      atom.map((a, i) =>
+        to(a, { x: bentuk.titik[i][0], y: bentuk.titik[i][1] }, ms * 0.59, 'pose'),
+      ),
     )
     sambung(bentuk.ikatan)
-    await to(ikatan, { o: 1 }, 180)
+    await to(ikatan, { o: 1 }, ms * 0.23)
   }
   namaBaru(nama, 0)
   sambung(atom.slice(1).map((_, i) => [i, i + 1]))
@@ -267,9 +269,9 @@ export function asetilKertas(p: Panggung, x: number, y: number) {
   strip(m.ikatan, 25, 12, 90, 12, 8)
   const badan = obj(-60, 0, m.g)
   badan.append(m.ikatan, ...m.atom)
-  gambar(badan, koa, 130, 12, 110, 55)
+  const lencana = gambar(badan, koa, 130, 12, 110, 55)
   m.judul.remove()
   m.hitung.remove()
   const judul = label(m.g, 0, 130, 'Asetil KoA · 2 C', 24)
-  return { ...m, judul }
+  return { ...m, judul, badan, lencana }
 }
