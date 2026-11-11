@@ -63,7 +63,7 @@ async function bersihAnim(p: Panggung, g: number) {
   await to(net, { s: 1 }, 300)
   await say(p, 'e1-e-07')
 
-  // Kartu Jelaskan tetap di tengah; persamaan di atasnya, dua ATP bersih di sisi kanan.
+  // Kartu Jelaskan tetap di tengah; persamaan di atasnya, dua ATP bersih di bawah kartu.
   for (const o of [...used, lu, lm, ...made.slice(0, 2)]) o.remove()
   const hp = matchMedia(HP_MIRING).matches
   const skala = p.svg.getBoundingClientRect().width / 1600
@@ -71,7 +71,9 @@ async function bersihAnim(p: Panggung, g: number) {
   bunyi('geser')
   await Promise.all([
     to(net, { x: 800, y: hp ? 108 / skala : 210, s: hp ? 0.4 / skala : 1 }, 600),
-    ...made.slice(2).map((m, i) => to(m, { x: 1490, y: 420 + i * 140 }, 600)),
+    ...made
+      .slice(2)
+      .map((m, i) => to(m, { x: hp ? 1490 : 680 + i * 240, y: hp ? 420 + i * 140 : 700 }, 600)),
   ])
 }
 
