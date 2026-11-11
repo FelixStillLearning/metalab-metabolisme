@@ -97,16 +97,6 @@ async function pembuka(p: Panggung) {
   bunyi('geser')
   await Promise.all(masuk.map((m, i) => tempatkan(m, 700 + i * 180, 360 + i * 80, 0.65, 1400)))
   await say(p, 'pembuka', '01-ramah')
-  await Promise.all(
-    masuk.flatMap((m) => [
-      to(m.asetil, { o: 0, s: 0.15 }, 450),
-      to(m.karboksil, { o: 0, s: 0.15 }, 450),
-    ]),
-  )
-  masuk.forEach((m) => {
-    m.asetil.remove()
-    m.karboksil.remove()
-  })
   p.fx.replaceChildren()
   const matriksX = 800 + ((650 - 700) * 1200) / 1400
   const matriksY = 450 + ((300 - 350) * 600) / 700
@@ -119,6 +109,10 @@ async function pembuka(p: Panggung) {
   await Promise.all([
     to(panel, { x: 800, y: 450, s: 4.9 }, 3400, 'kamera'),
     camTo(p, matriksX, matriksY, 4.2, 3400),
+    ...masuk.flatMap((m) => [
+      to(m.asetil, { s: 0.04, o: 0 }, 3400, 'kamera'),
+      to(m.karboksil, { s: 0.04, o: 0 }, 3400, 'kamera'),
+    ]),
     (async () => {
       await wait(p, 1200)
       await pasangLatar(p, matriks, 'matriks')
@@ -126,6 +120,10 @@ async function pembuka(p: Panggung) {
     })(),
   ])
   mito.remove()
+  masuk.forEach((m) => {
+    m.asetil.remove()
+    m.karboksil.remove()
+  })
   await to(p.cam, { x: 0, y: 0, s: 1 }, 0)
   await to(panel, { o: 0 }, 350)
   panel.remove()
@@ -141,7 +139,7 @@ async function tempatkan(m: Piruvat, x: number, y: number, s = 1, ms = 700) {
 }
 
 function konteksAerob(p: Panggung) {
-  const g = obj(1280, 410, p.fx)
+  const g = obj(1180, 410, p.fx)
   g.dataset.objek = 'konteks-aerob'
   const isi = el('g', { class: 'e2-konteks-isi' }, g)
   cut(
