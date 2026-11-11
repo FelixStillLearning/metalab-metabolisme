@@ -1393,3 +1393,9 @@
     height: 18px;
   }
 }
+
+.pemutar-sasaran[data-seret-over] {
+  outline: 4px solid var(--color-accent);
+  background: rgb(255 255 255 / 35%);
+  border-radius: 50%;
+}

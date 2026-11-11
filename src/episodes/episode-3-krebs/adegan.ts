@@ -390,7 +390,7 @@ async function tempatkan(p: Panggung, roda: Roda) {
       TAHAP.map((_, i) => ({
         teks: `${z.nama} ke tahap ${i + 1}`,
         posisi: posisi(i),
-        ukuran: [150, 125],
+        ukuran: [78, 78],
       })),
       async (i) => {
         roda.aktif(i)
