@@ -219,7 +219,7 @@ export async function arrive(p: Panggung, g: Objek, x: number, y: number) {
   await to(g, { x: g._x - dx * 0.04, y: g._y - dy * 0.04, r: -arah * 5 }, 110, 'ancang')
   await to(g, { x: x + arah * 14, y, r: arah * 3 }, 430, 'keluar')
   await to(g, { x, r: 0 }, 190, 'pose')
-  comic(p, 'WUSH!', x - arah * 30, y - 100, 'var(--color-paper)', p.world).catch(() => {})
+  await comic(p, 'WUSH!', x - arah * 30, y - 100, 'var(--color-paper)', p.world)
 }
 
 export async function arc(g: Objek, x: number, y: number, lift: number, ms: number) {

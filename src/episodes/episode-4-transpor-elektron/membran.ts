@@ -7,11 +7,11 @@ import kepala from '../../assets/images/organel-atp-sintase-kepala.webp'
 import hplus from '../../assets/images/pembawa-h-plus.webp'
 import q from '../../assets/images/organel-ubikuinon.webp'
 import cyt from '../../assets/images/organel-sitokrom-c.webp'
-import { el, label } from '../../features/pemutar-episode/kertas'
+import { cut, el, label } from '../../features/pemutar-episode/kertas'
 import { obj, type Panggung } from '../../features/pemutar-episode/mesin'
 export const X = { I: 320, II: 530, III: 760, IV: 1000 }
 export const Y = 450
-export const posisiKompleks = (k: keyof typeof X): [number, number] => [X[k], k === 'II' ? 600 : Y]
+export const posisiKompleks = (k: keyof typeof X): [number, number] => [X[k], k === 'II' ? 570 : Y]
 export function gambar(parent: Element, href: string, x: number, y: number, w = 160, h = 80) {
   const g = obj(x, y, parent)
   el('image', { href, x: -w / 2, y: -h / 2, width: w, height: h }, g)
@@ -31,12 +31,34 @@ export function membran(p: Panggung) {
       k === 'II' ? 100 : 290,
     )
     c.dataset.kompleks = k
-    label(g, X[k], k === 'II' ? 680 : 290, k, 34)
+    if (k === 'II') {
+      // Dua subunit jangkar tertanam di membran; kepala katalitik menghadap matriks.
+      const jangkar = el('g', { 'data-jangkar': 'II' }, c)
+      for (const x of [-22, 2]) {
+        cut(
+          jangkar,
+          [
+            [x, -105],
+            [x + 18, -108],
+            [x + 21, 12],
+            [x - 1, 15],
+          ],
+          'var(--color-fosfat)',
+          {},
+          1,
+          { bayangan: true },
+        )
+      }
+      c.prepend(jangkar)
+    }
+    label(g, X[k], k === 'II' ? 650 : 290, k, 34)
     return c
   })
-  gambar(g, q, 625, Y, 60, 60).dataset.objek = 'ubikuinon'
+  const ubikuinon = gambar(g, q, 625, Y, 60, 60)
+  ubikuinon.dataset.objek = 'ubikuinon'
   label(g, 625, 510, 'Q', 22)
-  gambar(g, cyt, 880, 340, 65, 65).dataset.objek = 'sitokrom-c'
+  const sitokrom = gambar(g, cyt, 880, 340, 65, 65)
+  sitokrom.dataset.objek = 'sitokrom-c'
   label(g, 880, 280, 'Cyt c', 22)
   const sintase = obj(1320, Y, g)
   sintase.dataset.objek = 'atp-sintase'
@@ -46,7 +68,7 @@ export function membran(p: Panggung) {
   rotor.dataset.objek = 'kepala-sintase'
   el('image', { href: kepala, x: -104.4, y: -104.4, width: 216, height: 216 }, rotor)
   label(g, 1320, 275, 'ATP sintase', 30)
-  return { g, kompleks, sintase, rotor }
+  return { g, kompleks, ubikuinon, sitokrom, sintase, rotor }
 }
 export type Membran = ReturnType<typeof membran>
 export function proton(parent: Element, x: number, y: number) {
