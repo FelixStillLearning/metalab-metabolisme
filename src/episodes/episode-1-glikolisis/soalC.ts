@@ -157,7 +157,7 @@ export async function soalC(
   await rumble
 
   bunyi('belah')
-  burstBehind(p, glu)
+  burstBehind(p, glu, 260, 260)
   // Tidak ditunggu, seperti prototype: glukosa terbelah bersamaan dengan letupan dan KRAAK!
   void comic(p, 'KRAAK!', glu._x, 310, 'var(--color-hot)', p.world)
 
