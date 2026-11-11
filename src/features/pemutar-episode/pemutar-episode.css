@@ -240,7 +240,9 @@
 /* Tombol di akhir adegan, di atas gelembung narator */
 .pemutar-akhir {
   position: absolute;
-  top: 69%;
+  display: flex;
+  gap: 1.2cqw;
+  top: 75%;
   left: 50%;
   translate: -50% 0;
 }
