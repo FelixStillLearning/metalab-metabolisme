@@ -4,11 +4,19 @@
 
 .pemutar {
   /* Lebar panggung 16:9 yang muat di layar; juga dipakai .pemutar-latar */
-  --panggung: min(100vw, calc(100dvh * 16 / 9));
+  --aman-kiri: env(safe-area-inset-left, 0px);
+  --aman-kanan: env(safe-area-inset-right, 0px);
+  --aman-atas: env(safe-area-inset-top, 0px);
+  --aman-bawah: env(safe-area-inset-bottom, 0px);
+  --panggung: min(
+    calc(100vw - var(--aman-kiri) - var(--aman-kanan)),
+    calc((100dvh - var(--aman-atas) - var(--aman-bawah)) * 16 / 9)
+  );
   position: fixed;
   inset: 0;
   display: grid;
   place-items: center;
+  padding: var(--aman-atas) var(--aman-kanan) var(--aman-bawah) var(--aman-kiri);
   overflow: hidden;
   background: var(--color-screen);
 }
@@ -18,7 +26,8 @@
 .pemutar-latar {
   position: absolute;
   inset: 0;
-  background-position: center;
+  background-position: calc(50% + (var(--aman-kiri) - var(--aman-kanan)) / 2)
+    calc(50% + (var(--aman-atas) - var(--aman-bawah)) / 2);
   background-repeat: no-repeat;
   background-size: calc(var(--panggung) * 2258 / 1672) calc(var(--panggung) * 9 / 16 * 1527 / 941);
   animation: pemutar-latar-masuk 600ms both;
@@ -380,13 +389,13 @@
 
 .pemutar-bilah {
   position: absolute;
-  top: 12px;
-  left: max(12px, 1.2vw);
+  top: max(12px, var(--aman-atas));
+  left: max(12px, 1.2vw, var(--aman-kiri));
   z-index: 3;
   display: flex;
   align-items: center;
   gap: 2px;
-  max-width: calc(100vw - 24px);
+  max-width: calc(100vw - max(12px, 1.2vw, var(--aman-kiri)) - max(12px, var(--aman-kanan)));
   padding: 4px;
   border-radius: 10px;
   background: #0d2526e8;
@@ -1134,8 +1143,8 @@
 
 @media (max-height: 500px) and (orientation: landscape) {
   .pemutar-bilah {
-    top: 6px;
-    left: 8px;
+    top: max(6px, var(--aman-atas));
+    left: max(8px, var(--aman-kiri));
   }
 
   .pemutar-posisi {

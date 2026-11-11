@@ -200,3 +200,29 @@ test('menutup pengaturan setelah HP diputar tetap menjeda episode', async ({ pag
   await page.getByRole('button', { name: 'Lanjut (spasi)' }).click()
   await expect(gelembung(page)).toHaveText(KALIMAT_2)
 })
+
+test('viewport memenuhi layar dan pemutar menjaga area aman notch', async ({ page }) => {
+  await expect(page.locator('meta[name="viewport"]')).toHaveAttribute(
+    'content',
+    /viewport-fit=cover/,
+  )
+  await page.setViewportSize({ width: 844, height: 390 })
+  for (const sisi of ['kiri', 'kanan']) {
+    await page.locator('.pemutar').evaluate((el, sisi) => {
+      const gaya = (el as HTMLElement).style
+      gaya.setProperty('--aman-kiri', sisi === 'kiri' ? '44px' : '0px')
+      gaya.setProperty('--aman-kanan', sisi === 'kanan' ? '44px' : '0px')
+      gaya.setProperty('--aman-bawah', '21px')
+    }, sisi)
+    const panggung = (await page.locator('[data-panggung]').boundingBox())!
+    const bilah = (await page.locator('.pemutar-bilah').boundingBox())!
+    const kiri = sisi === 'kiri' ? 44 : 0
+    const kanan = sisi === 'kanan' ? 800 : 844
+    expect(panggung.x).toBeGreaterThanOrEqual(kiri)
+    expect(panggung.x + panggung.width).toBeLessThanOrEqual(kanan)
+    expect(panggung.y + panggung.height).toBeLessThanOrEqual(369)
+    expect(bilah.x).toBeGreaterThanOrEqual(kiri)
+    expect(bilah.x + bilah.width).toBeLessThanOrEqual(kanan)
+    expect(Math.abs(panggung.width / panggung.height - 16 / 9)).toBeLessThan(0.01)
+  }
+})
