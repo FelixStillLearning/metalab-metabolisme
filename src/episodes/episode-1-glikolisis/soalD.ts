@@ -54,12 +54,13 @@ export async function soalD(p: Panggung, [m1, m2]: [Separuh, Separuh]) {
   }
   await say(p, 'e1-d-01')
 
-  // Dua elektron per PGAL, di antara PGAL dan NAD+ agar perpindahannya terlihat
+  // Dua elektron muncul dekat PGAL masing-masing, lalu bergerak menuju NAD+.
   bunyi('muncul')
-  const pasangan = [270, 540].map((y) =>
+  const pasangan = [m1, m2].map((pgal) =>
     [-18, 18].map((dy) => {
-      const e = hide(elektron(p.world, 740 - geser, y + dy))
-      void to(e, { o: 1, x: 1300 - geser }, 600)
+      const jarakSisi = pgal.side === 1 ? 220 : 85
+      const e = hide(elektron(p.world, pgal._x + jarakSisi, pgal._y + dy))
+      void to(e, { o: 1 }, 500)
       return e
     }),
   )
@@ -80,8 +81,8 @@ export async function soalD(p: Panggung, [m1, m2]: [Separuh, Separuh]) {
       const es = pasangan[i]
       const y = es[0]._y + 18
       bunyi('geser')
-      await arc(n, 1400 - geser, y, 80, 600)
-      void comic(p, 'KLIK', 1400 - geser, y - 85, 'var(--color-nad)', p.world)
+      await Promise.all(es.map((e, k) => arc(e, n._x - 80, n._y + (k ? 14 : -14), 80, 600)))
+      void comic(p, 'KLIK', n._x, y - 85, 'var(--color-nad)', p.world)
       bunyi('tempel')
       // Kedua elektron ditangkap dan ikut menempel di NADH
       await Promise.all(
