@@ -138,7 +138,7 @@ export async function soalD(p: Panggung, [m1, m2]: [Separuh, Separuh]) {
     async (i) => {
       const t = targets[i]
       const [ox, oy] = dunia(t, i)
-      const adp = carrier(p, ox - 100, 860, 'ADP')
+      const adp = carrier(p, ox - 100, 650, 'ADP')
       adp._s = 0.65
       hide(adp)
       bunyi('geser')
