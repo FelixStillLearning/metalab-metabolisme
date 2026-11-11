@@ -213,3 +213,19 @@
     min-height: 30px;
   }
 }
+
+.episode-3 [data-garis-tahap] {
+  stroke: var(--color-ink);
+  stroke-width: 2;
+  opacity: 0.35;
+  pointer-events: none;
+  transition:
+    stroke 250ms,
+    stroke-width 250ms,
+    opacity 250ms;
+}
+.episode-3 [data-garis-tahap][data-aktif='true'] {
+  stroke: var(--color-accent);
+  stroke-width: 4;
+  opacity: 1;
+}

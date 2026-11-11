@@ -23,6 +23,28 @@ export const posisiSamping = (i: number): [number, number] => {
   const a = -Math.PI / 2 + (i * Math.PI) / 4
   return [500 + Math.cos(a) * 215, 450 + Math.sin(a) * 215]
 }
+export function garisTahap(p: Panggung, tahap: number) {
+  const [x1, y1] = posisi(tahap - 1)
+  const [x2, y2] = posisiSamping(tahap - 1)
+  let garis = p.world.querySelector<SVGElement>(`[data-garis-tahap="${tahap}"]`)
+  if (!garis) {
+    garis = el(
+      'line',
+      {
+        x1: x1 + (x2 - x1) * 0.38,
+        y1: y1 + (y2 - y1) * 0.38,
+        x2: x1 + (x2 - x1) * 0.7,
+        y2: y1 + (y2 - y1) * 0.7,
+        'data-garis-tahap': String(tahap),
+        'stroke-linecap': 'round',
+      },
+      p.world,
+    )
+  }
+  p.world.querySelectorAll<SVGElement>('[data-garis-tahap]').forEach((g) => {
+    g.dataset.aktif = String(g === garis)
+  })
+}
 export function rodaKrebs(p: Panggung) {
   const g = obj(500, 450, p.world)
   g.dataset.objek = 'roda-krebs'
@@ -31,6 +53,9 @@ export function rodaKrebs(p: Panggung) {
     g,
     aktif: (i: number) => {
       g.dataset.tahap = String(i + 1)
+      p.world.querySelectorAll<SVGElement>('[data-garis-tahap]').forEach((garis) => {
+        garis.dataset.aktif = String(garis.dataset.garisTahap === String(i + 1))
+      })
     },
   }
 }
@@ -40,6 +65,7 @@ export function simpanTahap(
   tahap: number,
   nama: string,
 ) {
+  garisTahap(p, tahap)
   const [x, y] = posisiSamping(tahap - 1)
   const g = m.g.cloneNode(true) as SVGGElement
   g.removeAttribute('data-detail-reaksi')

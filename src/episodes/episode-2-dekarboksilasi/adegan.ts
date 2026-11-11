@@ -108,21 +108,21 @@ async function pembuka(p: Panggung) {
     m.karboksil.remove()
   })
   p.fx.replaceChildren()
-  const matriksX = 800 + ((840 - 887) * 1200) / 1774
-  const matriksY = 450 + ((360 - 443.5) * 600) / 887
+  const matriksX = 800 + ((650 - 700) * 1200) / 1400
+  const matriksY = 450 + ((300 - 350) * 600) / 700
   const panel = hide(gambar(p.fx, panelZoom, matriksX, matriksY, 440, 440))
   panel.dataset.objek = 'panel-zoom'
   bunyi('muncul')
   await to(panel, { o: 1 }, 300)
   bunyi('geser')
-  // Jangkar matriks sumber C04: (840, 360) pada gambar bersih 1774 × 887.
+  // Jangkar pada daerah matriks krem, sumber 1400 × 700.
   await Promise.all([
-    to(panel, { x: 800, y: 450, s: 4.9 }, 3000, 'kamera'),
-    camTo(p, matriksX, matriksY, 4.2, 3000),
+    to(panel, { x: 800, y: 450, s: 4.9 }, 3400, 'kamera'),
+    camTo(p, matriksX, matriksY, 4.2, 3400),
     (async () => {
-      await wait(p, 1000)
+      await wait(p, 1200)
       await pasangLatar(p, matriks, 'matriks')
-      await to(mito, { o: 0 }, 1400)
+      await to(mito, { o: 0 }, 1600)
     })(),
   ])
   mito.remove()

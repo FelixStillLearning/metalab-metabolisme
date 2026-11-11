@@ -42,6 +42,7 @@ import {
   asetilKertas,
   label,
   simpanTahap,
+  garisTahap,
   posisiSamping,
   gambar,
   lepasCo2,
@@ -78,20 +79,20 @@ async function pembuka(p: Panggung) {
     'pembuka',
     'Dua asetil KoA dari satu glukosa siap memasuki siklus Krebs, di matriks mitokondria.',
   )
-  const x = 800 + ((840 - 887) * 1200) / 1774
-  const y = 450 + ((360 - 443.5) * 600) / 887
+  const x = 800 + ((980 - 700) * 1200) / 1400
+  const y = 450 + ((310 - 350) * 600) / 700
   const panel = hide(gambar(p.fx, panelZoom, x, y, 440, 440))
   panel.dataset.objek = 'panel-zoom'
   bunyi('muncul')
   await to(panel, { o: 1 }, 300)
   bunyi('geser')
   await Promise.all([
-    to(panel, { x: 800, y: 450, s: 4.9 }, 3000, 'kamera'),
-    camTo(p, x, y, 4.2, 3000),
+    to(panel, { x: 800, y: 450, s: 4.9 }, 3400, 'kamera'),
+    camTo(p, x, y, 4.2, 3400),
     (async () => {
-      await wait(p, 1000)
+      await wait(p, 1200)
       await pasangLatar(p, matriks, 'matriks')
-      await to(g, { o: 0 }, 1400)
+      await to(g, { o: 0 }, 1600)
     })(),
   ])
   g.remove()
@@ -311,6 +312,7 @@ async function putar(p: Panggung, roda: Roda) {
     }
     const lepas = i === 2 || i === 3 ? await lepasCo2(p, m, i + 1) : null
     await m.susun(t.nama, i + 1)
+    simpanTahap(p, m, i + 1, t.nama)
     if (lepas) {
       burstBehind(p, m.g)
       bunyi('belah')
@@ -326,14 +328,49 @@ async function putar(p: Panggung, roda: Roda) {
     let koenzim: ReturnType<typeof gambar> | null = null
     if (t.air) {
       air = gambar(p.world, h2o, 880, 570, 100, 100)
-      bunyi('geser')
-      await to(air, { x: 1050, y: 460, o: 0 }, 600)
+      air.dataset.objek = 'air-masuk'
+      const airMasuk = air
+      await Promise.all([
+        say(
+          p,
+          `tahap-${i + 1}-air`,
+          i === 0
+            ? 'Air ditambahkan dalam pembentukan sitrat enam karbon. Amati H₂O yang masuk ke reaksi.'
+            : 'Tahap tujuh. Air ditambahkan ke fumarat sehingga terbentuk malat.',
+        ),
+        (async () => {
+          bunyi('muncul')
+          await to(hide(airMasuk), { o: 1 }, 350)
+          await wait(p, 350)
+          bunyi('geser')
+          await to(airMasuk, { x: 1050, y: 460 }, 1100)
+          await to(airMasuk, { o: 0 }, 350)
+        })(),
+      ])
+      await wait(p, 450)
     }
     if (i === 0 || i === 4) {
       koenzim = gambar(p.world, koa, 1050, 482, 100, 50)
-      bunyi('geser')
-      await to(koenzim, { x: 1280, y: 560 }, 750)
-      label(koenzim, 0, 60, 'KoA dilepas', 22)
+      koenzim.dataset.objek = 'koa-keluar'
+      const koaKeluar = koenzim
+      await Promise.all([
+        say(
+          p,
+          `tahap-${i + 1}-koa`,
+          i === 0
+            ? 'Koenzim A dilepas setelah mengantarkan gugus asetil. H₂O yang masuk dan KoA yang keluar adalah dua zat berbeda.'
+            : 'Koenzim A dilepas dari suksinil KoA saat suksinat terbentuk.',
+        ),
+        (async () => {
+          bunyi('muncul')
+          await to(hide(koaKeluar), { o: 1 }, 350)
+          await wait(p, 350)
+          bunyi('geser')
+          await to(koaKeluar, { x: 1280, y: 560 }, 1200)
+          label(koaKeluar, 0, 60, 'KoA dilepas', 22)
+          await wait(p, 600)
+        })(),
+      ])
     }
     const b = t.hasil ? await pembawa(p, i + 1, t.hasil) : null
     const kelanjutan = [
@@ -346,8 +383,7 @@ async function putar(p: Panggung, roda: Roda) {
       'Air ditambahkan ke fumarat sehingga terbentuk malat. Karbon tetap empat.',
       'Malat menjadi oksaloasetat kembali, disertai pembentukan NADH. Empat karbon siap mengikat gugus asetil berikutnya.',
     ][i]
-    simpanTahap(p, m, i + 1, t.nama)
-    await say(p, `tahap-${i + 1}`, `Tahap ${i + 1}. ${kelanjutan}`)
+    if (i !== 0 && i !== 6) await say(p, `tahap-${i + 1}`, `Tahap ${i + 1}. ${kelanjutan}`)
     air?.remove()
     koenzim?.remove()
     b?.remove()
@@ -491,6 +527,7 @@ export async function episode(p: Panggung) {
     to(keterangan, { o: 0 }, 450),
   ])
   keterangan.remove()
+  garisTahap(p, 1)
   delete pratinjau.g.dataset.tanyaTahap
   await say(
     p,
@@ -507,7 +544,9 @@ export async function episode(p: Panggung) {
   })
   m!.g.remove()
   p.world.querySelectorAll('[data-molecule="co2"]').forEach((n) => n.remove())
-  p.world.querySelectorAll('[data-model-tahap], [data-nama-tahap]').forEach((g) => g.remove())
+  p.world
+    .querySelectorAll('[data-model-tahap], [data-nama-tahap], [data-garis-tahap]')
+    .forEach((g) => g.remove())
   await tempatkan(p, roda)
   const penanda = [...p.fx.querySelectorAll('[data-penanda-tahap]')]
   await Promise.all(penanda.map((g) => to(g as Parameters<typeof to>[0], { o: 0 }, 400)))
