@@ -226,3 +226,34 @@ test('viewport memenuhi layar dan pemutar menjaga area aman notch', async ({ pag
     expect(Math.abs(panggung.width / panggung.height - 16 / 9)).toBeLessThan(0.01)
   }
 })
+
+test('pengaturan HP miring terbaca penuh tanpa menggulir pada setiap episode', async ({
+  page,
+}, info) => {
+  test.skip(info.project.name !== 'hp-miring', 'Khusus panel HP miring')
+  for (const [width, height] of [
+    [667, 375],
+    [800, 360],
+    [932, 430],
+  ]) {
+    await page.setViewportSize({ width, height })
+    for (const episode of [0, 1, 2, 3, 4]) {
+      await page.goto(`/#/episode/${episode}`)
+      await page.getByRole('button', { name: 'Pengaturan', exact: true }).click()
+      const panel = page.getByRole('dialog', { name: 'Pengaturan' })
+      await expect(panel.getByRole('switch')).toHaveCount(6)
+      const ukuran = await panel.evaluate((el) => ({
+        tinggi: el.clientHeight,
+        isi: el.scrollHeight,
+        lebar: el.clientWidth,
+        isiLebar: el.scrollWidth,
+      }))
+      expect(ukuran.isi, `episode ${episode}, ${width}`).toBeLessThanOrEqual(ukuran.tinggi)
+      expect(ukuran.isiLebar).toBeLessThanOrEqual(ukuran.lebar)
+      for (const item of await panel.locator('label, li, button').all())
+        await expect(item).toBeInViewport({ ratio: 1 })
+      if (episode === 0) await page.screenshot({ path: info.outputPath(`pengaturan-${width}.png`) })
+      await panel.getByRole('button', { name: 'Tutup pengaturan' }).click()
+    }
+  }
+})

@@ -432,11 +432,11 @@
     padding: 10px 18px;
   }
   .episode-0 .pemutar-soal h2 {
-    font-size: 15px;
-    margin-bottom: 5px;
+    font-size: 13px;
+    margin-bottom: 4px;
   }
   .episode-0 .pemutar-pilihan {
-    font-size: 13px;
+    font-size: 12px;
     padding: 5px 12px;
     gap: 5px;
   }
@@ -452,7 +452,7 @@
   }
   .episode-0 .pemutar-panduan-kartu {
     font-size: 11px;
-    padding: 6px 10px;
+    padding: 12px 20px;
     gap: 5px;
   }
   .episode-0 .pemutar-panduan-ikon {
@@ -474,11 +474,11 @@
   .episode-0 .pemutar-gelembung,
   .episode-0 .pemutar-narator[data-tugas] .pemutar-gelembung {
     font-size: 12px;
-    padding: 6px 16px;
+    padding: 10px 26px;
   }
   .e0-reaksi {
-    top: 17%;
-    height: 39%;
+    top: 14%;
+    height: 35%;
     inset-inline: 3%;
     gap: 3px;
     grid-template-rows: 24px minmax(0, 1fr) 16px 12px;
@@ -533,6 +533,7 @@
     height: 22px;
   }
   .e0-panah-model {
+    display: none;
     font-size: 30px;
   }
   .e0-persamaan {
@@ -732,8 +733,8 @@
 }
 @media (max-height: 500px) and (orientation: landscape) {
   .episode-0 .pemutar-soal {
-    bottom: 14%;
-    padding: 8px 14px;
+    bottom: 16.5%;
+    padding: 14px 22px;
   }
   .episode-0 .pemutar-konfirmasi {
     gap: 5px;
@@ -747,7 +748,8 @@
     font-size: 13px;
   }
   .episode-0 .pemutar-status-pilihan {
-    font-size: 11px;
+    font-size: 10px;
+    min-height: 2.6em;
     margin-top: 4px;
   }
 }
@@ -757,7 +759,7 @@
     top: 22%;
   }
   .episode-0 .pemutar-soal {
-    bottom: 12%;
+    bottom: 13%;
   }
 }
 

@@ -452,3 +452,67 @@ test('satu cue jawaban, kartu terbang mengikuti jeda, bersih saat keluar, mode t
   await expect(terbang).toHaveCount(0)
   await expect(page.locator('[data-riwayat="0"]')).toContainText(TABEL[0].sel[0])
 })
+
+test('kontrol ringkas dan teks kartu serta bubble tetap di dalam kertas', async ({
+  page,
+}, info) => {
+  test.skip(info.project.name !== 'desktop', 'Empat ukuran layar diuji dalam satu alur')
+  test.setTimeout(45000)
+  await siapkan(page)
+  await page.setViewportSize({ width: 667, height: 375 })
+  await page.goto('/')
+  await page.goto('/#/episode/0?cepat')
+  await page.getByRole('button', { name: 'Mulai episode' }).click()
+  for (const soal of SOAL.slice(0, 2)) {
+    await page.getByRole('button', { name: soal.opsi[soal.benar], exact: true }).click()
+    await page.getByRole('button', { name: 'Jawab', exact: true }).click()
+  }
+  const opsi = page.getByRole('button', { name: SOAL[2].opsi[0], exact: true })
+  await expect(opsi).toBeVisible({ timeout: 20000 })
+  await expect(page.locator('[data-gelembung]')).toHaveText(SOAL[2].tanya)
+  await opsi.click()
+  for (const [width, height] of [
+    [667, 375],
+    [800, 360],
+    [932, 430],
+    [1440, 900],
+  ]) {
+    await page.setViewportSize({ width, height })
+    const bilah = (await page.locator('.pemutar-bilah').boundingBox())!
+    expect(bilah.height).toBeLessThanOrEqual(44)
+    for (const tombol of await page.locator('.pemutar-bilah > button').all()) {
+      const r = (await tombol.boundingBox())!
+      expect(r.width).toBeGreaterThanOrEqual(44)
+      expect(r.height).toBeGreaterThanOrEqual(44)
+    }
+    const kartu = (await page.locator('.pemutar-soal').boundingBox())!
+    const bagan = (await page.locator('.e0-reaksi').boundingBox())!
+    const bubble = (await page.locator('.pemutar-gelembung').boundingBox())!
+    expect(bagan.y + bagan.height).toBeLessThanOrEqual(kartu.y)
+    expect(kartu.y + kartu.height).toBeLessThanOrEqual(bubble.y)
+    for (const selector of ['.pemutar-soal', '.pemutar-gelembung', '.pemutar-panduan-kartu']) {
+      const hasil = await page.locator(selector).evaluate((el) => {
+        const kotak = el.getBoundingClientRect()
+        const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT)
+        let jarak = Infinity
+        while (walker.nextNode()) {
+          if (!walker.currentNode.textContent?.trim()) continue
+          const range = document.createRange()
+          range.selectNodeContents(walker.currentNode)
+          for (const r of range.getClientRects()) {
+            jarak = Math.min(
+              jarak,
+              r.left - kotak.left,
+              kotak.right - r.right,
+              r.top - kotak.top,
+              kotak.bottom - r.bottom,
+            )
+          }
+        }
+        return jarak
+      })
+      expect(hasil, `${selector} ${width}`).toBeGreaterThanOrEqual(8)
+    }
+    await page.screenshot({ path: info.outputPath(`kartu-ringkas-${width}.png`) })
+  }
+})
