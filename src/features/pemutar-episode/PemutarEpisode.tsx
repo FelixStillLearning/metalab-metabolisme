@@ -113,6 +113,7 @@ function PemutarEpisode({
     const g = latar.current!
     for (const [x, y, r] of PARTIKEL)
       disc(g, x, y, r, 'var(--color-paper)', { opacity: 0.65 }, { bayangan: true })
+    musik(true)
     return () => {
       kendali.abort()
       // Gerak yang sedang berjalan ikut dihentikan; janjinya tidak pernah selesai, adegan sudah batal
@@ -177,7 +178,6 @@ function PemutarEpisode({
     sudahMulai.current = true
     setMulai(true)
     if (!otomatis && !langsung) bunyi('mulai')
-    musik(true)
     // Episode dipakai miring: di perangkat sentuh minta layar penuh lalu kunci mendatar
     if (matchMedia('(pointer: coarse)').matches) {
       document.documentElement

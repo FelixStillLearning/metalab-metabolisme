@@ -36,7 +36,7 @@ test('musik mengikuti halaman, bisu, dan berganti tanpa tumpang tindih', async (
     location.hash = '/episode/1?cepat'
   })
   await expect(page.getByRole('button', { name: 'Mulai episode' })).toBeVisible()
-  await expect.poll(() => laguAktif(page)).toEqual([])
+  await expect.poll(() => laguAktif(page)).toEqual(['musik-latar.ogg'])
   await page.getByRole('button', { name: 'Mulai episode' }).click()
   await expect.poll(() => laguAktif(page)).toEqual(['musik-latar.ogg'])
   expect(gagal).toEqual([])
