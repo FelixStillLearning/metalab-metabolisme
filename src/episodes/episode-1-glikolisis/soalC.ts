@@ -64,11 +64,11 @@ export async function soalC(
 
   // Animasi Amati: Investasi energi
   bunyi('geser')
-  await Promise.all([camTo(p, 800, 450, 1, 700), to(glu, { x: 800, y: 535, s: 1.25 }, 700)])
+  await Promise.all([camTo(p, 800, 450, 1, 700), to(glu, { x: 800, y: 450, s: 1.25 }, 700)])
 
   const atps = P.from.map(([x, y], i) => carrier(p, x, y, 'ATP', i ? -1 : 1))
   bunyi('geser')
-  await Promise.all(atps.map((a, i) => arrive(p, a, i ? 1370 : 230, i > 1 ? 790 : 675)))
+  await Promise.all(atps.map((a, i) => arrive(p, a, i ? 1370 : 230, 450)))
 
   await say(p, P.g === 1 ? 'e1-c-atp-1' : P.g === 2 ? 'e1-c-atp-2' : 'e1-c-atp-3')
 
@@ -127,9 +127,9 @@ export async function soalC(
     await shake(p, glu)
     await shake(p, glu)
     await say(p, 'e1-c-04')
-    const b = carrier(p, 1680, 750, 'ATP', -1)
+    const b = carrier(p, 1680, 450, 'ATP', -1)
     bunyi('geser')
-    await arrive(p, b, 1370, 675)
+    await arrive(p, b, 1370, 450)
     await give(b, 1)
   } else {
     await give(atps[1], 1)
