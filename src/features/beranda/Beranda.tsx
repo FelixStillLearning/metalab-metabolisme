@@ -13,6 +13,7 @@ import sel from '../../assets/images/sel-hewan.webp'
 import { bolehBersuaraSendiri, putar, type NamaSuara } from '../../lib/suara'
 import TombolSuara from '../../components/TombolSuara'
 import PengaturVolume from '../../components/PengaturVolume'
+import TombolLayarPenuh from '../../components/TombolLayarPenuh'
 import './beranda.css'
 
 const gambarLatar = { '--latar': `url("${latar}")`, '--latar-hp': `url("${latarHp}")` }
@@ -94,6 +95,7 @@ function Beranda() {
       <div className="absolute top-4 right-4 z-30 flex gap-2">
         <TombolSuara saatDinyalakan={putarUlangSemua} />
         <PengaturVolume />
+        <TombolLayarPenuh />
       </div>
       <div key={putaran} className="contents">
         <div className="absolute inset-0 -z-10">
@@ -123,7 +125,7 @@ function Beranda() {
             width={840}
             height={168}
             style={tunda(0)}
-            className="tempel h-auto w-[min(190px,calc(100vw-148px))] landscape:w-[clamp(150px,min(21vw,38dvh),410px)]"
+            className="tempel h-auto w-[min(190px,calc(100vw-204px))] landscape:w-[clamp(150px,min(21vw,38dvh),410px)]"
           />
           <span
             style={tunda(90)}

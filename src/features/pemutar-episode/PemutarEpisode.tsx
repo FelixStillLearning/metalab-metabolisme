@@ -1,5 +1,5 @@
 import { gsap } from 'gsap'
-import { ArrowLeft, Maximize, Pause, Play, Settings } from 'lucide-react'
+import { ArrowLeft, Pause, Play, Settings } from 'lucide-react'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { useReducedMotion } from 'motion/react'
 import { Link } from 'react-router'
@@ -294,15 +294,6 @@ function PemutarEpisode({
         </button>
         <TombolSuara className="pemutar-ib" />
         <PengaturVolume className="pemutar-ib" />
-        <button
-          type="button"
-          className="pemutar-ib"
-          aria-label="Layar penuh (F)"
-          title="Masuk/keluar layar penuh (F)"
-          onClick={layarPenuh}
-        >
-          <Maximize aria-hidden="true" />
-        </button>
         <span className="pemutar-posisi" aria-live="polite">
           {babIni ? (
             <>

@@ -226,18 +226,3 @@ test('viewport memenuhi layar dan pemutar menjaga area aman notch', async ({ pag
     expect(Math.abs(panggung.width / panggung.height - 16 / 9)).toBeLessThan(0.01)
   }
 })
-
-test('tombol layar penuh di sampul bisa masuk dan keluar tanpa membuka pengaturan', async ({
-  page,
-}, info) => {
-  test.skip(info.project.name === 'hp-tegak', 'HP tegak menampilkan ajakan putar HP')
-  const tombol = page.getByRole('button', { name: 'Layar penuh (F)', exact: true })
-  await expect(tombol).toBeVisible()
-  await expect(tombol).toBeInViewport()
-  await tombol.click()
-  await expect.poll(() => page.evaluate(() => !!document.fullscreenElement)).toBe(true)
-  await expect(page.getByRole('dialog', { name: 'Pengaturan' })).toBeHidden()
-  await tombol.click()
-  await expect.poll(() => page.evaluate(() => !!document.fullscreenElement)).toBe(false)
-  await expect(page.getByRole('button', { name: 'Mulai episode' })).toBeVisible()
-})
