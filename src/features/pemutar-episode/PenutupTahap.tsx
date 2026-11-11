@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router'
 import latar from '../../assets/images/latar-peta-penutup-lebar.webp'
+import mitokondria from '../../assets/images/organel-mitokondria.webp'
 import bintang from '../../assets/images/efek-bintang-sorot.webp'
 import asetilKoa from '../../assets/images/molekul-asetil-koa.webp'
 import nadh from '../../assets/images/pembawa-nadh.webp'
@@ -36,8 +37,12 @@ const NARASI: Record<Episode, string> = {
 async function jalankan(p: Panggung, episode: Episode) {
   const aktif = episode - 1
   await pasangLatar(p, latar, 'peta-penutup')
+  const sorot = obj(X[aktif], Y, p.world)
+  sorot.dataset.efek = 'bintang-sorot'
+  el('image', { href: bintang, x: -125, y: -125, width: 250, height: 250 }, sorot)
+  hide(sorot)
   const simpul = X.map((x, i) => {
-    const status = i < aktif ? 'selesai' : i === aktif ? 'menyala' : 'belum'
+    const status = i <= aktif ? 'selesai' : i === aktif + 1 ? 'menyala' : 'belum'
     const g = obj(x, Y, p.world)
     g.dataset.simpul = String(i + 1)
     g.dataset.status = status
@@ -49,22 +54,34 @@ async function jalankan(p: Panggung, episode: Episode) {
   })
   for (const g of simpul) {
     bunyi('muncul')
-    void to(g, { o: 1, s: 1 }, 400)
-    await wait(p, 130)
+    void to(g, { o: 1, s: 1 }, 500)
+    await wait(p, 160)
   }
-  await ucapKalimat(p, `e${episode}-penutup`, { teks: NARASI[episode], pose: '07-bangga' })
+  await wait(p, 500)
+  sorot._s = 0.5
+  sorot._r = -20
+  bunyi('muncul')
+  await to(sorot, { o: 1, s: 1, r: 0 }, 500, 'letup')
+  await ucapKalimat(p, `e${episode}-penutup-selesai`, {
+    teks: `${NAMA[aktif]} selesai.`,
+    pose: '07-bangga',
+  })
 
   if (episode === 2 || episode === 3) {
+    const mito = obj(X[aktif + 1], 222, p.world)
+    mito.dataset.objek = 'mitokondria'
+    el('image', { href: mitokondria, x: -140, y: -70, width: 280, height: 140 }, mito)
+    hide(mito)
     const produk =
       episode === 2
         ? [-1, 1].map((s) => ({
-            g: obj(X[aktif], Y - 125 + s * 42, p.world),
+            g: obj(X[aktif] + s * 85, 190, p.world),
             src: asetilKoa,
-            x: X[aktif + 1] + s * 58,
+            x: X[aktif + 1] + s * 85,
           }))
         : [
-            { g: obj(X[aktif], Y - 125, p.world), src: nadh, x: X[aktif + 1] - 58 },
-            { g: obj(X[aktif], Y - 35, p.world), src: fadh2, x: X[aktif + 1] + 58 },
+            { g: obj(X[aktif] - 85, 190, p.world), src: nadh, x: X[aktif + 1] - 85 },
+            { g: obj(X[aktif] + 85, 190, p.world), src: fadh2, x: X[aktif + 1] + 85 },
           ]
     produk.forEach(({ g, src }, i) => {
       g.dataset.objek = episode === 2 ? `produk-asetil-koa-${i + 1}` : `produk-pembawa-${i + 1}`
@@ -73,20 +90,21 @@ async function jalankan(p: Panggung, episode: Episode) {
       g._s = 0.65
     })
     bunyi('muncul')
-    await Promise.all(produk.map(({ g }) => to(g, { o: 1, s: 1 }, 400)))
-    bunyi('geser')
-    await Promise.all(produk.map(({ g, x }) => to(g, { x, y: Y - 125 }, 1100, 'busur')))
-    bunyi('tempel')
+    await Promise.all([
+      to(mito, { o: 1 }, 600),
+      ...produk.map(({ g }) => to(g, { o: 1, s: 1 }, 600)),
+    ])
+    await Promise.all([
+      ucapKalimat(p, `e${episode}-penutup`, { teks: NARASI[episode], pose: '05-menjelaskan' }),
+      (async () => {
+        await wait(p, 400)
+        bunyi('geser')
+        await Promise.all(produk.map(({ g, x }) => to(g, { x, y: 230 }, 1600, 'busur')))
+        bunyi('tempel')
+      })(),
+    ])
   } else {
-    const sorot = obj(X[aktif], Y, p.world)
-    el('image', { href: bintang, x: -115, y: -115, width: 230, height: 230 }, sorot)
-    hide(sorot)
-    bunyi('muncul')
-    await to(sorot, { o: 1, s: 1 }, 550, 'letup')
-    simpul.forEach((g) => {
-      g.dataset.status = 'selesai'
-      g.querySelector('image')?.setAttribute('href', simpulSelesai)
-    })
+    await ucapKalimat(p, 'e4-penutup', { teks: NARASI[4], pose: '07-bangga' })
   }
   await ucapKalimat(p, `e${episode}-penutup-akhir`, {
     teks:
@@ -114,9 +132,11 @@ export default function PenutupTahap({ episode }: { episode: Episode }) {
           <Link to={TUJUAN[episode]} className="tombol-utama" onClick={() => bunyi('melesat')}>
             {episode === 4 ? 'Ke peta materi' : `Lanjut ke Episode ${episode + 1}`}
           </Link>
-          <Link to="/peta-materi" className="tombol-utama" onClick={() => bunyi('kembali')}>
-            Ke peta materi
-          </Link>
+          {episode !== 4 && (
+            <Link to="/peta-materi" className="tombol-utama" onClick={() => bunyi('kembali')}>
+              Ke peta materi
+            </Link>
+          )}
         </div>
       )}
     </PemutarEpisode>
