@@ -175,10 +175,18 @@ test('E3 lengkap: delapan tahap, dua POE, zat, hasil/cetak dan replay terpisah',
   await page.emulateMedia({ media: 'screen' })
   await page.setViewportSize(info.project.use.viewport!)
   await page.evaluate(async () => {
-    const { kendali } = await import('/src/' + 'features/pemutar-episode/mesin.ts')
+    // Vite dapat memberi URL bertanda waktu; pakai modul yang benar-benar dimuat aplikasi.
+    const modul = performance
+      .getEntriesByType('resource')
+      .find((r) => new URL(r.name).pathname === '/src/features/pemutar-episode/mesin.ts')
+    if (!modul) throw new Error('Mesin animasi aplikasi belum dimuat')
+    const { kendali } = await import(modul.name)
     kendali.cepat = 0.12
   })
   await page.getByRole('button', { name: 'Putar ulang tanpa jeda' }).click()
+  await expect(page.locator('[data-detail-reaksi][data-molecule="Fumarat"]')).toBeVisible({
+    timeout: 45000,
+  })
   await expect(page).toHaveURL(/#\/episode\/3\/hasil$/, { timeout: 60000 })
   expect(await baca()).toEqual(sebelum)
   for (const key of ['metalab-jawaban', 'metalab-jawaban-e0', 'metalab-jawaban-e2'])
