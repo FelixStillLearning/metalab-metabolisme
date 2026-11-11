@@ -35,7 +35,7 @@ export function mintaPilah(signal: AbortSignal, baris: BarisPilah) {
     if (signal.aborted) return batal()
     signal.addEventListener('abort', batal, { once: true })
     usePemutar.setState({
-      petunjuk: 'Seret kartu ke sisi yang sesuai, atau ketuk tombol pada kartu.',
+      petunjuk: '',
       kalimat: '',
     })
     usePilah.setState({

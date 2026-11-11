@@ -186,11 +186,6 @@ export default function PapanReaksi() {
           {kelompok(r.hasil, 2)}
         </div>
       </div>
-      <div className="e0-persamaan">
-        <span>{rumus(r.bahan)}</span>
-        <b aria-hidden="true">→</b>
-        <span>{rumus(r.hasil)}</span>
-      </div>
       <div
         className="e0-isian e0-isian-perubahan"
         role="status"
