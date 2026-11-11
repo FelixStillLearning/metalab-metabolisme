@@ -16,14 +16,14 @@ import { say } from './naskah'
 async function bersihAnim(p: Panggung, g: number) {
   p.fx.replaceChildren()
   // Jarak lencana 140 (prototype 120): lencana gambar lebih lebar dari lencana kode
-  const used = [0, 1].map((i) => hide(badge(p, 620 + i * 140, 450, 'ATP', p.fx)))
-  const lu = hide(kinetik(p, 690, 390, '−2 DIPAKAI', 36, 'var(--color-hot)'))
+  const used = [0, 1].map((i) => hide(badge(p, 730 + i * 140, 350, 'ATP', p.fx)))
+  const lu = hide(kinetik(p, 800, 290, '−2 DIPAKAI', 36, 'var(--color-hot)'))
   bunyi('muncul')
   await Promise.all([...used.map((u) => to(u, { o: 1 }, 500)), to(lu, { o: 1 }, 500)])
   await say(p, 'e1-e-02', { tambah: -600 })
 
-  const made = [0, 1, 2, 3].map((i) => hide(badge(p, 520 + i * 140, 450, 'ATP', p.fx)))
-  const lm = hide(kinetik(p, 800, 390, '+4 TERBENTUK', 36, 'var(--color-ok)'))
+  const made = [0, 1, 2, 3].map((i) => hide(badge(p, 530 + i * 180, 550, 'ATP', p.fx)))
+  const lm = hide(kinetik(p, 800, 475, '+4 TERBENTUK', 36, 'var(--color-ok)'))
   bunyi('atp')
   await Promise.all([...made.map((m) => to(m, { o: 1 }, 500)), to(lm, { o: 1 }, 500)])
   await say(p, 'e1-e-03', { tambah: -600 })
@@ -33,7 +33,7 @@ async function bersihAnim(p: Panggung, g: number) {
 
   for (let i = 0; i < 2; i++) {
     bunyi('geser')
-    await to(made[i], { x: used[i]._x, y: 450 }, 700)
+    await to(made[i], { x: used[i]._x, y: 350 }, 700)
     bunyi('tempel')
     await Promise.all([to(made[i], { o: 0, s: 0.6 }, 300), to(used[i], { o: 0 }, 300)])
   }
@@ -41,8 +41,8 @@ async function bersihAnim(p: Panggung, g: number) {
   await Promise.all([
     to(lu, { o: 0 }, 300),
     to(lm, { o: 0 }, 300),
-    to(made[2], { x: 740, y: 450, s: 1.2 }, 700),
-    to(made[3], { x: 900, y: 450, s: 1.2 }, 700),
+    to(made[2], { x: 730, y: 550, s: 1.2 }, 700),
+    to(made[3], { x: 870, y: 550, s: 1.2 }, 700),
   ])
   const net = hide(kinetik(p, 800, 350, 'ATP BERSIH = 4 − 2 = 2', 44, 'var(--color-paper)'))
   if (g === 2) {
