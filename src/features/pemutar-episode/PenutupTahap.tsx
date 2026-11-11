@@ -10,7 +10,7 @@ import simpulMenyala from '../../assets/images/ui-simpul-tahap-menyala.webp'
 import simpulSelesai from '../../assets/images/ui-simpul-tahap-selesai.webp'
 import PemutarEpisode from './PemutarEpisode'
 import { el, label } from './kertas'
-import { burstBehind, comic, hide, obj, pasangLatar, to, wait, type Panggung } from './mesin'
+import { hide, obj, pasangLatar, to, wait, type Panggung } from './mesin'
 import { ucapKalimat } from './ucapKalimat'
 import { bunyi } from '../../lib/suara'
 
@@ -55,59 +55,29 @@ async function jalankan(p: Panggung, episode: Episode) {
   await ucapKalimat(p, `e${episode}-penutup`, { teks: NARASI[episode], pose: '07-bangga' })
 
   if (episode === 2 || episode === 3) {
-    const produk = obj(X[aktif], Y - 150, p.world)
-    produk.dataset.objek = episode === 2 ? 'produk-asetil-koa' : 'produk-pembawa-elektron'
-    el(
-      'rect',
-      { x: -199, y: -59, width: 410, height: 132, rx: 12, fill: 'var(--color-ink)', opacity: 0.42 },
-      produk,
-    )
-    el(
-      'rect',
-      {
-        x: -205,
-        y: -66,
-        width: 410,
-        height: 132,
-        rx: 12,
-        fill: 'var(--color-paper)',
-        stroke: 'var(--color-ink)',
-        'stroke-width': 4,
-      },
-      produk,
-    )
-    const isian =
+    const produk =
       episode === 2
-        ? [
-            { src: asetilKoa, x: -105 },
-            { src: asetilKoa, x: 105 },
-          ]
+        ? [-1, 1].map((s) => ({
+            g: obj(X[aktif], Y - 125 + s * 42, p.world),
+            src: asetilKoa,
+            x: X[aktif + 1] + s * 58,
+          }))
         : [
-            { src: nadh, x: -105 },
-            { src: fadh2, x: 105 },
+            { g: obj(X[aktif], Y - 125, p.world), src: nadh, x: X[aktif + 1] - 58 },
+            { g: obj(X[aktif], Y - 35, p.world), src: fadh2, x: X[aktif + 1] + 58 },
           ]
-    isian.forEach(({ src, x }, i) => {
-      el(
-        'image',
-        { href: src, x: x - 78, y: -36, width: 156, height: 72, 'data-produk': String(i + 1) },
-        produk,
-      )
+    produk.forEach(({ g, src }, i) => {
+      g.dataset.objek = episode === 2 ? `produk-asetil-koa-${i + 1}` : `produk-pembawa-${i + 1}`
+      el('image', { href: src, x: -68, y: -32, width: 136, height: 64 }, g)
+      hide(g)
+      g._s = 0.65
     })
-    hide(produk)
-    produk._s = 0.7
     bunyi('muncul')
-    await to(produk, { o: 1, s: 1 }, 450)
+    await Promise.all(produk.map(({ g }) => to(g, { o: 1, s: 1 }, 400)))
     bunyi('geser')
-    await to(produk, { x: X[aktif + 1], y: Y - 150 }, 1300, 'busur')
-    burstBehind(p, produk, 170)
-    await comic(p, 'ZAP!', X[aktif + 1], Y - 235, 'var(--color-paper)')
+    await Promise.all(produk.map(({ g, x }) => to(g, { x, y: Y - 125 }, 1100, 'busur')))
     bunyi('tempel')
-  }
-  bunyi('muncul')
-  await wait(p, 250)
-  simpul[aktif].dataset.status = 'selesai'
-  simpul[aktif].querySelector('image')?.setAttribute('href', simpulSelesai)
-  if (episode === 4) {
+  } else {
     const sorot = obj(X[aktif], Y, p.world)
     el('image', { href: bintang, x: -115, y: -115, width: 230, height: 230 }, sorot)
     hide(sorot)
