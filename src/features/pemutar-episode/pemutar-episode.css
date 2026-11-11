@@ -358,6 +358,10 @@
   transform: rotate(-0.6deg);
 }
 
+.pemutar-gelembung[data-panjang] {
+  font-size: clamp(13px, 1.35cqw, 23px);
+}
+
 /* Ekor menunjuk ke narator */
 .pemutar-gelembung::after {
   content: '';

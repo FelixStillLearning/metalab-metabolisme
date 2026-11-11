@@ -59,6 +59,7 @@ function Gelembung() {
         className="pemutar-gelembung"
         hidden={!tampilSubtitle}
         data-masuk={!!masuk}
+        data-panjang={kalimat.length > 120 || undefined}
         style={masuk}
       >
         <span data-gelembung hidden={!tampilSubtitle}>
