@@ -2,6 +2,8 @@ import { gsap } from 'gsap'
 import { afterEach, beforeAll, beforeEach, expect, test } from 'vitest'
 import {
   durasi,
+  burstBehind,
+  arrive,
   jedaSemua,
   kendali,
   obj,
@@ -62,6 +64,15 @@ test('durasi mengikuti putar pelan, mode tenang, dan mode cepat', () => {
   usePengaturan.setState({ tenang: false })
   kendali.cepat = 0.12
   expect(durasi(1000)).toBe(120)
+})
+
+test('kedatangan selesai sesudah tulisan WUSH hilang', async () => {
+  kendali.cepat = 0.01
+  const p = panggung()
+  const g = obj(0, 0, p.world)
+  await arrive(p, g, 200, 300)
+  expect([g._x, g._y]).toEqual([200, 300])
+  expect(p.world.querySelector('[data-word="WUSH!"]')).toBeNull()
 })
 
 test('skeleton membuat satu atom C per titik', () => {
@@ -175,4 +186,14 @@ test('wait ditolak saat abort', async () => {
   const janji = wait(p, 1000)
   kendaliAbort.abort()
   await expect(janji).rejects.toMatchObject({ name: 'AbortError' })
+})
+
+test('letupan tetap lokal meskipun pemanggil meminta latar besar', async () => {
+  kendali.cepat = 0.08
+  const p = panggung()
+  const g = obj(800, 450, p.world)
+  burstBehind(p, g, 480)
+  const gambar = p.world.querySelector('[data-effect="split-burst"] image')!
+  expect(Number(gambar.getAttribute('width'))).toBeLessThanOrEqual(180)
+  await wait(p, 2000)
 })

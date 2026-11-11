@@ -88,12 +88,6 @@
     width: 41%;
     max-height: 87%;
   }
-  .episode-3 .tok-zat {
-    width: 64px;
-  }
-  .episode-3 .tok-zat span {
-    padding: 8px 6px;
-  }
   .e3-tabel {
     font-size: 14px;
   }
@@ -131,4 +125,112 @@
     max-height: 70%;
     overflow: auto;
   }
+}
+
+.episode-3 .pemutar-sampul-dekorasi-kanan {
+  top: 3%;
+  right: 3%;
+  width: 15%;
+  transform: rotate(10deg);
+}
+.episode-3 .tok-zat {
+  height: auto;
+  padding: 8px;
+  border: 3px dashed var(--color-ink);
+  border-radius: 12px;
+  background: rgb(245 241 232 / 0.35);
+}
+.episode-3 .tok-zat[aria-pressed='true'] {
+  padding: 0;
+  border: 0;
+  background: none;
+}
+.episode-3 .poe-zone {
+  background: none;
+  border: 3px dashed var(--color-ink);
+  border-radius: 50%;
+}
+.episode-3 .pemutar-panggung:has(.pemutar-poe) .pemutar-narator {
+  left: 1%;
+  width: 98%;
+  transform: none;
+  --maskot: 9cqw;
+}
+@media (max-width: 760px), (max-height: 500px) {
+  .episode-3 .pemutar-panggung:has(.pemutar-poe) .pemutar-narator {
+    --maskot: 70px;
+  }
+}
+
+.episode-3 .pemutar-pilih-molekul[aria-label='Ketuk substrat siklus Krebs.'] .pemutar-sasaran,
+.episode-3 .pemutar-pilih-molekul[aria-label='Ketuk pengikat gugus asetil.'] .pemutar-sasaran {
+  border: 3px dashed var(--color-paper);
+  border-radius: 18px;
+}
+@media (max-width: 760px), (max-height: 500px) {
+  .episode-3 .tok-zat {
+    width: 80px;
+    padding: 3px;
+  }
+  .episode-3 .tok-zat span {
+    padding: 5px 4px;
+  }
+}
+
+.episode-3 .pemutar-pilih-molekul[aria-label='Ketuk substrat siklus Krebs.'] .pemutar-sasaran:hover,
+.episode-3
+  .pemutar-pilih-molekul[aria-label='Ketuk substrat siklus Krebs.']
+  .pemutar-sasaran:focus-visible,
+.episode-3 .pemutar-pilih-molekul[aria-label='Ketuk pengikat gugus asetil.'] .pemutar-sasaran:hover,
+.episode-3
+  .pemutar-pilih-molekul[aria-label='Ketuk pengikat gugus asetil.']
+  .pemutar-sasaran:focus-visible {
+  outline: none;
+  border-color: var(--color-ink);
+  background: rgb(245 241 232 / 0.15);
+}
+.episode-3 .pemutar-panggung:has([data-tanya-tahap]) .pemutar-soal {
+  top: 20%;
+  left: 50%;
+  right: auto;
+  bottom: auto;
+  width: 48%;
+  transform: translateX(-50%);
+}
+
+@media (max-width: 760px), (max-height: 500px) {
+  .episode-3 .pemutar-panggung:has([data-tanya-tahap]) .pemutar-soal {
+    top: 12%;
+    width: 60%;
+    padding: 10px 14px;
+  }
+  .episode-3 .pemutar-panggung:has([data-tanya-tahap]) .pemutar-soal h2 {
+    font-size: 14px;
+    margin-bottom: 5px;
+  }
+  .episode-3 .pemutar-panggung:has([data-tanya-tahap]) .pemutar-pilihan {
+    padding: 5px 10px;
+    min-height: 30px;
+  }
+}
+
+.episode-3 [data-garis-tahap] {
+  stroke: var(--color-ink);
+  stroke-width: 2;
+  opacity: 0.35;
+  pointer-events: none;
+  transition:
+    stroke 250ms,
+    stroke-width 250ms,
+    opacity 250ms;
+}
+.episode-3 [data-garis-tahap][data-aktif='true'] {
+  stroke: var(--color-accent);
+  stroke-width: 4;
+  opacity: 1;
+}
+
+.episode-3 .pemutar-sasaran {
+  min-width: 44px;
+  min-height: 44px;
 }

@@ -91,19 +91,31 @@ test('E4 lengkap: jalur, pompa, komik, dua POE, tabel, hasil/cetak, reload dan r
     if (r.status() === 404) galat.push(r.url())
   })
   await page.addInitScript(() => {
-    const w = window as unknown as { jejakE4: string[] }
+    const w = window as unknown as { jejakE4: string[]; tumpukanKomik: string[][] }
     w.jejakE4 = []
+    w.tumpukanKomik = []
     new MutationObserver(() => {
+      const efek = [...document.querySelectorAll('[data-word]')]
+      for (let i = 0; i < efek.length; i++) {
+        for (const b of efek.slice(i + 1)) {
+          const a = efek[i].getBoundingClientRect()
+          const r = b.getBoundingClientRect()
+          if (a.left < r.right && a.right > r.left && a.top < r.bottom && a.bottom > r.top)
+            w.tumpukanKomik.push([efek[i].getAttribute('data-word')!, b.getAttribute('data-word')!])
+        }
+      }
       const g = document.querySelector('[data-kompleks-aktif]')
       if (g)
         w.jejakE4.push(`${g.getAttribute('data-jalur')}:${g.getAttribute('data-kompleks-aktif')}`)
+      const pembawa = document.querySelector('[data-pembawa-aktif]')
+      if (pembawa) w.jejakE4.push(pembawa.getAttribute('data-pembawa-aktif')!)
       for (const e of document.querySelectorAll('[data-effect]'))
         w.jejakE4.push(e.getAttribute('data-word') || e.getAttribute('data-effect')!)
     }).observe(document, {
       subtree: true,
       childList: true,
       attributes: true,
-      attributeFilter: ['data-kompleks-aktif'],
+      attributeFilter: ['data-kompleks-aktif', 'data-pembawa-aktif', 'transform'],
     })
   })
   await mulai(page)
@@ -113,8 +125,11 @@ test('E4 lengkap: jalur, pompa, komik, dua POE, tabel, hasil/cetak, reload dan r
   const target = (await page
     .getByRole('button', { name: 'Pilih Kompleks II', exact: true })
     .boundingBox())!
-  const gambar = (await page.locator('[data-kompleks="II"]').boundingBox())!
+  const gambar = (await page.locator('[data-kompleks="II"] > image').boundingBox())!
   expect(Math.abs(target.y + target.height / 2 - gambar.y - gambar.height / 2)).toBeLessThan(2)
+  const jangkar = (await page.locator('[data-jangkar="II"]').boundingBox())!
+  expect(jangkar.y).toBeLessThan(gambar.y)
+  expect(jangkar.y + jangkar.height).toBeGreaterThan(gambar.y + gambar.height / 2)
   await page.screenshot({ path: info.outputPath('kompleks-tebak.png') })
   await tebak(page, 'c', 1, true)
   await expect(page.locator('#poe-explain-judul')).toBeVisible({ timeout: 30000 })
@@ -130,18 +145,37 @@ test('E4 lengkap: jalur, pompa, komik, dua POE, tabel, hasil/cetak, reload dan r
   await jelaskan(page, 'h')
   for (const r of RUMPANG)
     await page.getByRole('button', { name: r.opsi[r.benar], exact: true }).click()
+  await expect(page.locator('[data-gelembung]')).toContainText(
+    'Bandingkan empat tahap respirasi aerob.',
+  )
+  expect(await page.locator('[data-tabel] image').count()).toBe(4)
+  await page.screenshot({ path: info.outputPath('tabel-pengantar.png') })
   for (const row of TABEL) {
     for (const benar of row.sel)
       await page.getByRole('button', { name: benar, exact: true }).click()
   }
+  await expect(page.locator('[data-ringkasan-atp]')).toHaveCount(4)
+  expect(
+    await page
+      .locator('[data-ringkasan-atp]')
+      .evaluateAll((gs) => gs.map((g) => g.getAttribute('data-ringkasan-atp'))),
+  ).toEqual(['2 ATP', '0 ATP', '2 ATP', '34 ATP'])
+  await expect(page.locator('[data-ringkasan-atp]').last()).toBeVisible()
+  await page.screenshot({ path: info.outputPath('penutup-empat-tahap.png') })
   await expect(page).toHaveURL(/#\/episode\/4\/hasil$/, { timeout: 20000 })
   await expect(page.getByRole('heading', { name: 'Rantai elektronmu' })).toBeVisible()
+  await expect(page.locator('.hasil')).not.toContainText(
+    /menurut (perhitungan )?buku|mengikuti buku/i,
+  )
   const baca = () => page.evaluate(() => localStorage.getItem('metalab-jawaban-e4'))
   const data = JSON.parse((await baca())!).state
   expect(data.hasil.jawaban).toEqual(JAWABAN)
   expect(data.hasil.poe.c).toEqual({ tebakan: 1, alasan: 0, penjelasan: 2 })
   expect(data.hasil.poe.h).toEqual({ tebakan: 2, alasan: 0, penjelasan: 2 })
   const jejak = await page.evaluate(() => (window as unknown as { jejakE4: string[] }).jejakE4)
+  expect(
+    await page.evaluate(() => (window as unknown as { tumpukanKomik: string[][] }).tumpukanKomik),
+  ).toEqual([])
   for (const k of [
     'NADH:I',
     'NADH:III',
@@ -149,6 +183,8 @@ test('E4 lengkap: jalur, pompa, komik, dua POE, tabel, hasil/cetak, reload dan r
     'FADH2:II',
     'FADH2:III',
     'FADH2:IV',
+    'Q',
+    'Cyt c',
     'LEPAS!',
     'POP!',
     'KLIK!',
@@ -174,7 +210,11 @@ test('E4 lengkap: jalur, pompa, komik, dua POE, tabel, hasil/cetak, reload dan r
   await page.emulateMedia({ media: 'screen' })
   await page.setViewportSize(info.project.use.viewport!)
   await page.evaluate(async () => {
-    const { kendali } = await import('/src/' + 'features/pemutar-episode/mesin.ts')
+    const modul = performance
+      .getEntriesByType('resource')
+      .find((r) => new URL(r.name).pathname === '/src/features/pemutar-episode/mesin.ts')
+    if (!modul) throw new Error('Mesin animasi aplikasi belum dimuat')
+    const { kendali } = await import(modul.name)
     kendali.cepat = 0.08
   })
   await page.getByRole('button', { name: 'Putar ulang tanpa jeda' }).click()
@@ -188,6 +228,34 @@ test('E4 lengkap: jalur, pompa, komik, dua POE, tabel, hasil/cetak, reload dan r
   ])
     expect(await page.evaluate((k) => localStorage.getItem(k), k)).toBe('data lama')
   expect(galat).toEqual([])
+})
+
+test('E4 sampul utuh dan ringkas pada desktop serta HP', async ({ page }, info) => {
+  test.skip(info.project.name !== 'desktop', 'Tiga viewport diperiksa dalam satu alur')
+  for (const [width, height] of [
+    [1440, 900],
+    [800, 360],
+    [667, 375],
+  ]) {
+    await page.setViewportSize({ width, height })
+    await page.goto('/#/episode/4')
+    const sampul = page.locator('.pemutar-sampul')
+    await expect(sampul.locator('.pemutar-label')).toHaveText('Episode 4')
+    await expect(sampul).not.toContainText(/aktivitas|menurut (perhitungan )?buku/i)
+    await page.getByRole('button', { name: 'Mulai episode' }).waitFor()
+    // Tunggu animasi masuk selesai sebelum mengukur batas gambar yang diputar.
+    await page.waitForTimeout(800)
+    const panggung = (await page.locator('[data-panggung]').boundingBox())!
+    for (const gambar of await sampul.locator('img, .pemutar-sampul-isi, button, a').all()) {
+      if (!(await gambar.isVisible())) continue
+      const r = (await gambar.boundingBox())!
+      expect(r.x).toBeGreaterThanOrEqual(panggung.x)
+      expect(r.y).toBeGreaterThanOrEqual(panggung.y)
+      expect(r.x + r.width).toBeLessThanOrEqual(panggung.x + panggung.width)
+      expect(r.y + r.height).toBeLessThanOrEqual(panggung.y + panggung.height)
+    }
+    await page.screenshot({ path: info.outputPath(`sampul-${width}.png`) })
+  }
 })
 
 test('E4 hasil kosong, orientasi dan tautan peta', async ({ page }, info) => {
@@ -277,7 +345,32 @@ test('E4 tempo normal: reaksi air/ATP, jeda gerak, efek off/on dan abort', async
   await tebak(page, 'c', 1)
   await jelaskan(page, 'c')
   await page.getByRole('button', { name: 'H₂O', exact: true }).click({ timeout: 30000 })
+  await expect(page.locator('[data-reaksi="air"] [data-oxygen]')).toHaveCount(2)
+  const atomAwal = await page.locator('[data-reaksi="air"]').evaluate((g) => {
+    const atom = [...g.querySelectorAll('[data-oxygen], [data-hydrogen]')]
+    atom.forEach((el, i) => el.setAttribute('data-atom-awal', String(i)))
+    return atom.length
+  })
+  expect(atomAwal).toBe(6)
   await expect(page.locator('[data-objek="air-terbentuk"]')).toHaveCount(2, { timeout: 10000 })
+  await expect(page.locator('[data-word="POP!"]')).toHaveCount(2)
+  const pop = await page.locator('[data-word="POP!"]').all()
+  const air = await page.locator('[data-objek="air-terbentuk"]').all()
+  for (let i = 0; i < air.length; i++) {
+    const r = (await pop[i].boundingBox())!
+    const h = (await air[i].boundingBox())!
+    expect(Math.abs(r.x + r.width / 2 - h.x - h.width / 2)).toBeLessThan(20)
+    expect(r.y + r.height).toBeLessThan(h.y)
+  }
+  await expect(page.locator('[data-reaksi="air"] [data-oxygen]')).toHaveCount(2)
+  await expect(page.locator('[data-reaksi="air"] [data-hydrogen]')).toHaveCount(4)
+  await expect(page.locator('[data-reaksi="air"] [data-proton]')).toHaveCount(0)
+  await expect(page.locator('[data-reaksi="air"] [data-electron]')).toHaveCount(0)
+  await expect(page.locator('[data-objek="air-terbentuk"] [data-atom-awal]')).toHaveCount(6)
+  for (const water of await page.locator('[data-objek="air-terbentuk"]').all()) {
+    await expect(water.locator('[data-oxygen]')).toHaveCount(1)
+    await expect(water.locator('[data-hydrogen]')).toHaveCount(2)
+  }
   await page.screenshot({ path: info.outputPath('normal-air.png') })
   await page.getByRole('button', { name: 'ATP sintase', exact: true }).click({ timeout: 60000 })
   await expect(page.locator('[data-objek="atp-terbentuk"]')).toBeVisible({ timeout: 15000 })

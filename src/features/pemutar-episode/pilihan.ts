@@ -80,6 +80,7 @@ export async function mintaKetukSemua(
   sasaran: SoalPilihan['opsi'],
   ketuk: (index: number) => Promise<void>,
   pengecoh?: { indeks: number[]; salah: (index: number) => void | Promise<void> },
+  seret?: SoalPilihan['seret'],
 ) {
   const bukanPengecoh = (i: number) => !pengecoh?.indeks.includes(i)
   if (kendali.otomatis) {
@@ -142,6 +143,6 @@ export async function mintaKetukSemua(
         selesai()
       }
     }
-    usePemutar.setState({ pilihan: { judul, opsi: sasaran, pilih } })
+    usePemutar.setState({ pilihan: { judul, opsi: sasaran, pilih, seret } })
   })
 }

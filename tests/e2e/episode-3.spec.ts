@@ -46,7 +46,18 @@ async function jelaskan(page: Page, k: PoeE3) {
 }
 async function tempatkan(page: Page) {
   for (const z of ZAT) {
-    await page.getByRole('button', { name: `Tempatkan ${z.nama}`, exact: true }).click()
+    if (z.nama === 'ATP') {
+      await page.getByRole('button', { name: 'Seret ATP ke tahap', exact: true }).waitFor()
+      const roda = (await page.locator('[data-objek="roda-krebs"]').boundingBox())!
+      for (const marker of await page.locator('[data-penanda-tahap]').all()) {
+        const box = (await marker.boundingBox())!
+        const cx = roda.x + roda.width / 2
+        const cy = roda.y + roda.height / 2
+        const distance = Math.hypot(box.x + box.width / 2 - cx, box.y + box.height / 2 - cy)
+        expect(distance / roda.width).toBeCloseTo(215 / 320, 1)
+      }
+    }
+    await page.getByRole('button', { name: `Seret ${z.nama} ke tahap`, exact: true }).waitFor()
     const salah = [1, 2, 3, 4, 5, 6, 7, 8].find((n) => !(z.tahap as readonly number[]).includes(n))!
     await page.getByRole('button', { name: `${z.nama} ke tahap ${salah}`, exact: true }).click()
     await expect(page.locator('[data-gelembung]')).toContainText(z.pesan)
@@ -55,8 +66,14 @@ async function tempatkan(page: Page) {
       const r = (await b.boundingBox())!
       expect(r.height).toBeGreaterThanOrEqual(44)
       expect(r.width).toBeGreaterThanOrEqual(44)
-      await b.focus()
-      await page.keyboard.press('Enter')
+      const sumber = (await page
+        .getByRole('button', { name: `Seret ${z.nama} ke tahap`, exact: true })
+        .boundingBox())!
+      await page.mouse.move(sumber.x + sumber.width / 2, sumber.y + sumber.height / 2)
+      await page.mouse.down()
+      await page.mouse.move(r.x + r.width / 2, r.y + r.height / 2, { steps: 10 })
+      await page.mouse.up()
+      await expect(b).toHaveCount(0)
     }
   }
 }
@@ -73,9 +90,19 @@ test('E3 lengkap: delapan tahap, dua POE, zat, hasil/cetak dan replay terpisah',
   })
   await mulai(page)
   await expect(page.locator('#poe-tebak-judul')).toHaveText(POE['i·1'].judul, { timeout: 20000 })
-  const angkaC = (await page.locator('[data-molecule="Sitrat"] text').last().boundingBox())!
-  const zona = (await page.locator('.poe-zone').boundingBox())!
-  expect(angkaC.y + angkaC.height).toBeLessThan(zona.y + zona.height - 8)
+  await expect(page.locator('[data-molecule="Sitrat"] [data-carbon]')).toHaveCount(6)
+  await expect(page.locator('.tok-zat').first()).toHaveCSS('border-top-style', 'dashed')
+  const tokens = await page.locator('.tok-zat').all()
+  for (let i = 1; i < tokens.length; i++) {
+    const atas = (await tokens[i - 1].boundingBox())!
+    const bawah = (await tokens[i].boundingBox())!
+    expect(atas.y + atas.height).toBeLessThan(bawah.y)
+  }
+  if (info.project.name === 'hp-miring') {
+    const maskot = (await page.locator('.pemutar-maskot').boundingBox())!
+    const roda = (await page.locator('[data-objek="roda-krebs"]').boundingBox())!
+    expect(maskot.x + maskot.width).toBeLessThan(roda.x)
+  }
   await page.screenshot({ path: info.outputPath('tebak-karbon.png') })
   await page.evaluate(() => {
     const w = window as unknown as { jejak: { tahap: string; karbon: number; total: number }[] }
@@ -96,6 +123,7 @@ test('E3 lengkap: delapan tahap, dua POE, zat, hasil/cetak dan replay terpisah',
   await tebak(page, 'i·1', 0)
   await expect(page.locator('#poe-explain-judul')).toBeVisible({ timeout: 30000 })
   await expect(page.locator('[data-molecule="Oksaloasetat"] [data-carbon]')).toHaveCount(4)
+  await expect(page.locator('[data-model-tahap]')).toHaveCount(8)
   await expect(page.locator('[data-molecule="co2"]')).toHaveCount(2)
   await expect(page.locator('[data-carbon]')).toHaveCount(6)
   const jejak = await page.evaluate(
@@ -108,19 +136,8 @@ test('E3 lengkap: delapan tahap, dua POE, zat, hasil/cetak dan replay terpisah',
   await jelaskan(page, 'i·1')
   await tempatkan(page)
   await expect(page.locator('#poe-tebak-judul')).toHaveText(POE['i·2'].judul)
-  const penanda = page.locator('[data-penanda-tahap]')
-  await expect(penanda).toHaveCount(7)
-  const rodaBox = (await page.locator('[data-objek="roda-krebs"]').boundingBox())!
-  for (const marker of await penanda.all()) {
-    const box = (await marker.boundingBox())!
-    const cx = rodaBox.x + rodaBox.width / 2
-    const cy = rodaBox.y + rodaBox.height / 2
-    expect(Math.abs(box.x + box.width / 2 - cx) + box.width / 2).toBeLessThan(rodaBox.width * 0.28)
-    expect(Math.abs(box.y + box.height / 2 - cy) + box.height / 2).toBeLessThan(
-      rodaBox.height * 0.28,
-    )
-  }
-  await page.screenshot({ path: info.outputPath('penanda-tahap.png') })
+  await expect(page.locator('[data-penanda-tahap]')).toHaveCount(0)
+  await page.screenshot({ path: info.outputPath('roda-bersih.png') })
   await tebak(page, 'i·2', 2, true)
   await expect(page.locator('[data-putaran="1"]')).toContainText('3 NADH', { timeout: 15000 })
   await expect(page.locator('[data-putaran="2"]')).toContainText('6 NADH', { timeout: 15000 })
@@ -158,10 +175,18 @@ test('E3 lengkap: delapan tahap, dua POE, zat, hasil/cetak dan replay terpisah',
   await page.emulateMedia({ media: 'screen' })
   await page.setViewportSize(info.project.use.viewport!)
   await page.evaluate(async () => {
-    const { kendali } = await import('/src/' + 'features/pemutar-episode/mesin.ts')
+    // Vite dapat memberi URL bertanda waktu; pakai modul yang benar-benar dimuat aplikasi.
+    const modul = performance
+      .getEntriesByType('resource')
+      .find((r) => new URL(r.name).pathname === '/src/features/pemutar-episode/mesin.ts')
+    if (!modul) throw new Error('Mesin animasi aplikasi belum dimuat')
+    const { kendali } = await import(modul.name)
     kendali.cepat = 0.12
   })
   await page.getByRole('button', { name: 'Putar ulang tanpa jeda' }).click()
+  await expect(page.locator('[data-detail-reaksi][data-molecule="Fumarat"]')).toBeVisible({
+    timeout: 45000,
+  })
   await expect(page).toHaveURL(/#\/episode\/3\/hasil$/, { timeout: 60000 })
   expect(await baca()).toEqual(sebelum)
   for (const key of ['metalab-jawaban', 'metalab-jawaban-e0', 'metalab-jawaban-e2'])
@@ -201,12 +226,12 @@ for (const [karbon, putaran] of [
     await page.screenshot({ path: info.outputPath('667-tebak.png') })
     await tebak(page, 'i·1', karbon, true)
     await expect(page.locator('#poe-explain-judul')).toBeVisible({ timeout: 25000 })
-    const molekul = (await page.locator('[data-molecule="Oksaloasetat"]').boundingBox())!
+    const molekul = (await page.locator('[data-model-tahap="8"]').boundingBox())!
     const kartu = (await page.locator('.poe-card-explain').boundingBox())!
     expect(molekul.x + molekul.width).toBeLessThan(kartu.x)
     await page.screenshot({ path: info.outputPath('667-oksaloasetat.png') })
     await jelaskan(page, 'i·1')
-    await page.getByRole('button', { name: 'Tempatkan H₂O', exact: true }).click()
+    await page.getByRole('button', { name: 'Seret H₂O ke tahap', exact: true }).waitFor()
     for (const b of await page.getByRole('button', { name: /H₂O ke tahap/ }).all()) {
       const r = (await b.boundingBox())!
       expect(r.height).toBeGreaterThanOrEqual(44)
@@ -217,7 +242,7 @@ for (const [karbon, putaran] of [
     for (const n of [1, 7])
       await page.getByRole('button', { name: `H₂O ke tahap ${n}`, exact: true }).click()
     for (const z of ZAT.slice(1)) {
-      await page.getByRole('button', { name: `Tempatkan ${z.nama}`, exact: true }).click()
+      await page.getByRole('button', { name: `Seret ${z.nama} ke tahap`, exact: true }).waitFor()
       for (const n of z.tahap)
         await page.getByRole('button', { name: `${z.nama} ke tahap ${n}`, exact: true }).click()
     }
@@ -329,7 +354,7 @@ test('E3 komik: enam atom yang sama bergabung, model tetap terlihat dan CO₂ te
   ).toBe(true)
   const m = (await page.locator('[data-objek="sitrat-ikhtisar"]').boundingBox())!
   const q = (await page.locator('.pemutar-soal').boundingBox())!
-  expect(m.x + m.width).toBeLessThan(q.x)
+  expect(m.y).toBeGreaterThan(q.y + q.height)
   await page.screenshot({ path: info.outputPath('komik-gabung-enam-c.png') })
   await page.getByRole('button', { name: '8 tahap', exact: true }).click()
   await expect(page.locator('#poe-tebak-judul')).toHaveText(POE['i·1'].judul, { timeout: 15000 })

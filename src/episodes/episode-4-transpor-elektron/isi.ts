@@ -64,7 +64,7 @@ export const POE = {
     zat: ['30 ATP', '34 ATP', '38 ATP'],
     alasan: [
       'Hanya NADH menghasilkan ATP: 10 × 3 = 30.',
-      '10 NADH × 3 ATP + 2 FADH₂ × 2 ATP = 34 ATP menurut buku.',
+      '10 NADH × 3 ATP + 2 FADH₂ × 2 ATP = 34 ATP.',
       'Seluruh 38 ATP respirasi aerob terbentuk di transpor elektron.',
     ],
     balik: [
@@ -72,7 +72,7 @@ export const POE = {
       'Ya. 30 + 4 = 34 ATP dari transpor elektron.',
       'Empat ATP lainnya terbentuk langsung: dua dari glikolisis dan dua dari siklus Krebs.',
     ],
-    hasil: '34 ATP dari transpor elektron; total respirasi aerob 38 ATP menurut perhitungan buku',
+    hasil: '34 ATP dari transpor elektron; total respirasi aerob 38 ATP',
   },
 } satisfies Record<
   PoeE4,
@@ -124,11 +124,11 @@ export const JAWABAN: Record<ButirE4, string> = {
   c: 'Kompleks II menerima elektron FADH₂, tanpa memompa H⁺.',
   d: 'Elektron FADH₂ mengalir melalui kompleks II → III → IV; hanya III dan IV memompa H⁺ pada jalur ini.',
   e: 'Aliran elektron memompa H⁺ dari matriks ke ruang antarmembran. H⁺ kembali lewat ATP sintase (kemiosmosis); energinya membentuk ATP dari ADP + fosfat. Elektron tidak melewati ATP sintase.',
-  f: 'Menurut perhitungan buku: 1 NADH setara 3 ATP, 1 FADH₂ setara 2 ATP.',
+  f: '1 NADH setara 3 ATP, 1 FADH₂ setara 2 ATP.',
   g: '10 NADH: 2 glikolisis + 2 dekarboksilasi oksidatif + 6 siklus Krebs; 2 FADH₂ dari siklus Krebs.',
-  h: 'Transpor elektron: (10 × 3) + (2 × 2) = 34 ATP. Seluruh respirasi aerob: 2 + 0 + 2 + 34 = 38 ATP menurut buku.',
+  h: 'Transpor elektron: (10 × 3) + (2 × 2) = 34 ATP. Seluruh respirasi aerob: 2 + 0 + 2 + 34 = 38 ATP.',
   i: 'O₂ adalah akseptor elektron terakhir di kompleks IV. ½ O₂ + 2 H⁺ + 2 e⁻ → H₂O. Untuk 10 NADH + 2 FADH₂: 6 O₂ + 24 H⁺ + 24 e⁻ → 12 H₂O. Ini H⁺ pembentuk air, bukan jumlah H⁺ yang dipompa.',
   j: PENGERTIAN,
   '1.11':
-    'Perbandingan enam variabel empat tahap respirasi aerob terisi. ATP: 2 (bersih) + 0 + 2 + 34 = 38 ATP menurut buku.',
+    'Perbandingan enam variabel empat tahap respirasi aerob terisi. ATP: 2 (bersih) + 0 + 2 + 34 = 38 ATP.',
 }

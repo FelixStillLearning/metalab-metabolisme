@@ -38,6 +38,14 @@ type Penyimpanan = {
   selesaikan: () => boolean
   simpanPenjelasan: (teks: string) => void
 }
+
+const JAWABAN_LAMA: Partial<Record<ButirE4, string>> = {
+  f: 'Menurut perhitungan buku: 1 NADH setara 3 ATP, 1 FADH₂ setara 2 ATP.',
+  h: 'Transpor elektron: (10 × 3) + (2 × 2) = 34 ATP. Seluruh respirasi aerob: 2 + 0 + 2 + 34 = 38 ATP menurut buku.',
+  '1.11':
+    'Perbandingan enam variabel empat tahap respirasi aerob terisi. ATP: 2 (bersih) + 0 + 2 + 34 = 38 ATP menurut buku.',
+}
+
 export const useJawabanE4 = create<Penyimpanan>()(
   persist(
     (set, get) => ({
@@ -67,6 +75,22 @@ export const useJawabanE4 = create<Penyimpanan>()(
     }),
     {
       name: 'metalab-jawaban-e4',
+      version: 1,
+      migrate: (tersimpan) => {
+        const s = tersimpan as Partial<Penyimpanan> | null
+        // Perubahan redaksi tidak menghapus hasil dan draf yang sudah disimpan.
+        for (const data of [s?.draf, s?.hasil]) {
+          for (const k of BUTIR) {
+            if (data?.jawaban && JAWABAN_LAMA[k] && data.jawaban[k] === JAWABAN_LAMA[k])
+              data.jawaban[k] = JAWABAN[k]
+          }
+        }
+        return {
+          draf: s?.draf ?? { jawaban: {}, poe: {} },
+          hasil: s?.hasil ?? null,
+          penjelasan: s?.penjelasan ?? '',
+        }
+      },
       partialize: ({ draf, hasil, penjelasan }) => ({ draf, hasil, penjelasan }),
       merge: (tersimpan, awal) => {
         const s = tersimpan as Partial<Penyimpanan> | null

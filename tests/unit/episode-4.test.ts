@@ -80,3 +80,31 @@ test('rehidrasi memulihkan draf dan menolak data rusak', async () => {
   expect(useJawabanE4.getState().penjelasan).toBe('')
   expect(typeof useJawabanE4.getState().mulai).toBe('function')
 })
+
+test('perubahan redaksi mempertahankan hasil, draf, POE dan refleksi versi lama', async () => {
+  isi()
+  useJawabanE4.getState().selesaikan()
+  const hasil = useJawabanE4.getState().hasil!
+  const lama = {
+    ...hasil,
+    jawaban: {
+      ...hasil.jawaban,
+      f: 'Menurut perhitungan buku: 1 NADH setara 3 ATP, 1 FADH₂ setara 2 ATP.',
+      h: 'Transpor elektron: (10 × 3) + (2 × 2) = 34 ATP. Seluruh respirasi aerob: 2 + 0 + 2 + 34 = 38 ATP menurut buku.',
+      '1.11':
+        'Perbandingan enam variabel empat tahap respirasi aerob terisi. ATP: 2 (bersih) + 0 + 2 + 34 = 38 ATP menurut buku.',
+    },
+  }
+  localStorage.setItem(
+    'metalab-jawaban-e4',
+    JSON.stringify({
+      state: { draf: lama, hasil: lama, penjelasan: 'Elektron berakhir di oksigen.' },
+      version: 0,
+    }),
+  )
+  await useJawabanE4.persist.rehydrate()
+  expect(useJawabanE4.getState().hasil).toEqual(hasil)
+  expect(useJawabanE4.getState().draf).toEqual(hasil)
+  expect(useJawabanE4.getState().penjelasan).toBe('Elektron berakhir di oksigen.')
+  expect(JSON.parse(localStorage.getItem('metalab-jawaban-e4')!).version).toBe(1)
+})

@@ -1,3 +1,9 @@
+.episode-4 .pemutar-sampul-dekorasi-kanan {
+  top: 3%;
+  right: 3%;
+  width: 15%;
+  transform: rotate(10deg);
+}
 .episode-4 .pemutar-narator,
 .episode-4 .pemutar-narator[data-tugas] {
   --maskot: clamp(100px, 12cqw, 180px);
@@ -7,6 +13,24 @@
   min-height: 44px;
   color: var(--color-ink);
   font: 700 max(14px, 1.3cqw)/1.15 var(--font-body);
+  height: auto;
+  padding: 8px;
+  border: 3px dashed var(--color-ink);
+  border-radius: 12px;
+}
+.episode-4 .tok-zat[aria-pressed='true'] {
+  padding: 0;
+  border: 0;
+}
+.episode-4 .pemutar-sasaran {
+  border: 3px dashed var(--color-paper);
+  border-radius: 18px;
+}
+.episode-4 .pemutar-sasaran:hover,
+.episode-4 .pemutar-sasaran:focus-visible,
+.episode-4 .pemutar-sasaran[aria-pressed='true'] {
+  border-color: var(--color-ink);
+  outline: none;
 }
 .episode-4 .tok-zat span {
   display: block;
@@ -51,10 +75,6 @@
 }
 .e4-tujuan .pemutar-sasaran {
   min-width: 44px;
-  border: 3px dashed var(--color-paper);
-}
-.e4-tujuan .pemutar-sasaran[aria-pressed='true'] {
-  border-color: var(--color-accent);
 }
 .episode-4:has([data-tabel]) .pemutar-soal {
   width: 88%;
@@ -130,6 +150,12 @@
   margin-top: 4px;
 }
 @media (max-width: 760px), (max-height: 500px) {
+  .episode-4 .pemutar-sampul-aksi {
+    flex-wrap: nowrap;
+  }
+  .episode-4 .pemutar-sampul .tombol-utama {
+    padding-inline: 1em;
+  }
   .episode-4 .pemutar-narator,
   .episode-4 .pemutar-narator[data-tugas] {
     --maskot: 88px;
@@ -157,6 +183,7 @@
   }
   .episode-4 .tok-zat {
     width: 64px;
+    padding: 3px;
   }
   .episode-4 .tok-zat span {
     padding: 8px 6px;

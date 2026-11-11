@@ -13,8 +13,8 @@ export default function Episode4TransporElektron() {
     <div className="episode-4">
       <PemutarEpisode
         judul="Transpor elektron"
-        label="Episode 4 · Aktivitas 1.10–1.11"
-        ringkasan="Ikuti aliran elektron, pemompaan H⁺, pembentukan air, dan ATP sintase. Bandingkan keempat tahap respirasi aerob menurut perhitungan buku."
+        label="Episode 4"
+        ringkasan="Ikuti perjalanan elektron dari NADH dan FADH₂ hingga terbentuk air dan ATP."
         gambarSampul={mitokondria}
         bab={[...BAB]}
         otomatis={otomatis}

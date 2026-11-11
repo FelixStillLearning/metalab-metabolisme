@@ -1,18 +1,19 @@
 import krista from '../../assets/images/latar-krista-lebar.webp'
 import mito from '../../assets/images/mitokondria-zoom.webp'
+import panelZoom from '../../assets/images/organel-panel-zoom.webp'
 import nad from '../../assets/images/pembawa-nad.webp'
 import nadh from '../../assets/images/pembawa-nadh.webp'
 import fad from '../../assets/images/pembawa-fad.webp'
 import fadh from '../../assets/images/pembawa-fadh2.webp'
 import atp from '../../assets/images/pembawa-atp.webp'
 import adp from '../../assets/images/pembawa-adp.webp'
-import o2 from '../../assets/images/molekul-o2.webp'
+import atomO from '../../assets/images/molekul-atom-o.webp'
 import air from '../../assets/images/molekul-h2o.webp'
 import co2 from '../../assets/images/molekul-co2.webp'
 import selKosong from '../../assets/images/interaksi-sel-tabel.webp'
 import selAktif from '../../assets/images/interaksi-sel-tabel-aktif.webp'
 import selTerisi from '../../assets/images/interaksi-sel-tabel-terisi.webp'
-import { el, label } from '../../features/pemutar-episode/kertas'
+import { disc, el, label, strip } from '../../features/pemutar-episode/kertas'
 import {
   camTo,
   arc,
@@ -22,6 +23,7 @@ import {
   obj,
   pasangLatar,
   to,
+  wait,
   type Panggung,
   type Objek,
 } from '../../features/pemutar-episode/mesin'
@@ -39,7 +41,7 @@ import { useJawabanE4 } from '../../stores/jawaban-episode-4'
 import { usePemutar } from '../../stores/pemutar'
 import { bunyi, siapkan } from '../../lib/suara'
 import { BAB, JALUR, POE, RUMPANG, POTONGAN, KOLOM, TABEL, type ButirE4, type PoeE4 } from './isi'
-import { gambar, membran, proton, posisiKompleks, X, Y, type Membran } from './membran'
+import { gambar, membran, proton, posisiKompleks, X, type Membran } from './membran'
 const catat = (k: ButirE4) => useJawabanE4.getState().catat(k)
 const bab = (k: (typeof BAB)[number]['k']) =>
   usePemutar.setState({ bab: BAB.findIndex((b) => b.k === k) })
@@ -59,11 +61,27 @@ async function pembuka(p: Panggung) {
     'pembuka',
     'NADH dan FADH₂ dari tiga tahap sebelumnya membawa elektron menuju membran dalam mitokondria, yang berlipat membentuk krista.',
   )
+  // Lipatan membran dalam pada sumber 1774 × 887, berbeda dari jangkar matriks E2/E3.
+  const x = 800 + ((1010 - 887) * 1200) / 1774
+  const y = 450 + ((580 - 443.5) * 600) / 887
+  const panel = hide(gambar(p.fx, panelZoom, x, y, 440, 440))
+  panel.dataset.objek = 'zoom-krista'
+  bunyi('muncul')
+  await to(panel, { o: 1 }, 300)
   bunyi('geser')
-  await camTo(p, 850, 430, 4.2, 1800)
-  await pasangLatar(p, krista, 'krista')
+  await Promise.all([
+    to(panel, { x: 800, y: 450, s: 4.9 }, 3000, 'kamera'),
+    camTo(p, x, y, 4.2, 3000),
+    (async () => {
+      await wait(p, 1000)
+      await pasangLatar(p, krista, 'krista')
+      await to(g, { o: 0 }, 1400)
+    })(),
+  ])
   g.remove()
   await to(p.cam, { x: 0, y: 0, s: 1 }, 0)
+  await to(panel, { o: 0 }, 350)
+  panel.remove()
 }
 async function kumpulkan(p: Panggung) {
   bab('g')
@@ -143,8 +161,13 @@ async function flow(p: Panggung, m: Membran, jenis: 'NADH' | 'FADH2', hs: Objek[
     m.g.dataset.jalur = jenis
     m.g.dataset.kompleksAktif = k
     if (i > 0) {
-      const [x, y] = k === 'III' ? [625, Y] : [880, 340]
-      await Promise.all(es.map((e, j) => arc(e, x + (j ? 14 : -14), y, 60, 700)))
+      const pembawa = k === 'III' ? m.ubikuinon : m.sitokrom
+      m.g.dataset.pembawaAktif = k === 'III' ? 'Q' : 'Cyt c'
+      await Promise.all(es.map((e, j) => arc(e, pembawa._x + (j ? 14 : -14), pembawa._y, 60, 700)))
+      bunyi('klik')
+      await to(pembawa, { s: 1.25 }, 200, 'letup')
+      await to(pembawa, { s: 1 }, 200)
+      delete m.g.dataset.pembawaAktif
     }
     await Promise.all(
       es.map((e, j) => to(e, { x: X[k] + (j ? 14 : -14), y: posisiKompleks(k)[1] }, 650)),
@@ -153,6 +176,11 @@ async function flow(p: Panggung, m: Membran, jenis: 'NADH' | 'FADH2', hs: Objek[
     bunyi('klik')
     await to(aktif, { s: 1.07 }, 180, 'letup')
     await to(aktif, { s: 1 }, 180)
+    if (i === 0) {
+      // Pembawa teroksidasi kembali ke matriks; pasangan elektronnya tetap di rantai.
+      await to(g, { x: 90, y: 680, o: 0 }, 650)
+      g.remove()
+    }
     if (k !== 'II') {
       // Satu penanda aliran per kompleks, bukan jumlah proton stoikiometrik.
       const h = proton(p.world, X[k], 610)
@@ -183,7 +211,6 @@ async function flow(p: Panggung, m: Membran, jenis: 'NADH' | 'FADH2', hs: Objek[
   }
   await Promise.all(es.map((e) => to(e, { o: 0 }, 250)))
   es.forEach((e) => e.remove())
-  g.remove()
   delete m.g.dataset.kompleksAktif
 }
 async function poe(p: Panggung, k: PoeE4, amati: () => Promise<void>) {
@@ -287,23 +314,56 @@ async function oksigen(p: Panggung, m: Membran, gradien: Objek[]) {
       ),
   )
   gs.forEach((g) => g.remove())
+  pesan('Amati dua atom oksigen dan empat H⁺ membentuk dua molekul air setelah menerima elektron.')
   p.fx.replaceChildren()
-  const o = gambar(p.fx, o2, 800, 480, 200, 110)
-  const es = [-3, -1, 1, 3].map((s) => elektron(p.fx, 800 + s * 65, 340))
-  const hs = [-3, -1, 1, 3].map((s) => proton(p.fx, 800 + s * 100, 590))
+  const reaksi = obj(0, 0, p.fx)
+  reaksi.dataset.reaksi = 'air'
+  const ikatan = obj(800, 480, reaksi)
+  strip(ikatan, -48, 0, 48, 0, 10)
+  const os = [-1, 1].map((s) => {
+    const o = gambar(reaksi, atomO, 800 + s * 48, 480, 72, 72)
+    o.dataset.oxygen = ''
+    return o
+  })
+  const es = [-3, -1, 1, 3].map((s) => elektron(reaksi, 800 + s * 65, 340))
+  const hs = [-3, -1, 1, 3].map((s) => {
+    const h = proton(reaksi, 800 + s * 100, 590)
+    h.dataset.hydrogen = ''
+    return h
+  })
   label(p.fx, 800, 230, 'O₂ + 4 H⁺ + 4 e⁻ → 2 H₂O', 34)
   bunyi('geser')
-  await Promise.all([...es, ...hs].map((g) => arc(g, 800, 480, 60, 900)))
-  o.remove()
+  await Promise.all(es.map((e, i) => arc(e, os[Math.floor(i / 2)]._x, 480, 60, 900)))
+  await Promise.all(es.map((e) => to(e, { o: 0 }, 200)))
   es.forEach((e) => e.remove())
-  hs.forEach((h) => h.remove())
-  for (const x of [640, 960]) {
-    const h = gambar(p.fx, air, 800, 480, 150, 150)
-    h.dataset.objek = 'air-terbentuk'
-    await arc(h, x, 490, 80, 500)
-  }
+  await to(ikatan, { o: 0 }, 200)
+  ikatan.remove()
+  await Promise.all([
+    ...os.map((o, i) => arc(o, 640 + i * 320, 470, 70, 700)),
+    ...hs.map((h, i) => arc(h, 640 + Math.floor(i / 2) * 320 + (i % 2 ? 48 : -48), 520, 60, 900)),
+  ])
+  hs.forEach((h) => {
+    h.replaceChildren()
+    delete h.dataset.proton
+    disc(h, 0, 0, 23, 'var(--color-paper)', {}, { bayangan: true })
+    el(
+      'text',
+      { x: 0, y: 8, 'text-anchor': 'middle', 'font-size': 26, fill: 'var(--color-ink)' },
+      h,
+    ).textContent = 'H'
+  })
+  os.forEach((o, i) => {
+    const water = obj(0, 0, reaksi)
+    water.dataset.objek = 'air-terbentuk'
+    const hidrogen = hs.slice(i * 2, i * 2 + 2)
+    for (const h of hidrogen) {
+      strip(water, o._x, o._y, h._x, h._y, 8)
+    }
+    water.append(o, ...hidrogen)
+    label(water, o._x, o._y + 115, 'H₂O', 24)
+  })
   bunyi('tempel')
-  await comic(p, 'POP!', 800, 380, 'var(--color-h2o)')
+  await Promise.all(os.map((o) => comic(p, 'POP!', o._x, o._y - 110, 'var(--color-h2o)')))
   await say(
     p,
     'air',
@@ -332,7 +392,9 @@ async function kemiosmosis(p: Panggung, m: Membran, hs: Objek[]) {
     'Ketuk ATP sintase.',
     [{ teks: 'ATP sintase', posisi: [1320, 540], ukuran: [260, 260] }],
     async () => {
-      pesan('')
+      pesan(
+        'H⁺ kembali ke matriks melalui ATP sintase. Alirannya membantu membentuk ATP dari ADP dan fosfat.',
+      )
       bunyi('geser')
       await Promise.all(hs.map((h, i) => to(h, { x: 1320, y: 310 - i * 30 }, 650)))
       await Promise.all([
@@ -376,13 +438,13 @@ async function hitung(p: Panggung) {
     }
     label(p.world, 470, 540, '30 + 4 = 34 ATP', 40).dataset.objek = 'total-atp'
     label(p.world, 470, 640, '+ 2 glikolisis + 2 Krebs = 38 ATP', 28)
-    label(p.world, 470, 240, 'PERHITUNGAN MENURUT BUKU', 26)
+    label(p.world, 470, 240, 'ATP DARI PEMBAWA ELEKTRON', 26)
     bunyi('atp')
     await comic(p, '34 ATP!', 470, 165, 'var(--color-fosfat)', p.world)
     await say(
       p,
       'hitung',
-      'Menurut perhitungan buku: tiap NADH setara tiga ATP, tiap FADH₂ dua ATP. Sepuluh kali tiga ditambah dua kali dua: tiga puluh empat ATP dari transpor elektron. Ditambah dua ATP glikolisis dan dua ATP siklus Krebs, total seluruh respirasi aerob tiga puluh delapan ATP.',
+      'Tiap NADH setara tiga ATP, tiap FADH₂ dua ATP. Sepuluh kali tiga ditambah dua kali dua: tiga puluh empat ATP dari transpor elektron. Ditambah dua ATP glikolisis dan dua ATP siklus Krebs, total seluruh respirasi aerob tiga puluh delapan ATP.',
     )
   })
   catat('f')
@@ -406,11 +468,6 @@ function teksSel(parent: Element, x: number, y: number, teks: string) {
 }
 async function tabel(p: Panggung) {
   bab('1.11')
-  await say(
-    p,
-    'tabel',
-    'Bandingkan keempat tahap respirasi aerob. Isi tabel per baris: bahan, tempat, oksigen, hasil, pembawa elektron, lalu ATP. Pada tabel oksigen, aerob menunjukkan kaitannya dengan respirasi aerob; O₂ tidak dikonsumsi langsung dalam dekarboksilasi atau siklus Krebs.',
-  )
   const g = el('g', { 'data-tabel': '1.11' }, p.world)
   for (const [r, row] of TABEL.entries()) {
     g.replaceChildren()
@@ -424,6 +481,19 @@ async function tabel(p: Panggung) {
       )
       return im
     })
+    if (r === 0)
+      await say(
+        p,
+        'tabel',
+        'Bandingkan empat tahap respirasi aerob. Lengkapi tabel mulai dari bahan hingga ATP yang terbentuk.',
+      )
+    else if (r === 2)
+      await say(
+        p,
+        'tabel-oksigen',
+        'Dekarboksilasi dan siklus Krebs bergantung pada ketersediaan O₂, tetapi tidak mengonsumsinya secara langsung.',
+      )
+    else pesan(`Lengkapi baris ${row.nama.toLowerCase()} untuk keempat tahap respirasi aerob.`)
     for (const [c, benar] of row.sel.entries()) {
       cells[c].setAttribute('href', selAktif)
       const opsi = [...new Set([...row.sel, ...(r === 5 ? ['38'] : [])])]
@@ -442,11 +512,25 @@ async function tabel(p: Panggung) {
   }
   catat('1.11')
   g.remove()
-  label(p.world, 800, 400, '2 + 0 + 2 + 34 = 38 ATP', 46)
+  for (const [i, [nama, jumlah]] of [
+    ['Glikolisis', '2 ATP'],
+    ['Dekarboksilasi', '0 ATP'],
+    ['Siklus Krebs', '2 ATP'],
+    ['Transpor elektron', '34 ATP'],
+  ].entries()) {
+    const g = gambar(p.world, atp, 290 + i * 340, 390, 150, 75)
+    g.dataset.ringkasanAtp = jumlah
+    label(g, 0, -100, nama, 25)
+    label(g, 0, 85, jumlah, 32)
+    bunyi('tempel')
+    await to(hide(g), { o: 1 }, 300, 'letup')
+  }
+  label(p.world, 800, 600, 'SATU GLUKOSA → 38 ATP', 34)
+  bunyi('selesai')
   await say(
     p,
     'tamat',
-    'Respirasi aerob selesai. Menurut perhitungan buku, satu glukosa menghasilkan total tiga puluh delapan ATP. Buka lembar hasil untuk melihat jalur elektron dan tabel perbandingan empat tahap.',
+    'Respirasi aerob selesai. Satu glukosa menghasilkan total tiga puluh delapan ATP. Buka lembar hasil untuk melihat jalur elektron dan tabel perbandingan empat tahap.',
   )
 }
 export async function episode(p: Panggung) {
@@ -461,7 +545,14 @@ export async function episode(p: Panggung) {
   await kemiosmosis(p, m, hs)
   await hitung(p)
   bab('j')
-  await mintaLengkapi(p.signal, 'Lengkapi pengertian transpor elektron', POTONGAN, RUMPANG)
+  await Promise.all([
+    mintaLengkapi(p.signal, 'Lengkapi pengertian transpor elektron', POTONGAN, RUMPANG),
+    say(
+      p,
+      'pengertian',
+      'Transpor elektron berlangsung di membran krista. Oksigen menerima elektron terakhir, sedangkan aliran H⁺ melalui ATP sintase membantu membentuk ATP. Lengkapi pengertiannya.',
+    ),
+  ])
   catat('j')
   await tabel(p)
   usePemutar.setState({ bab: BAB.length, kalimat: '' })

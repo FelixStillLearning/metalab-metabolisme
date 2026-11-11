@@ -114,7 +114,7 @@ export default function HasilEpisode3() {
         })),
         tabel: <Tabel />,
       }}
-      rute={{ episode: '/episode/3', lanjut: '/episode/4' }}
+      rute={{ episode: '/episode/3', lanjut: '/episode/3/penutup' }}
       narasi={{
         id: 'e3-hasil',
         teks: 'Ini roda siklus Krebsmu. Bandingkan tebakan dengan pengamatan. Jelaskan mengapa dua asetil KoA menghasilkan dua putaran, dengan oksaloasetat terbentuk kembali.',

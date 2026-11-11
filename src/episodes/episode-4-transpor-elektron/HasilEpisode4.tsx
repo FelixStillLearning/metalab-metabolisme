@@ -57,7 +57,7 @@ function Rantai() {
         <img src={adpP} alt="ADP + fosfat" /> → <img src={atp} alt="ATP" />
       </p>
       <p>
-        Menurut buku: 10 × 3 + 2 × 2 = <b>34 ATP</b>
+        10 × 3 + 2 × 2 = <b>34 ATP</b>
       </p>
       <p>
         Seluruh respirasi: 2 + 0 + 2 + 34 = <b>38 ATP</b>
@@ -73,7 +73,7 @@ export default function HasilEpisode4() {
     <LembarHasil
       label="Episode 4 · Transpor elektron"
       judul="Rantai elektronmu"
-      lead="Jalur elektron, kemiosmosis, dan perbandingan empat tahap respirasi aerob. Perhitungan ATP mengikuti buku."
+      lead="Jalur elektron, kemiosmosis, dan perbandingan empat tahap respirasi aerob."
       penjelasan={penjelasan}
       simpanPenjelasan={simpanPenjelasan}
       bagan={
@@ -126,7 +126,7 @@ export default function HasilEpisode4() {
         })),
         tabel: <TabelPerbandingan />,
       }}
-      rute={{ episode: '/episode/4', lanjut: '/peta-materi' }}
+      rute={{ episode: '/episode/4', lanjut: '/episode/4/penutup' }}
       narasi={{
         id: 'e4-hasil',
         teks: 'Respirasi aerob selesai. Ini rantai elektronmu dan tabel perbandingan empat tahap. Jelaskan hubungan jalur elektron, aliran proton, dan pembentukan ATP.',

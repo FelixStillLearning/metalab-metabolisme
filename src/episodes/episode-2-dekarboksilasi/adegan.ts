@@ -18,6 +18,7 @@ import {
   camTo,
   comic,
   hide,
+  kinetik,
   obj,
   pasangLatar,
   shake,
@@ -107,21 +108,21 @@ async function pembuka(p: Panggung) {
     m.karboksil.remove()
   })
   p.fx.replaceChildren()
-  const matriksX = 800 + ((840 - 887) * 1200) / 1774
-  const matriksY = 450 + ((360 - 443.5) * 600) / 887
+  const matriksX = 800 + ((650 - 700) * 1200) / 1400
+  const matriksY = 450 + ((300 - 350) * 600) / 700
   const panel = hide(gambar(p.fx, panelZoom, matriksX, matriksY, 440, 440))
   panel.dataset.objek = 'panel-zoom'
   bunyi('muncul')
   await to(panel, { o: 1 }, 300)
   bunyi('geser')
-  // Jangkar matriks sumber C04: (840, 360) pada gambar bersih 1774 × 887.
+  // Jangkar pada daerah matriks krem, sumber 1400 × 700.
   await Promise.all([
-    to(panel, { x: 800, y: 450, s: 4.9 }, 3000, 'kamera'),
-    camTo(p, matriksX, matriksY, 4.2, 3000),
+    to(panel, { x: 800, y: 450, s: 4.9 }, 3400, 'kamera'),
+    camTo(p, matriksX, matriksY, 4.2, 3400),
     (async () => {
-      await wait(p, 1000)
+      await wait(p, 1200)
       await pasangLatar(p, matriks, 'matriks')
-      await to(mito, { o: 0 }, 1400)
+      await to(mito, { o: 0 }, 1600)
     })(),
   ])
   mito.remove()
@@ -523,11 +524,27 @@ async function hasil(p: Panggung, molekul: Piruvat[], koas: Objek[], nadh: Objek
     { teks: '2 CO₂', gambar: gambarCo2 },
   ]
   const chips = items.map((item, i) => {
-    const g = gambar(p.fx, item.gambar, 280 + i * 260, 450, 180, 90)
-    label(g, 0, 80, item.teks, 22)
+    const g = obj(380 + i * 230, 550, p.fx)
+    g.dataset.chip = String(i)
+    cut(
+      g,
+      [
+        [-80, -62],
+        [79, -64],
+        [81, 61],
+        [-79, 63],
+      ],
+      '#ffffff',
+      { 'fill-opacity': 0.55 },
+      1,
+      { bayangan: true },
+    )
+    el('image', { href: item.gambar, x: -68, y: -46, width: 136, height: 64 }, g)
+    teks(g, 0, 46, item.teks, 20, 'var(--color-ink)')
     hide(g)
     return g
   })
+  kinetik(p, 800, 260, 'HASIL DEKARBOKSILASI OKSIDATIF', 30, 'var(--color-paper)')
   bunyi('muncul')
   await Promise.all(chips.map((g) => to(g, { o: 1 }, 450)))
   await say(p, 'hasil')
@@ -535,10 +552,16 @@ async function hasil(p: Panggung, molekul: Piruvat[], koas: Objek[], nadh: Objek
   await mintaKetukSemua(
     p.signal,
     'Ketuk semua hasil dekarboksilasi oksidatif.',
-    items.map((item, i) => ({ teks: item.teks, posisi: [chips[i]._x, 480], ukuran: [230, 200] })),
+    items.map((item, i) => ({
+      teks: item.teks,
+      posisi: [chips[i]._x, chips[i]._y],
+      ukuran: [170, 136],
+    })),
     async (i) => {
       const x = 500 + got++ * 300
-      await arc(chips[i], x, 300, 100, 700)
+      chips[i].dataset.terkumpul = ''
+      bunyi('geser')
+      await to(chips[i], { x, y: 370 }, 600)
       bunyi('tempel')
     },
     {
